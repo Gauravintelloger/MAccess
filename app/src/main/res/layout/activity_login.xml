@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:background="@drawable/grey_to_white_gradient_top_bottom"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.login.LoginActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_marginTop="110dp"
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo_maccess_with_text"/>
+
+        <TextView
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="52dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/heading"
+            android:text="@string/employee_login"/>
+
+        <TextView
+            style="@style/normal"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/employee_login_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:paddingLeft="16dp"
+            android:drawablePadding="12dp"
+            android:fontFamily="@font/normal400"
+            android:hint="Username"
+            android:background="@drawable/edittext_background"
+            android:drawableLeft="@drawable/user"
+            android:minHeight="55dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:paddingLeft="16dp"
+            android:drawablePadding="12dp"
+            android:hint="Password"
+            android:background="@drawable/edittext_background"
+            android:drawableLeft="@drawable/password"
+            android:minHeight="55dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="right"
+            android:text="@string/forgotPassword"
+            android:fontFamily="@font/normal400"
+            android:textColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textColor="@color/black"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:fontFamily="@font/normal400"
+            android:text="By using our mobile app, you agree to our Terms of Use and Privacy Policy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="65dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/submitBt"
+            android:background="@drawable/button_background"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="22dp"
+            android:textColor="@color/white"
+            android:minHeight="55dp"
+            android:layout_marginBottom="55dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"/>
+
+    </LinearLayout>
+
+
+
+
+
+</ScrollView>
