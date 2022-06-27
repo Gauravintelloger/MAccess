@@ -23,9 +23,14 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
         Handler(Looper.getMainLooper()).postDelayed({
             val token = AppShared(this@SplashGifActivity).getToken()
 
-            if(token?.isEmpty() == false)
+            if(token?.isEmpty() == false){
                 startActivity(Intent(applicationContext, HomeActivity::class.java))
-            else startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            }
+            else {
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            }
 
         },2000)
 

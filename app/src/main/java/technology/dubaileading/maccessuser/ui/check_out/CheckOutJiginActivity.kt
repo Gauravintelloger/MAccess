@@ -1,12 +1,15 @@
 package technology.dubaileading.maccessuser.ui.check_out
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessuser.R
 import technology.dubaileading.maccessuser.base.BaseActivity
@@ -29,6 +32,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
     var t : Timer = Timer()
     lateinit var gpsTracker : GPSTracker
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,6 +40,10 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         val date = AppShared(applicationContext).getTiming()
         if (date!!.isEmpty()) {
             startActivity(Intent(applicationContext, CheckInActivity::class.java))
+            finish()
+        }
+
+        binding.materialToolbar.setNavigationOnClickListener {
             finish()
         }
 
@@ -67,14 +75,22 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             binding.timeTxt.text = "check in at ${AppShared(applicationContext).getTiming()}"
         }else{
             if(AppShared(applicationContext).isBreakOut()){
-                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_out))
+                binding.breakStatus.visibility = View.VISIBLE
+
+//                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_out))
+                binding.imageView2.setImageDrawable(ResourcesCompat.getDrawable(resources,
+                    R.drawable.ic_break_out,null))
                 binding.statusName.setTextColor(resources.getColor(R.color.color_break_out))
                 binding.statusName.text = "Break Out "
 
                 binding.timeTxt.text = "at ${AppShared(applicationContext).getTiming()}"
             }
             else{
-                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_in))
+                binding.breakStatus.visibility = View.VISIBLE
+
+//                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_in))
+                binding.imageView2.setImageDrawable(ResourcesCompat.getDrawable(resources,
+                    R.drawable.ic_break_in,null))
                 binding.statusName.setTextColor(resources.getColor(R.color.color_break_in))
                 binding.statusName.text = "Break In "
 
@@ -146,12 +162,19 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
 
-                val savedTime = AppShared(applicationContext).getTiming()!!
-                val hours: String = AppShared(applicationContext).getHours()!!
+                runOnUiThread(Runnable {
+                    val savedTime = AppShared(this@CheckOutJiginActivity).getTiming()!!
+                    val hours: String = AppShared(this@CheckOutJiginActivity).getHours()!!
 
-                var timerTime = TimerHelper().findTime(savedTime,hours);
+                    if(savedTime == "") {
+                        t.cancel()
+                        return@Runnable
+                    }
 
-                binding.timer.setText(timerTime)
+                    var timerTime = TimerHelper().findTime(savedTime,hours);
+
+                    binding.timer.text = timerTime
+                })
             }
         }, 0, 1000)
     }
@@ -222,6 +245,8 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                     AppShared(applicationContext).setBreakOut(true)
                     AppShared(applicationContext).saveHours(binding.timer.text.toString())
 
+                    AppShared(applicationContext).setBreakStarted(true)
+
                     performTimerLogic()
                 }
             }
@@ -256,6 +281,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                     AppShared(applicationContext).saveTiming("")
                     AppShared(applicationContext).saveHours("")
                     AppShared(applicationContext).setBreakOut(false)
+                    AppShared(applicationContext).setBreakStarted(false)
 
                     val intent = Intent(this@CheckOutJiginActivity, HomeActivity::class.java)
                     startActivity(intent)

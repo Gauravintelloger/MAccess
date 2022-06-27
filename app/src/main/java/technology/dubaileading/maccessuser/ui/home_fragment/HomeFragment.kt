@@ -34,6 +34,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
     lateinit var timerText : TextView
 
+    lateinit var activity: Context
+
     override fun createViewModel(): HomeFragmentViewModel {
         return ViewModelProvider(this).get(HomeFragmentViewModel::class.java)
     }
@@ -129,6 +131,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
         t.cancel()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        this.activity = context
+    }
+
     private fun runTimer() {
         t = Timer()
 
@@ -138,9 +145,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
 
-                activity!!.runOnUiThread(Runnable {
+                (activity as Activity)?.runOnUiThread(Runnable {
                     val savedTime = AppShared(activity as Context).getTiming()!!
                     val hours: String = AppShared(activity as Context).getHours()!!
+
+                    if(savedTime == "") {
+                        t.cancel()
+                        return@Runnable
+                    }
 
                     var timerTime = TimerHelper().findTime(savedTime,hours)
 

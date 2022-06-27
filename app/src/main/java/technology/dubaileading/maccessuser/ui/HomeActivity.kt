@@ -84,11 +84,19 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
                 .replace(
                     R.id.fragment_container,
                     fragment
-                ) //                    .addToBackStack(fragment.getTag())
+                )
+//                .addToBackStack(fragment.getTag())
                 .commit()
             return true
         }
         return false
+    }
+
+    override fun onBackPressed() {
+//        super.onBackPressed()
+        loadFragment(HomeFragment())
+        navView.selectedItemId = R.id.bnm_home
+
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

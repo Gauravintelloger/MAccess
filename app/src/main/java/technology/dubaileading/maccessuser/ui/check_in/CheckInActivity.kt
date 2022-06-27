@@ -54,8 +54,16 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 //            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
 //        }
 
-        binding.timesheet.setOnClickListener{
+//        binding.timesheet.setOnClickListener{
+//            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
+//        }
+
+        binding.timeS.setOnClickListener{
             startActivity(Intent(applicationContext,AttendanceActivity::class.java))
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            finish()
         }
 
         val gifFromAssets = GifDrawable(assets, "start_shift.gif")
