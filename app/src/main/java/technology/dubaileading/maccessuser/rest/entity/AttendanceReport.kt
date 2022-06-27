@@ -287,7 +287,7 @@ data class DataItem(
 	val device: Any? = null,
 
 	@field:SerializedName("remarks")
-	val remarks: Any? = null,
+	val remarks: String? = null,
 
 	@field:SerializedName("status")
 	val status: Int? = null
