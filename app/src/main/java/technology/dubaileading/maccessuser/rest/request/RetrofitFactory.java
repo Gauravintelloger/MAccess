@@ -18,6 +18,7 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import technology.dubaileading.maccessuser.BaseApplication;
+import technology.dubaileading.maccessuser.BuildConfig;
 import technology.dubaileading.maccessuser.utils.AppShared;
 
 /**
@@ -25,6 +26,7 @@ import technology.dubaileading.maccessuser.utils.AppShared;
  */
 public class RetrofitFactory {
 
+    //public static final String BASE_URL = "http://staging.dubaileading.technology/maccess-saas/api/public/api/";
     public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
 
 
