@@ -12,4 +12,5 @@
     app:itemTextAppearanceActive="@style/BottomNavigationView.Active"
     app:itemTextAppearanceInactive="@style/BottomNavigationView.Inactive"
     app:menu="@menu/menu_home_bottom_navigation"
-    android:background="@color/white"/>
+    android:background="@color/white"
+    android:elevation="8dp"/>

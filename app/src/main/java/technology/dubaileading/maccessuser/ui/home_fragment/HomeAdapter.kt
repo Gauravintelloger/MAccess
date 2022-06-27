@@ -9,7 +9,7 @@ import technology.dubaileading.maccessuser.R
 class HomeAdapter : RecyclerView.Adapter<HomeAdapter.VH>() {
 
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
+        var view = itemView.findViewById<View>(R.id.gap)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -20,7 +20,11 @@ class HomeAdapter : RecyclerView.Adapter<HomeAdapter.VH>() {
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-
+//        holder.view.visibility = View.VISIBLE
+        if(position == 1){
+            holder.view.visibility = View.VISIBLE
+        }
+        else holder.view.visibility = View.GONE
     }
 
     override fun getItemCount(): Int {

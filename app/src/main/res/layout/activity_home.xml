@@ -1,36 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.HomeActivity">
+    tools:context=".ui.HomeActivity"
+    android:background="@color/white">
 
     <include
         layout="@layout/layout_home_fragments"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"/>
-
-    <ImageButton
-        android:id="@+id/img_ORDR"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="fitXY"
-        android:clickable="true"
-        android:elevation="1dp"
-        android:src="@drawable/home_logo"
+        android:layout_height="match_parent"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
         app:layout_anchor="@id/bnv_layout"
-        android:background="#fff"
-        app:layout_anchorGravity="center_horizontal"
-        tools:ignore="SpeakableTextPresentCheck"/>
+        android:background="@drawable/elevation_gradient"/>
 
     <LinearLayout
         android:id="@+id/bnv_layout"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
 
         <include
             layout="@layout/bottom_bar"
@@ -38,7 +31,24 @@
             android:layout_height="match_parent" />
 
     </LinearLayout>
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="95dp"
+        app:layout_anchor="@id/bnv_layout"
+        android:background="@drawable/curve"
+        app:layout_anchorGravity="center_horizontal"
+        android:layout_marginBottom="36dp"
+        android:elevation="0dp"/>
 
-
-
+    <ImageButton
+        android:id="@+id/img_ORDR"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/hom_fab"
+        android:clickable="true"
+        android:elevation="1dp"
+        android:src="@drawable/ic_logo"
+        app:layout_anchor="@id/bnv_layout"
+        app:layout_anchorGravity="center_horizontal"
+        tools:ignore="SpeakableTextPresentCheck" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

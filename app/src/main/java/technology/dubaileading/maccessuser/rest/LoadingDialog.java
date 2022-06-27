@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import technology.dubaileading.maccessuser.R;
 
+
 public class LoadingDialog extends Dialog {
 
     private Context context;

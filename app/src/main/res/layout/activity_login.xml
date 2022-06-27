@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/usename"
             android:paddingLeft="16dp"
             android:drawablePadding="12dp"
             android:fontFamily="@font/normal400"
@@ -52,6 +53,7 @@
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/password"
             android:paddingLeft="16dp"
             android:drawablePadding="12dp"
             android:hint="Password"
@@ -70,6 +72,7 @@
             android:layout_marginRight="16dp"
             android:gravity="right"
             android:text="@string/forgotPassword"
+            android:visibility="gone"
             android:fontFamily="@font/normal400"
             android:textColor="@color/black"
             android:layout_width="match_parent"

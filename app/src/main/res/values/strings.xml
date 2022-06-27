@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MAccess</string>
+    <string name="app_name">mAccess</string>
     <string name="employee_login">Employee Login</string>
     <string name="employee_login_description">Simply enter your existing username and the corresponding password.</string>
     <string name="forgotPassword">Forgot Password?</string>

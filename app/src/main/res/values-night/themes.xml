@@ -15,12 +15,12 @@
     </style>
 
     <style name="BottomNavigationView.Inactive" parent="@style/TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="fontFamily">@font/normal400</item>
     </style>
 
     <style name="BottomNavigationView.Active" parent="@style/TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="fontFamily">@font/normal400</item>
     </style>
 

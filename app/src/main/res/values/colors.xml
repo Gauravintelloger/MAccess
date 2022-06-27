@@ -8,8 +8,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="transparent">#00FFFFFF</color>
+
     <color name="blue">#01A0C6</color>
     <color name="text_light_shade">#5C616F</color>
     <color name="seperator">#D0D7DD</color>
+    <color name="wlcolor">#C1D9E7</color>
+    <color name="color_break_in">#008859</color>
+    <color name="color_break_out">#F26333</color>
+
+    <color name="image_tint">#5C616F</color>
 
 </resources>

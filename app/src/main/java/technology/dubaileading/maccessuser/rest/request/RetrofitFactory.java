@@ -17,17 +17,19 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import technology.dubaileading.maccessuser.BaseApplication;
+import technology.dubaileading.maccessuser.utils.AppShared;
 
 /**
  * Singleton factory implementation to instantiate retrofit objects
  */
 public class RetrofitFactory {
 
-    public static final String BASE_URL = "https://dev.ordr.qa/";
+    public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
 
 
-    public static final String BASE_IMAGE_URL = BASE_URL+"api/images/getProductImage?path=";
-    public static final String BASE_RESTAURANT_IMAGE_URL = BASE_URL+"api/images/getRestaurantImage?path=";
+//    public static final String BASE_IMAGE_URL = BASE_URL+"api/images/getProductImage?path=";
+//    public static final String BASE_RESTAURANT_IMAGE_URL = BASE_URL+"api/images/getRestaurantImage?path=";
 
     private OkHttpClient httpClient;
 
@@ -68,7 +70,7 @@ public class RetrofitFactory {
      */
     public Retrofit getRetrofit() {
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL+"api/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(this.gson))
                 .client(this.httpClient)
                 .build();
@@ -91,11 +93,10 @@ public class RetrofitFactory {
 
                             Request.Builder requestBuilder = original.newBuilder().url(url);
 
-//                            Profile profile = SharedPreference.
-//                                    getObj(BaseApplication.getInstance()).getProfile();
-//                            if (profile != null) {
-//                                requestBuilder.addHeader("Authentication", profile.getToken());
-//                            }
+                            String token = new AppShared(BaseApplication.getInstance()).getToken();
+                            if (token != null) {
+                                requestBuilder.addHeader("Authorization", "Bearer "+token);
+                            }
 
                             Request request = requestBuilder.build();
 
