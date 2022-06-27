@@ -3,6 +3,7 @@ package technology.dubaileading.maccessuser.rest.endpoints;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import technology.dubaileading.maccessuser.rest.entity.AttendenceReport;
 import technology.dubaileading.maccessuser.rest.entity.BreakInRequest;
 import technology.dubaileading.maccessuser.rest.entity.BreakInResponse;
 import technology.dubaileading.maccessuser.rest.entity.BreakOutRequest;
@@ -13,6 +14,7 @@ import technology.dubaileading.maccessuser.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessuser.rest.entity.CheckOutResponse;
 import technology.dubaileading.maccessuser.rest.entity.LoginRequest;
 import technology.dubaileading.maccessuser.rest.entity.LoginResponse;
+import technology.dubaileading.maccessuser.rest.entity.ReportRequest;
 
 public interface EmployeeEndpoint {
 
@@ -30,5 +32,8 @@ public interface EmployeeEndpoint {
 
     @POST("employee/checkOUT")
     Call<CheckOutResponse> checkOut(@Body CheckOutRequest breakOutRequest);
+
+    @POST("employee/EmployeeAttendenceReport")
+    Call<AttendenceReport> getAttendanceReport(@Body ReportRequest reportRequest);
 
 }

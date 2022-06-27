@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/status_img"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="20dp"
@@ -18,7 +19,7 @@
         app:srcCompat="@drawable/ic_check_in_out" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/status"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -27,12 +28,12 @@
         android:text="Check In"
         android:textColor="@color/black"
         android:textSize="17sp"
-        app:layout_constraintEnd_toStartOf="@+id/textView4"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
-        app:layout_constraintTop_toTopOf="@+id/imageView3" />
+        app:layout_constraintEnd_toStartOf="@+id/comp"
+        app:layout_constraintStart_toEndOf="@+id/status_img"
+        app:layout_constraintTop_toTopOf="@+id/status_img" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/remark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -41,23 +42,23 @@
         android:textColor="@color/black"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView3" />
+        app:layout_constraintTop_toTopOf="@+id/status_img" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/dateTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2022-02-10 13:04:28"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-        app:layout_constraintStart_toStartOf="@+id/textView3" />
+        app:layout_constraintBottom_toBottomOf="@+id/status_img"
+        app:layout_constraintStart_toStartOf="@+id/status" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/comp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Comp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
-        app:layout_constraintEnd_toEndOf="@+id/textView4" />
+        app:layout_constraintBottom_toBottomOf="@+id/status_img"
+        app:layout_constraintEnd_toEndOf="@+id/remark" />
 
     <View
         android:layout_width="match_parent"

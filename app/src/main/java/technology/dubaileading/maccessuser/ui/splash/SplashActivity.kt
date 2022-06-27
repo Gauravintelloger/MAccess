@@ -26,9 +26,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
         Handler(Looper.getMainLooper()).postDelayed({
             val token = AppShared(this@SplashActivity).getToken()
 
-            if(token?.isEmpty() == false)
+            if(token?.isEmpty() == false){
                 startActivity(Intent(applicationContext, HomeActivity::class.java))
-            else startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            }
 
         },2000)
 

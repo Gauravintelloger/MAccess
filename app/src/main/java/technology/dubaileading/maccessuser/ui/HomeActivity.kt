@@ -37,6 +37,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
             navView.selectedItemId = R.id.bnm_home
         }
 
+
         navView.setOnItemSelectedListener(NavigationBarView.OnItemSelectedListener { item ->
             when (item.title){
                 "Services" -> {
