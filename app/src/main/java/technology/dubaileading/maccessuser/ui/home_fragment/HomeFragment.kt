@@ -138,12 +138,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
 
-                val savedTime = AppShared(activity as Context).getTiming()!!
-                val hours: String = AppShared(activity as Context).getHours()!!
-
-                var timerTime = TimerHelper().findTime(savedTime,hours);
-
                 activity!!.runOnUiThread(Runnable {
+                    val savedTime = AppShared(activity as Context).getTiming()!!
+                    val hours: String = AppShared(activity as Context).getHours()!!
+
+                    var timerTime = TimerHelper().findTime(savedTime,hours)
+
                     timerText?.text = timerTime
                 })
             }
