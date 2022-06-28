@@ -167,7 +167,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
     }
 
     fun getAddress(currentLoc: LatLng): String? {
-        return try {
+        try {
             val geocoder: Geocoder
             val addresses: List<Address>
             geocoder = Geocoder(this, Locale.getDefault())
@@ -176,11 +176,11 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
                 currentLoc.longitude,
                 1
             ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            addresses[0].getAddressLine(0)
+            return addresses[0].getAddressLine(0)
         } catch (e: Exception) {
-            e.toString()
+//            e.toString()
         }
-//        return "";
+        return "";
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

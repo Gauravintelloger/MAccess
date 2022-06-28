@@ -13,6 +13,7 @@ import technology.dubaileading.maccessuser.databinding.ActivitySplashBinding
 import technology.dubaileading.maccessuser.ui.HomeActivity
 import technology.dubaileading.maccessuser.ui.login.LoginActivity
 import technology.dubaileading.maccessuser.utils.AppShared
+import technology.dubaileading.maccessuser.utils.Utils
 
 class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
 
@@ -22,6 +23,9 @@ class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
 //        startActivity(Intent(applicationContext, LoginActivity::class.java))
 
 //        Log.e("token",AppShared(applicationContext).getToken()!!)
+
+
+
 
         Handler(Looper.getMainLooper()).postDelayed({
             val token = AppShared(this@SplashActivity).getToken()

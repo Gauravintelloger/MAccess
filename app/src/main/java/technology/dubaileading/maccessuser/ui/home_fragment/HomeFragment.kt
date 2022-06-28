@@ -110,15 +110,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
             binding?.view?.visibility = View.GONE
             return
         }
+        else{
+
+        }
 
         val isBreakOut: Boolean = AppShared(activity as Context).isBreakOut()
         if(isBreakOut){
+            binding?.timeLayout?.visibility = View.VISIBLE
+            binding?.view?.visibility = View.VISIBLE
+
             //when is break out - no updating in ui will happen
             binding?.timer?.text = AppShared(activity as Context).getHours()
 
             t.cancel()
         }
         else{
+            binding?.timeLayout?.visibility = View.VISIBLE
+            binding?.view?.visibility = View.VISIBLE
+
             runTimer()
         }
 

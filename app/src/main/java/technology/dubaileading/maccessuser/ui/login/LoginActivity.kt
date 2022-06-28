@@ -1,26 +1,14 @@
 package technology.dubaileading.maccessuser.ui.login
 
-import android.app.Dialog
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModelProvider
-import technology.dubaileading.maccessuser.R
 import technology.dubaileading.maccessuser.base.BaseActivity
 import technology.dubaileading.maccessuser.databinding.ActivityLoginBinding
-import technology.dubaileading.maccessuser.databinding.AlertErrorLogBinding
-import technology.dubaileading.maccessuser.databinding.DialogComingSoonBinding
 import technology.dubaileading.maccessuser.rest.endpoints.EmployeeEndpoint
-
 import technology.dubaileading.maccessuser.rest.entity.LoginRequest
 import technology.dubaileading.maccessuser.rest.entity.LoginResponse
 import technology.dubaileading.maccessuser.rest.request.ServerRequestFactory
@@ -28,6 +16,7 @@ import technology.dubaileading.maccessuser.rest.request.SuccessCallback
 import technology.dubaileading.maccessuser.ui.HomeActivity
 import technology.dubaileading.maccessuser.utils.AppShared
 import technology.dubaileading.maccessuser.utils.Utils
+
 
 class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
@@ -83,18 +72,35 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<LoginResponse?> {
                 override fun onSuccess(user: LoginResponse?) {
-                    if (user?.data?.status_id == 1) {
+                    if (user?.status == "ok") {
                         AppShared(this@LoginActivity).saveToken(user.token)
 
                         AppShared(this@LoginActivity).saveUser(user)
 
                         startActivity(Intent(this@LoginActivity,HomeActivity::class.java))
                         finish()
-                    } else if (user?.statuscode == "900"){
-                        showAlert(user?.message)
-                    } else {
-                        Toast.makeText(this@LoginActivity, user?.message, Toast.LENGTH_LONG).show()
                     }
+                    else {
+
+                        AlertDialog.Builder(this@LoginActivity)
+                            .setTitle("Alert")
+                            .setMessage(user?.message)
+                            .setPositiveButton(
+                                "Ok"
+                            ) { dialog, which ->
+                            }
+//                            .setNegativeButton(android.R.string.no, null)
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show()
+
+//                        Toast.makeText(this@LoginActivity, user?.message, Toast.LENGTH_LONG).show()
+//                        showAlert(user?.message)
+                    }
+//                    else if (user?.statuscode == "900"){
+//                        showAlert(user?.message)
+//                    } else {
+//                        Toast.makeText(this@LoginActivity, user?.message, Toast.LENGTH_LONG).show()
+//                    }
                 }
             }) {
                 //Toast.makeText(this@LoginActivity, "error", Toast.LENGTH_LONG).show()
@@ -102,25 +108,23 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
         request.executeAsync()
     }
 
-    private fun showAlert(message: String) {
-        val dialog = Dialog(applicationContext)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        val inflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val convertView = inflater.inflate(R.layout.alert_error_log, null) as View
-        val message = convertView.findViewById<View>(R.id.message) as TextView
-        val okBtn = convertView.findViewById<View>(R.id.ok_btn) as Button
-
-
-        message.text = message.toString()
-
-        okBtn.setOnClickListener {
-            dialog.cancel()
-        }
-
-        dialog.setContentView(convertView)
-        dialog.show()
-
-    }
+//    private fun showAlert(message: String?) {
+//        val dialog = Dialog(applicationContext)
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+//        val inflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//        val convertView = inflater.inflate(R.layout.alert_error_log, null) as View
+//        val message = convertView.findViewById<View>(R.id.message) as TextView
+//        val okBtn = convertView.findViewById<View>(R.id.ok_btn) as Button
+//
+//        message.text = message.toString()
+//
+//        okBtn.setOnClickListener {
+//            dialog.cancel()
+//        }
+//
+//        dialog.setContentView(convertView)
+//        dialog.show()
+//    }
 
 
 }

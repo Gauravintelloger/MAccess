@@ -95,6 +95,13 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
 
     override fun onBackPressed() {
 //        super.onBackPressed()
+
+        var id = navView.selectedItemId
+        if(id == R.id.bnm_home){
+            super.onBackPressed()
+            return
+        }
+
         loadFragment(HomeFragment())
         navView.selectedItemId = R.id.bnm_home
 

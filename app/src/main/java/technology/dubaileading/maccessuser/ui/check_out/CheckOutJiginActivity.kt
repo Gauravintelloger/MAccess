@@ -1,16 +1,15 @@
 package technology.dubaileading.maccessuser.ui.check_out
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
+import pl.droidsonroids.gif.GifDrawable
 import technology.dubaileading.maccessuser.R
 import technology.dubaileading.maccessuser.base.BaseActivity
 import technology.dubaileading.maccessuser.databinding.ActivityCheckOutBinding
@@ -19,6 +18,7 @@ import technology.dubaileading.maccessuser.rest.entity.*
 import technology.dubaileading.maccessuser.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessuser.rest.request.SuccessCallback
 import technology.dubaileading.maccessuser.ui.HomeActivity
+import technology.dubaileading.maccessuser.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessuser.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessuser.utils.AppShared
 import technology.dubaileading.maccessuser.utils.GPSTracker
@@ -41,6 +41,10 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         if (date!!.isEmpty()) {
             startActivity(Intent(applicationContext, CheckInActivity::class.java))
             finish()
+        }
+
+        binding.timesheetLayout.setOnClickListener{
+            startActivity(Intent(applicationContext, AttendanceActivity::class.java))
         }
 
         binding.materialToolbar.setNavigationOnClickListener {
@@ -72,10 +76,19 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         var breakStarted = AppShared(applicationContext).getBreakStarted()
         if(!breakStarted){
             binding.breakStatus.visibility = View.GONE
-            binding.timeTxt.text = "check in at ${AppShared(applicationContext).getTiming()}"
+            binding.checkIn.visibility = View.VISIBLE
+
+            val gifFromAssets = GifDrawable(assets, "check_in_gif.gif")
+            binding.checkInGif.setImageDrawable(gifFromAssets)
+
+//            binding.timeTxt.text = "check in at ${AppShared(applicationContext).getTiming()}"
+            binding.timeTxt.text = "at ${AppShared(applicationContext).getTiming()}"
         }else{
+            binding.breakStatus.visibility = View.VISIBLE
+            binding.checkIn.visibility = View.GONE
+
             if(AppShared(applicationContext).isBreakOut()){
-                binding.breakStatus.visibility = View.VISIBLE
+//                binding.breakStatus.visibility = View.VISIBLE
 
 //                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_out))
                 binding.imageView2.setImageDrawable(ResourcesCompat.getDrawable(resources,
@@ -86,7 +99,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                 binding.timeTxt.text = "at ${AppShared(applicationContext).getTiming()}"
             }
             else{
-                binding.breakStatus.visibility = View.VISIBLE
+//                binding.breakStatus.visibility = View.VISIBLE
 
 //                binding.imageView2.setImageDrawable(resources.getDrawable(R.drawable.ic_break_in))
                 binding.imageView2.setImageDrawable(ResourcesCompat.getDrawable(resources,
@@ -121,11 +134,13 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         if(status){
             binding.imgBreakIn.setColorFilter(ContextCompat.getColor(applicationContext,
                 R.color.image_tint), android.graphics.PorterDuff.Mode.SRC_IN)
+
             binding.breakInTxt.setTextColor(resources.getColor(R.color.image_tint))
 
             binding.breakInLayout.setOnClickListener(null)
         }else{
             binding.imgBreakIn.colorFilter = null
+
             binding.breakInTxt.setTextColor(resources.getColor(R.color.color_break_in))
 
             binding.breakInLayout.setOnClickListener{

@@ -261,9 +261,9 @@ public class GPSTracker extends Service implements LocationListener {
 
             return addresses.get(0).getAddressLine(0);
         }catch (Exception e){
-            return e.toString();
+//            return e.toString();
         }
-//        return "";
+        return "";
     }
 
     /**

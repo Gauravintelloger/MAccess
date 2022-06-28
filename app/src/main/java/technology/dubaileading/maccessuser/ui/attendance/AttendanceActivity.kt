@@ -44,14 +44,25 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
         attendanceReportAdapter = AttendanceReportAdapter(this@AttendanceActivity)
         binding?.reportsRv?.itemAnimator = DefaultItemAnimator()
         binding?.reportsRv?.layoutManager = LinearLayoutManager(this@AttendanceActivity)
         dataList = ArrayList<DataItem>()
         binding?.reportsRv?.adapter = attendanceReportAdapter
 
+
+        val myFormat = "yyyy-MM-dd" // mention the format you need
+        val sdf = SimpleDateFormat(myFormat, Locale.US)
+        var date = Date()
+
+        fromDate = sdf.format(date)
+        toDate = sdf.format(date)
+
+        binding.fromDate.text = sdf.format(date)
+        binding.toDate.text = sdf.format(date)
+
+        var reportRequest = ReportRequest(fromDate,toDate)
+        getReport(reportRequest)
 
         val today = Calendar.getInstance()
 
@@ -131,46 +142,6 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
                 Toast.makeText(this@AttendanceActivity, "error", Toast.LENGTH_LONG).show()
             }.build()
         request.executeAsync()
-    }
-
-    private fun processChecking() {
-
-//        var checkInRequest = CheckInRequest(
-//            mode = 1,
-//            date = Utils.getCurrentDate(),
-//            time = Utils.getCurrentTime(),
-//            lat_long = gpsTracker.latitude.toString() + "," + gpsTracker.longitude,
-//        )
-//
-//        val requestFactory = ServerRequestFactory()
-//        val call = requestFactory
-//            .obtainEndpointProxy(EmployeeEndpoint::class.java)
-//            .checkIN(checkInRequest)
-//
-//        val request = requestFactory.newHttpRequest<Any>(this@AttendanceActivity)
-//            .withEndpoint(call)
-//            .withProgressDialogue()
-//            .withSuccessAndFailureCallback(object : SuccessCallback<CheckInResponse?> {
-//                override fun onSuccess(user: CheckInResponse?) {
-//
-//                    val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-//                    val nowTime = sdf.format(Date())
-//
-//                    AppShared(applicationContext).saveTiming(nowTime)
-//                    AppShared(applicationContext).savePlace(binding.placeName.text.toString())
-//
-//                    startActivity(Intent(applicationContext, CheckOutJiginActivity::class.java))
-//                    finish()
-//
-//                }
-//            }
-//            ) { Toast.makeText(this@AttendanceActivity, "error", Toast.LENGTH_LONG).show() }.build()
-//        request.executeAsync()
-    }
-
-
-    override fun onResume() {
-        super.onResume()
     }
 
     private fun updateDateInView() {
