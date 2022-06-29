@@ -7,6 +7,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.crashlytics.internal.common.CrashlyticsCore
 import pl.droidsonroids.gif.GifDrawable
 
 import technology.dubaileading.maccessuser.base.BaseActivity
@@ -21,6 +22,10 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        binding.splashGif.setOnClickListener{
+//            throw RuntimeException("Test Crash")
+//        }
 
         Log.e("android ID", Utils.getUniqueID(applicationContext))
 

@@ -1,7 +1,11 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
+
+//classpath 'com.google.gms:google-services:4.3.12'
 
 android {
     compileSdk 31
@@ -57,4 +61,11 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.6.0'
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
+
+    implementation platform('com.google.firebase:firebase-bom:30.2.0')
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Declare the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-crashlytics'
 }
