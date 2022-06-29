@@ -1,5 +1,6 @@
 package technology.dubaileading.maccessuser.ui.attendance
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -22,16 +23,21 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
         return AttendanceViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AttendanceViewHolder, position: Int) {
-        holder.status.text = dataList[position].mode
+
         holder.dateTime.text = dataList[position].dateTimeUnix
         if (dataList[position]!!.remarks != null){
             holder.remark.text = dataList[position]!!.remarks.toString()
         }
-        if (dataList[position].mode!!.equals("in")){
+        if (dataList[position].mode!! == "in"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_in))
-        } else if (dataList[position].mode!!.equals("out")){
+            holder.status.text = "Break-in"
+        } else if (dataList[position].mode!! == "out"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_out))
+            holder.status.text = "Break-out"
+        } else {
+            holder.status.text = dataList[position].mode
         }
 
     }
@@ -41,6 +47,7 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
     }
 
     fun addList(items: ArrayList<DataItem>){
+        dataList.clear()
         dataList.addAll(items)
         notifyDataSetChanged()
     }
