@@ -2,10 +2,13 @@ package technology.dubaileading.maccessuser.ui.check_out
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +38,8 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        backGroundColor()
 
         //if no timer is set
         val date = AppShared(applicationContext).getTiming()
@@ -318,6 +323,15 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
 
     override fun createViewBinding(layoutInflater: LayoutInflater): ActivityCheckOutBinding {
         return ActivityCheckOutBinding.inflate(layoutInflater)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun backGroundColor() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
     }
 
 }

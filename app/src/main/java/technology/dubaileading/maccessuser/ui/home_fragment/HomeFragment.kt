@@ -25,6 +25,7 @@ import technology.dubaileading.maccessuser.ui.check_out.CheckOutJiginActivity
 import technology.dubaileading.maccessuser.ui.dialog.ComingSoonDialog
 import technology.dubaileading.maccessuser.ui.login.LoginActivity
 import technology.dubaileading.maccessuser.utils.AppShared
+import technology.dubaileading.maccessuser.utils.TickTokTimer
 import technology.dubaileading.maccessuser.utils.TimerHelper
 import java.util.*
 
@@ -88,6 +89,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
             alertDialog.setPositiveButton("Yes") { _, _ ->
                 run {
                     AppShared(activity as Context).clearAll()
+
+//                    TickTokTimer.cancelTimer()
+
                     t.cancel()
                     startActivity(Intent(activity,LoginActivity::class.java))
                     (activity as Activity).finishAffinity()
@@ -99,6 +103,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
     override fun onResume() {
         super.onResume()
+
+        t.cancel()
+
         performTimerLogic()
     }
 
@@ -122,6 +129,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
             //when is break out - no updating in ui will happen
             binding?.timer?.text = AppShared(activity as Context).getHours()
 
+//            TickTokTimer.cancelTimer()
             t.cancel()
         }
         else{
@@ -137,6 +145,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+//        TickTokTimer.cancelTimer()
         t.cancel()
     }
 
@@ -146,10 +156,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
     }
 
     private fun runTimer() {
+
+//        TickTokTimer.cancelTimer()
+
         t = Timer()
 
         binding?.timeLayout?.visibility = View.VISIBLE
         binding?.view?.visibility = View.VISIBLE
+
+//        TickTokTimer.schedule(activity = activity as Activity,object : TickTokTimer.CallBack{
+//            override fun timerCallback(string: String) {
+//                (activity as Activity).runOnUiThread(Runnable {
+//                    timerText.text = string
+//                })
+//            }
+//
+//        })
 
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {

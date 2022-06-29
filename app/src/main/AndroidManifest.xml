@@ -28,6 +28,7 @@
             android:theme="@style/HomeActivity.Theme"/>
 
         <activity android:name=".ui.check_out.CheckOutJiginActivity"
+            android:theme="@style/HomeActivity.Theme"
             android:exported="false"/>
 
         <meta-data
