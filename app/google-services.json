@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "675038158433",
+    "project_id": "maccess-2-user",
+    "storage_bucket": "maccess-2-user.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675038158433:android:ead64ba1b5be5cbfa01420",
+        "android_client_info": {
+          "package_name": "technology.dubaileading.maccessuser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "675038158433-t5a1jgv5do9rgvnhmgimka3ffgc9aqkt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVwT6vm46SwrOGN88SnQfMBYaO_p8fEGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "675038158433-t5a1jgv5do9rgvnhmgimka3ffgc9aqkt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "675038158433-qntjt965cq3bvusostb7slqi332fnb93.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "technology.dubaileading.maccessuser"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
