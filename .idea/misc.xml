@@ -14,14 +14,13 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_back.xml" value="0.2905" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_insurance_1.xml" value="0.297" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/notification_indicator.xml" value="0.183" />
-        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_check_in.xml" value="0.35052083333333334" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/statusbar_color.xml" value="0.2905" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_check_in.xml" value="0.34512820512820513" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_home.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_login.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_timelog.xml" value="0.35052083333333334" />
-        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/alert_error_log.xml" value="0.3494791666666667" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/alert_error_log.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/bottom_bar.xml" value="0.35052083333333334" />
-        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/dialog_coming_soon.xml" value="0.35052083333333334" />
-        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/dialog_loading.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/document_request.xml" value="0.24173850574712644" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_home.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_notifications.xml" value="0.35052083333333334" />
@@ -38,10 +37,6 @@
         <entry key="app/src/main/res/drawable/button_background.xml" value="0.21" />
         <entry key="app/src/main/res/drawable/edittext_background.xml" value="0.21" />
         <entry key="app/src/main/res/drawable/grey_to_white_gradient_top_bottom.xml" value="0.21" />
-        <entry key="app/src/main/res/drawable/ic_break_in.xml" value="0.21" />
-        <entry key="app/src/main/res/drawable/ic_break_out.xml" value="0.21" />
-        <entry key="app/src/main/res/layout/activity_check_in.xml" value="0.15520833333333334" />
-        <entry key="app/src/main/res/layout/activity_check_out.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2953125" />
@@ -51,11 +46,9 @@
         <entry key="app/src/main/res/layout/bottom_bar.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/dialog_loading.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.28231292724609375" />
-        <entry key="app/src/main/res/layout/item_time_log.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/layout_feeds.xml" value="0.2649597167968751" />
         <entry key="app/src/main/res/layout/layout_home_fragments.xml" value="0.2953125" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.2953125" />
-        <entry key="app/src/main/res/menu/menu_home_bottom_navigation.xml" value="0.3098958333333333" />
       </map>
     </option>
   </component>
