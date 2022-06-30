@@ -58,7 +58,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 //            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
 //        }
 
-        binding.timeSh.setOnClickListener{
+        binding.timeShi.setOnClickListener{
             startActivity(Intent(applicationContext,AttendanceActivity::class.java))
         }
 

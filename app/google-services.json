@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:675038158433:android:ead64ba1b5be5cbfa01420",
+        "mobilesdk_app_id": "1:675038158433:android:d6dfe62f34688ccba01420",
         "android_client_info": {
-          "package_name": "technology.dubaileading.maccessuser"
+          "package_name": "technology.dubaileading.maccessemployee"
         }
       },
       "oauth_client": [

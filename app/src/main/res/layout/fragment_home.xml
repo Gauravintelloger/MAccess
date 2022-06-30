@@ -219,6 +219,7 @@
                     android:orientation="vertical"
                     android:weightSum="3">
                     <TextView
+                        android:visibility="gone"
                         android:id="@+id/started"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
