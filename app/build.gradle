@@ -14,8 +14,8 @@ android {
         applicationId "technology.dubaileading.maccessemployee"
         minSdk 21
         targetSdk 31
-        versionCode 1
-        versionName "2.0.1"
+        versionCode 6
+        versionName "2.0.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
