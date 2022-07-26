@@ -17,6 +17,7 @@ import technology.dubaileading.maccessemployee.databinding.ActivityHomeBinding
 import technology.dubaileading.maccessemployee.ui.coming_soon.ComingSoonFragment
 import technology.dubaileading.maccessemployee.ui.home_fragment.HomeFragment
 import technology.dubaileading.maccessemployee.ui.login.LoginViewModel
+import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
 
 
 class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {

@@ -34,6 +34,7 @@ import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutJiginActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.GPSTracker
 import technology.dubaileading.maccessemployee.utils.Utils
@@ -140,8 +141,13 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 
                         startActivity(Intent(applicationContext, CheckOutJiginActivity::class.java))
                         finish()
-                    }else{
+                    } else if (user?.status == "notok" && user?.statuscode == "500"){
+                        Toast.makeText(this@CheckInActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckInActivity).saveToken("")
 
+                        startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        finish()
+                    }else{
                              AlertDialog.Builder(this@CheckInActivity)
                             .setTitle("Alert")
                             .setMessage(user?.message)
@@ -155,7 +161,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
                 }
             }
             ) {
-                //Toast.makeText(this@CheckInActivity, "error", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@CheckInActivity, "error"  , Toast.LENGTH_LONG).show()
             }.build()
 
         request.executeAsync()

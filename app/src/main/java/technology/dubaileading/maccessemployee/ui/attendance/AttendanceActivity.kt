@@ -19,6 +19,8 @@ import technology.dubaileading.maccessemployee.rest.entity.ReportRequest
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -133,10 +135,20 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<AttendenceReport?> {
                 override fun onSuccess(attendenceReport: AttendenceReport?) {
-                    if (attendenceReport?.attendanceData?.data != null){
-                        dataList = attendenceReport?.attendanceData?.data as List<DataItem>
-                        attendanceReportAdapter.addList(dataList as ArrayList<DataItem>)
+                    if (attendenceReport?.status == "ok") {
+                        if (attendenceReport.attendanceData?.data != null){
+                            dataList = attendenceReport?.attendanceData?.data as List<DataItem>
+                            attendanceReportAdapter.addList(dataList as ArrayList<DataItem>)
+                        }
+
+                    } else if (attendenceReport?.status == "notok" && attendenceReport?.statuscode == "500"){
+                        Toast.makeText(this@AttendanceActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@AttendanceActivity).saveToken("")
+
+                        startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        finish()
                     }
+
                 }
             }) {
                 Toast.makeText(this@AttendanceActivity, "error", Toast.LENGTH_LONG).show()

@@ -3,4 +3,13 @@
     <string name="employee_login">Employee Login</string>
     <string name="employee_login_description">Simply enter your existing username and the corresponding password.</string>
     <string name="forgotPassword">Forgot Password?</string>
+    <string name="services">Services</string>
+    <string name="banking">Banking</string>
+    <string name="insurance">Insurance</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="under_construction">This page is under construction</string>
+    <string name="notifications">Notifications</string>
+    <string name="requests">Requests</string>
+    <string name="new_request">New Request</string>
+
 </resources>

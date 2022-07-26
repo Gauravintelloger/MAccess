@@ -1,14 +1,18 @@
 package technology.dubaileading.maccessemployee.ui.check_out
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -37,6 +41,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
     var t : Timer = Timer()
     lateinit var gpsTracker : GPSTracker
     var IS_SHIFT_OVER = false;
+    var is_mock : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,17 +76,66 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             builder.setPositiveButton(
                 "Yes"
             ) { _, _ ->
-                checkOut()
+                if (is_mock){
+                    showAlert("Please disable fake location to be able to mark attendance")
+                } else if (!isAutoTimeZoneEnabled()){
+                    showAlert("Please enable the Automatic time zone to be able to mark attendance")
+                } else {
+                    checkOut()
+                }
+
             }
             builder.setNegativeButton("No", null)
             builder.show()
         }
+
+
+        is_mock = isMockLocationOn(
+            gpsTracker.location,
+            applicationContext
+        ) || isMockLocationOn(
+            gpsTracker.location,
+            applicationContext
+        )
 
         performTimerLogic()
 
 
 
     }
+
+    private fun showAlert(msg : String){
+        android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
+            .setTitle("Alert")
+            .setMessage(msg)
+            .setCancelable(false)
+            .setPositiveButton(
+                "Ok"
+            ) { dialog, which ->
+
+            }
+            .show()
+    }
+
+    private fun isMockLocationOn(location: Location, context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            location.isFromMockProvider
+        } else {
+            var mockLocation = "0"
+            try {
+                mockLocation = Settings.Secure.getString(
+                    context.contentResolver,
+                    Settings.Secure.ALLOW_MOCK_LOCATION
+                )
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+            mockLocation != "0"
+        }
+    }
+
+    private fun isAutoTimeZoneEnabled() =
+        Settings.Global.getInt(applicationContext.contentResolver, Settings.Global.AUTO_TIME) != 0
 
     private fun statusUpdate() {
         var breakStarted = AppShared(applicationContext).getBreakStarted()
@@ -255,6 +309,12 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                         AppShared(applicationContext).setBreakStarted(true)
 
                         performTimerLogic()
+                    }else if (user?.status == "notok" && user?.statuscode == "500"){
+                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutJiginActivity).saveToken("")
+
+                        startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        finish()
                     } else {
                         android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
                             .setTitle("Alert")
@@ -308,6 +368,12 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                         AppShared(applicationContext).setBreakStarted(true)
 
                         performTimerLogic()
+                    }else if (user?.status == "notok" && user?.statuscode == "500"){
+                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutJiginActivity).saveToken("")
+
+                        startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        finish()
                     }else{
 
                         android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
@@ -362,6 +428,12 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
 
                         val intent = Intent(this@CheckOutJiginActivity, HomeActivity::class.java)
                         startActivity(intent)
+                        finish()
+                    } else if (user?.status == "notok" && user?.statuscode == "500"){
+                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutJiginActivity).saveToken("")
+
+                        startActivity(Intent(applicationContext, LoginActivity::class.java))
                         finish()
                     } else {
                              AlertDialog.Builder(this@CheckOutJiginActivity)

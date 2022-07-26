@@ -62,6 +62,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
         timerText = binding?.timer!!
 
+        val token = AppShared(activity).getToken()
+
         var user = AppShared(activity as Context).getUser()
         binding?.username?.text = user.data.username
 
