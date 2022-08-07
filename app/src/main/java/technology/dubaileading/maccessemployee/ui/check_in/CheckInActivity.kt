@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
+import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -42,13 +40,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(), OnMapReadyCallback {
+class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(), OnMapReadyCallback, LocationListener {
 
     private lateinit var gpsTracker : GPSTracker
     private lateinit var mMap: GoogleMap
     var is_mock : Boolean = false
-
-
+    private val MIN_TIME: Long = 400
+    private val MIN_DISTANCE = 1000f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +67,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 //            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
 //        }
 
-        binding.time.setOnClickListener{
+        binding.timeSheet.setOnClickListener{
             startActivity(Intent(applicationContext,AttendanceActivity::class.java))
         }
 
@@ -80,18 +78,36 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
         val gifFromAssets = GifDrawable(assets, "start_shift.gif")
         binding.gif.setImageDrawable(gifFromAssets)
 
-        gpsTracker = GPSTracker(this)
-        gpsTracker.location
-
         MapsInitializer.initialize(this)
 
         binding.map.onCreate(savedInstanceState)
         binding.map.getMapAsync(this)
 
-
         checkLocationPermission()
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        locationManager.requestLocationUpdates(
+            LocationManager.NETWORK_PROVIDER,
+            MIN_TIME,
+            MIN_DISTANCE,
+            this
+        );
+
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            gpsTracker = GPSTracker(this)
+            gpsTracker.location
+        }else {
+            showAlert("You need give location access to use app")
+        }
 
         binding.shiftBt.setOnClickListener{
+            is_mock = isMockLocationOn(
+                gpsTracker.location,
+                applicationContext
+            ) || isMockLocationOn(
+                gpsTracker.location,
+                applicationContext
+            )
             if (is_mock){
                 showAlert("Please disable fake location to be able to mark attendance")
             } else if (!isAutoTimeZoneEnabled()){
@@ -168,6 +184,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
     }
 
 
+
     override fun onResume() {
         super.onResume()
         binding.map.onResume()
@@ -213,8 +230,6 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
     }
 
 
-
-
     private fun getAddress(currentLoc: LatLng): String? {
         try {
             val addresses: List<Address>
@@ -234,6 +249,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        checkLocationPermission()
 
         val currentLoc = LatLng(gpsTracker.latitude, gpsTracker.longitude)
         val address : String? = getAddress(currentLoc)
@@ -250,13 +266,6 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
         ).title("")
         mMap.addMarker(marker)
 
-        is_mock = isMockLocationOn(
-            gpsTracker.location,
-            applicationContext
-        ) || isMockLocationOn(
-            gpsTracker.location,
-            applicationContext
-        )
     }
 
     override fun onRequestPermissionsResult(
@@ -296,4 +305,14 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
             }
             .show()
     }
+
+    override fun onLocationChanged(location: Location) {
+        val latLng = LatLng(location.latitude, location.longitude)
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18f)
+        mMap.animateCamera(cameraUpdate)
+        //locationManager!!.removeUpdates(this)
+    }
+
+
+
 }

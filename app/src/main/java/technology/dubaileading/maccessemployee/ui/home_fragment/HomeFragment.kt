@@ -76,9 +76,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
             append(" \uD83D\uDD90")
         }
 
-        binding?.timeLayout?.setOnClickListener{
-            startActivity(Intent(activity, CheckOutJiginActivity::class.java))
-        }
+
 
         val locationManager = activity.getSystemService(BaseActivity.LOCATION_SERVICE) as LocationManager
 
@@ -90,7 +88,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
             }
 
         }
+        binding?.timeLayout?.setOnClickListener{
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                startActivity(Intent(activity, CheckOutJiginActivity::class.java))
+            } else {
+                showAlert()
+            }
 
+        }
         binding?.service?.setOnClickListener{
             ComingSoonDialog(activity as Context).show()
         }

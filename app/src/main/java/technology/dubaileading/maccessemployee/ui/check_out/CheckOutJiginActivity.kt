@@ -89,14 +89,20 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             builder.show()
         }
 
+        try {
+            is_mock = isMockLocationOn(
+                gpsTracker.location,
+                applicationContext
+            ) || isMockLocationOn(
+                gpsTracker.location,
+                applicationContext
+            )
+        }catch(e : Exception){
+            e.printStackTrace()
+        }
 
-        is_mock = isMockLocationOn(
-            gpsTracker.location,
-            applicationContext
-        ) || isMockLocationOn(
-            gpsTracker.location,
-            applicationContext
-        )
+
+
 
         performTimerLogic()
 
