@@ -43,7 +43,7 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
     }
 
     override fun getItemCount(): Int {
-        return dataList.size;
+        return dataList.size
     }
 
     fun addList(items: ArrayList<DataItem>){

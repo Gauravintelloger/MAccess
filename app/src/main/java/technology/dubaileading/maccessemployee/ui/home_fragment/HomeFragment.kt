@@ -1,22 +1,17 @@
 package technology.dubaileading.maccessemployee.ui.home_fragment
 
-import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +22,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentHomeBinding
-import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutJiginActivity
 import technology.dubaileading.maccessemployee.ui.dialog.ComingSoonDialog
@@ -43,11 +38,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
     lateinit var timerText : TextView
 
     lateinit var activity: Context
+    lateinit var homeAdapter: HomeAdapter
 
     override fun createViewModel(): HomeFragmentViewModel {
         return ViewModelProvider(this).get(HomeFragmentViewModel::class.java)
     }
     private val REQ_CODE_LOCATION = 100
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        homeAdapter = HomeAdapter(requireContext())
+    }
 
     override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentHomeBinding {
         return FragmentHomeBinding.inflate(layoutInflater!!)
@@ -58,11 +59,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
         binding?.rv?.itemAnimator = DefaultItemAnimator()
         binding?.rv?.layoutManager = LinearLayoutManager(activity)
-        binding?.rv?.adapter = HomeAdapter()
+        binding?.rv?.adapter = homeAdapter
+
+        viewModel?.getPosts(requireContext())
+        viewModel?.postsList?.observe(viewLifecycleOwner){
+            homeAdapter.addList(it.data as ArrayList<PostData>)
+
+        }
 
         timerText = binding?.timer!!
 
         val token = AppShared(activity).getToken()
+        Log.d("token", token.toString());
 
         var user = AppShared(activity as Context).getUser()
         binding?.username?.text = user.data.username

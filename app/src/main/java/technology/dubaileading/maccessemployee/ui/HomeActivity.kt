@@ -55,7 +55,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
                 }
                 "Notifications" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(ComingSoonFragment())
+                    loadFragment(NotificationsFragment())
                 }
                 "Profile" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)

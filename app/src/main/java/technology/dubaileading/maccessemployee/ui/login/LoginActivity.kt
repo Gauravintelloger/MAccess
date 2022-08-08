@@ -4,15 +4,10 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
-import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
-import technology.dubaileading.maccessemployee.rest.entity.LoginResponse
-import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
-import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Utils

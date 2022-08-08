@@ -2,6 +2,7 @@ package technology.dubaileading.maccessemployee.rest.endpoints;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInRequest;
@@ -15,6 +16,7 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse;
 import technology.dubaileading.maccessemployee.rest.entity.Notifications;
+import technology.dubaileading.maccessemployee.rest.entity.Posts;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
 
 public interface EmployeeEndpoint {
@@ -39,5 +41,8 @@ public interface EmployeeEndpoint {
 
     @POST("employee/notificationList")
     Call<Notifications> getNotifications();
+
+    @GET("employee/listPosts")
+    Call<Posts> getPosts();
 
 }

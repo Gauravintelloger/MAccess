@@ -7,71 +7,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.notifications.NotificationsFragment">
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        android:background="@drawable/home_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/materialToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/white"
+        app:title="@string/notifications"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/tittle"
+        app:titleTextColor="@color/white" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/home_bg" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="22dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginRight="22dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_back" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_marginRight="22dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/medium500"
-                    android:gravity="center"
-                    android:text="@string/notifications"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-    </FrameLayout>
-
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notification_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="-18dp"
-        android:orientation="vertical"
-        android:background="@drawable/container_bg"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/check_in_layout_bg"
+        android:clipToPadding="true"
+        android:paddingTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout">
+        app:layout_constraintTop_toBottomOf="@+id/materialToolbar" />
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/notification_rv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
