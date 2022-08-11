@@ -67,11 +67,11 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 //            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
 //        }
 
-        binding.timeSheet.setOnClickListener{
+        binding.time.setOnClickListener{
             startActivity(Intent(applicationContext,AttendanceActivity::class.java))
         }
 
-        binding.tool.setNavigationOnClickListener {
+        binding.toolb.setNavigationOnClickListener {
             finish()
         }
 

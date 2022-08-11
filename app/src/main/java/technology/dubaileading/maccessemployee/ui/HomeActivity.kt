@@ -18,6 +18,7 @@ import technology.dubaileading.maccessemployee.ui.coming_soon.ComingSoonFragment
 import technology.dubaileading.maccessemployee.ui.home_fragment.HomeFragment
 import technology.dubaileading.maccessemployee.ui.login.LoginViewModel
 import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
+import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
 
 
 class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
@@ -47,7 +48,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
                 }
                 "Requests" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(ComingSoonFragment())
+                    loadFragment(RequestsFragment())
                 }
                 "Home" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab)

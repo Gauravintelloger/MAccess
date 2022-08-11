@@ -5,15 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.rest.entity.NotificationData
 import technology.dubaileading.maccessemployee.rest.entity.PostData
-import technology.dubaileading.maccessemployee.rest.entity.Posts
 
-class HomeAdapter( private val context: Context) : RecyclerView.Adapter<HomeAdapter.PostsViewHolder>() {
+class HomeAdapter( private val context: Context, private val onLikeClickListener: onLikeClickListener) : RecyclerView.Adapter<HomeAdapter.PostsViewHolder>() {
 
     private var dataList = ArrayList<PostData>()
 
@@ -25,14 +25,19 @@ class HomeAdapter( private val context: Context) : RecyclerView.Adapter<HomeAdap
     }
 
     override fun onBindViewHolder(holder: PostsViewHolder, position: Int) {
-
-        if(position == 1){
-            holder.view.visibility = View.VISIBLE
-        }
-        else holder.view.visibility = View.GONE
         var url = dataList[position].imageUrl
-        Glide.with(context).load(url).into(holder.postImage)
+        holder.postImage.load(url){
+            transformations(RoundedCornersTransformation(30f))
+        }
+        holder.crated_at.text = dataList[position].readableCreatedAt
+        holder.title.text = dataList[position].caption
+        holder.likeCount.text = dataList[position].likedUsersCount.toString()
+
+        holder.like.setOnClickListener {
+            onLikeClickListener.onLikeClick(dataList[position], position)
+        }
     }
+
 
     override fun getItemCount(): Int {
         return dataList.size;
@@ -48,7 +53,10 @@ class HomeAdapter( private val context: Context) : RecyclerView.Adapter<HomeAdap
         var view = itemView.findViewById<View>(R.id.gap)
 
         var postImage = itemView.findViewById<View>(R.id.postImage) as ImageView
-        //var status_img = itemView.findViewById<View>(R.id.status_img) as ImageView
+        var crated_at = itemView.findViewById<View>(R.id.crated_at) as TextView
+        var likeCount = itemView.findViewById<View>(R.id.likeCount) as TextView
+        var title = itemView.findViewById<View>(R.id.title) as TextView
+        var like = itemView.findViewById<View>(R.id.like) as LinearLayout
     }
 
 }

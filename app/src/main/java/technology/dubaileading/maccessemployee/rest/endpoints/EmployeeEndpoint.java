@@ -4,6 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import technology.dubaileading.maccessemployee.rest.entity.ApiResponse;
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInResponse;
@@ -13,6 +14,7 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
+import technology.dubaileading.maccessemployee.rest.entity.LikePost;
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse;
 import technology.dubaileading.maccessemployee.rest.entity.Notifications;
@@ -44,5 +46,8 @@ public interface EmployeeEndpoint {
 
     @GET("employee/listPosts")
     Call<Posts> getPosts();
+
+    @POST("employee/likePost")
+    Call<ApiResponse> likePost(@Body LikePost likePost);
 
 }

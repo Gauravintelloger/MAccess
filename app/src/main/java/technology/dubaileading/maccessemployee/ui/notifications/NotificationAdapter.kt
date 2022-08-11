@@ -23,7 +23,8 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.Notificatio
     }
 
     override fun onBindViewHolder(holder: NotificationAdapter.NotificationViewHolder, position: Int) {
-        holder.notification.text = dataList[position].message
+        holder.notification.text = dataList[position].title
+        holder.message.text = dataList[position].message
         holder.time.text = dataList[position].dateOfNotificationWithTime
 
     }
@@ -40,6 +41,7 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.Notificatio
 
     class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var notification = itemView.findViewById<View>(R.id.notification) as TextView
+        var message = itemView.findViewById<View>(R.id.message) as TextView
         var time = itemView.findViewById<View>(R.id.time) as TextView
 
     }

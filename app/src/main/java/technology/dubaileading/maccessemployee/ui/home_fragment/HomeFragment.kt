@@ -22,6 +22,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentHomeBinding
+import technology.dubaileading.maccessemployee.rest.entity.LikePost
 import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutJiginActivity
@@ -31,7 +32,7 @@ import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.TimerHelper
 import java.util.*
 
-class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
+class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),onLikeClickListener {
 
     var t : Timer = Timer()
 
@@ -47,7 +48,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        homeAdapter = HomeAdapter(requireContext())
+        homeAdapter = HomeAdapter(requireContext(),this)
     }
 
     override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentHomeBinding {
@@ -64,6 +65,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
         viewModel?.getPosts(requireContext())
         viewModel?.postsList?.observe(viewLifecycleOwner){
             homeAdapter.addList(it.data as ArrayList<PostData>)
+        }
+
+        viewModel?.likePost?.observe(viewLifecycleOwner){
 
         }
 
@@ -248,6 +252,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>() {
                 })
             }
         }, 0, 1000)
+    }
+
+    override fun onLikeClick(postData: PostData, position: Int) {
+        var likePost = LikePost(postData.id)
+        viewModel?.likePost(requireContext(),likePost)
+
     }
 
 }

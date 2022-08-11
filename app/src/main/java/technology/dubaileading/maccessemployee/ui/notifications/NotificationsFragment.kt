@@ -42,13 +42,15 @@ class NotificationsFragment : BaseFragment<FragmentNotificationsBinding, Notific
         viewModel?.getNotifications(requireContext())
 
         viewModel?.notificationsList?.observe(viewLifecycleOwner){
-            //Toast.makeText(activity, it.message,Toast.LENGTH_LONG).show()
             notificationAdapter.addList(it.notificationData as ArrayList<NotificationData>)
 
         }
 
         viewModel?.invalidUser?.observe(viewLifecycleOwner){
-            //Toast.makeText(activity, it.message,Toast.LENGTH_LONG).show()
+        }
+
+        binding?.materialToolbar?.setNavigationOnClickListener {
+            activity?.onBackPressed()
         }
 
 

@@ -10,6 +10,7 @@
 
     <include
         layout="@layout/layout_home_fragments"
+        android:layout_marginBottom="56dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <View
@@ -37,7 +38,7 @@
         app:layout_anchor="@id/bnv_layout"
         android:background="@drawable/curve"
         app:layout_anchorGravity="center_horizontal"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="35dp"
         android:elevation="0dp"/>
 
     <ImageButton
