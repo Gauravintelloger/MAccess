@@ -7,6 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="container">#F6F7F8</color>
 
     <color name="transparent">#00FFFFFF</color>
 
@@ -26,6 +27,18 @@
     <color name="text_color_light2">#5C616F</color>
     <color name="text_color_light3">#995C616F</color>
     <color name="text_color_green">#008859</color>
+
+
+
+    <color name="al_Color">#01A0C6</color>
+    <color name="cl_Color">#F26333</color>
+    <color name="sl_Color">#10B364</color>
+    <color name="restl_Color">#CCCACA</color>
+    <color name="total_leaves_highlighted_color">#01A0C6</color>
+
+    <color name="text_color_black">#040C22</color>
+    <color name="text_color_grey">#5C616F</color>
+
 
 
 

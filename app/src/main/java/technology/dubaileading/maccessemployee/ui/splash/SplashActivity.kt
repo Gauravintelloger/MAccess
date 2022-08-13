@@ -18,13 +18,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        startActivity(Intent(applicationContext, LoginActivity::class.java))
-
-//        Log.e("token",AppShared(applicationContext).getToken()!!)
-
-
-
-
         Handler(Looper.getMainLooper()).postDelayed({
             val token = AppShared(this@SplashActivity).getToken()
 

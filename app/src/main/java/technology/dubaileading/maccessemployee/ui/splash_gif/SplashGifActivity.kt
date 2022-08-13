@@ -21,10 +21,6 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        binding.splashGif.setOnClickListener{
-//            throw RuntimeException("Test Crash")
-//        }
-
         Log.e("android ID", Utils.getUniqueID(applicationContext))
 
         Handler(Looper.getMainLooper()).postDelayed({

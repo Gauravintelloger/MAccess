@@ -1,7 +1,6 @@
 package technology.dubaileading.maccessemployee.ui.login
 
 import android.content.Context
-import technology.dubaileading.maccessemployee.RetrofitResponse
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse

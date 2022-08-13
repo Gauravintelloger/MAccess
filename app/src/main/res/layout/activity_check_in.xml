@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolb"
+            android:id="@+id/toolBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/ic_back"
@@ -135,7 +135,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/time"
+                    android:id="@+id/timeSheet"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_margin="8dp"

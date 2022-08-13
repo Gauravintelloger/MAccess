@@ -1,7 +1,6 @@
 package technology.dubaileading.maccessemployee.ui.notifications
 
 import android.content.Context
-import android.util.Log
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.Notifications
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
@@ -21,7 +20,6 @@ class NotificationsRepo(var callback: NotificationsCallback) {
             .withSuccessAndFailureCallback(object : SuccessCallback<Notifications?> {
                 override fun onSuccess(notifications: Notifications?) {
                     callback.notificationsResponse(notifications)
-                    Log.d("test","success------------------------")
                 }
             }) {
                 callback.notificationsFailure(it)

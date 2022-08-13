@@ -10,6 +10,18 @@
     <string name="under_construction">This page is under construction</string>
     <string name="notifications">Notifications</string>
     <string name="requests">Requests</string>
+    <string name="personal_info">Personal Information</string>
+    <string name="profile">Profile</string>
     <string name="new_request">New Request</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="leave_requested">Leave Requested</string>
+    <string name="change_password">Change Password</string>
+    <string name="attendance_log">Attendance Log</string>
+    <string name="settings">Settings</string>
+    <string name="un_sync_log">Un Sync Log</string>
+    <string name="personal_information">Personal Information</string>
+
 
 </resources>

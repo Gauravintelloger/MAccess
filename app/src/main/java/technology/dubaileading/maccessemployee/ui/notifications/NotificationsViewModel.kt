@@ -2,10 +2,7 @@ package technology.dubaileading.maccessemployee.ui.notifications
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import technology.dubaileading.maccessemployee.base.BaseViewModel
-import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
-import technology.dubaileading.maccessemployee.rest.entity.LoginResponse
 import technology.dubaileading.maccessemployee.rest.entity.Notifications
 import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
 
@@ -14,7 +11,7 @@ class NotificationsViewModel : BaseViewModel(),NotificationsCallback {
     private var notificationsRepo = NotificationsRepo(this)
     var notificationsList = MutableLiveData<Notifications>()
     var notificationsFailure = MutableLiveData<ErrorResponse>()
-    var invalidUser = MutableLiveData<Notifications>()
+    var error = MutableLiveData<Notifications>()
 
 
 
@@ -26,7 +23,7 @@ class NotificationsViewModel : BaseViewModel(),NotificationsCallback {
             notificationsList.value = notifications!!
         }
         else {
-            invalidUser.value = notifications!!
+            error.value = notifications!!
         }
 
     }

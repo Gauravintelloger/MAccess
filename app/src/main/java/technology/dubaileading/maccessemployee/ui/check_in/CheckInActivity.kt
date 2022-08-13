@@ -31,7 +31,7 @@ import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
-import technology.dubaileading.maccessemployee.ui.check_out.CheckOutJiginActivity
+import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.GPSTracker
@@ -54,24 +54,16 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
         //if no timer is set
         val date = AppShared(applicationContext).getTiming()
         if (date!!.isNotEmpty()) {
-            startActivity(Intent(applicationContext, CheckOutJiginActivity::class.java))
+            startActivity(Intent(applicationContext, CheckOutActivity::class.java))
             finish()
         }
 
 
-//        binding.timeSheet.setOnClickListener{
-//            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
-//        }
-
-//        binding.timesheet.setOnClickListener{
-//            startActivity(Intent(applicationContext,AttendanceActivity::class.java))
-//        }
-
-        binding.time.setOnClickListener{
+        binding.timeSheet.setOnClickListener{
             startActivity(Intent(applicationContext,AttendanceActivity::class.java))
         }
 
-        binding.toolb.setNavigationOnClickListener {
+        binding.toolBar.setNavigationOnClickListener {
             finish()
         }
 
@@ -155,7 +147,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
                         AppShared(applicationContext).saveTiming(nowTime)
                         AppShared(applicationContext).savePlace(binding.placeName.text.toString())
 
-                        startActivity(Intent(applicationContext, CheckOutJiginActivity::class.java))
+                        startActivity(Intent(applicationContext, CheckOutActivity::class.java))
                         finish()
                     } else if (user?.status == "notok" && user?.statuscode == "500"){
                         Toast.makeText(this@CheckInActivity, "Token expired", Toast.LENGTH_LONG).show()

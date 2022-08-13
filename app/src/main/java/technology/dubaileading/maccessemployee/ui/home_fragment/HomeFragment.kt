@@ -25,7 +25,7 @@ import technology.dubaileading.maccessemployee.databinding.FragmentHomeBinding
 import technology.dubaileading.maccessemployee.rest.entity.LikePost
 import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
-import technology.dubaileading.maccessemployee.ui.check_out.CheckOutJiginActivity
+import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
 import technology.dubaileading.maccessemployee.ui.dialog.ComingSoonDialog
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
@@ -77,7 +77,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         Log.d("token", token.toString());
 
         var user = AppShared(activity as Context).getUser()
-        binding?.username?.text = user.data.username
+        binding?.username?.text = user.data?.username
 
         binding?.welcomText?.text = buildSpannedString {
             inSpans(
@@ -102,7 +102,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         }
         binding?.timeLayout?.setOnClickListener{
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                startActivity(Intent(activity, CheckOutJiginActivity::class.java))
+                startActivity(Intent(activity, CheckOutActivity::class.java))
             } else {
                 showAlert()
             }

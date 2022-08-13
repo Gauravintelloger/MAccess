@@ -29,8 +29,8 @@
             android:layout_marginTop="40dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="5dp"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp"
             app:cardBackgroundColor="@color/white">
 
             <RelativeLayout
@@ -47,8 +47,8 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="Type"
-                    android:textColor="@color/text_light_shade"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_color_light2"
+                    android:textSize="12sp" />
 
                 <ImageView
                     android:layout_width="24dp"
@@ -92,8 +92,8 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="5dp">
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -109,8 +109,8 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="Description"
-                    android:textColor="@color/text_light_shade"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_color_light2"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -138,8 +138,8 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="5dp">
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -155,8 +155,8 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="Start Date"
-                    android:textColor="@color/text_light_shade"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_color_light2"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -192,8 +192,8 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="5dp">
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -209,8 +209,8 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="End Date"
-                    android:textColor="@color/text_light_shade"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_color_light2"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -247,8 +247,8 @@
             android:layout_marginRight="24dp"
             android:layout_marginBottom="24dp"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="5dp">
+            app:cardCornerRadius="5dp"
+            app:cardElevation="2dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -264,8 +264,8 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="Attach a File (Optional)"
-                    android:textColor="@color/text_light_shade"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_color_light2"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:layout_width="match_parent"

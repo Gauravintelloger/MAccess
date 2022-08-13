@@ -3,11 +3,9 @@ package technology.dubaileading.maccessemployee.ui.notifications
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.rest.entity.DataItem
 import technology.dubaileading.maccessemployee.rest.entity.NotificationData
 
 

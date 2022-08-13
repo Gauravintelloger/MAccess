@@ -4,7 +4,6 @@ package technology.dubaileading.maccessemployee.ui.notifications
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 
@@ -46,7 +45,7 @@ class NotificationsFragment : BaseFragment<FragmentNotificationsBinding, Notific
 
         }
 
-        viewModel?.invalidUser?.observe(viewLifecycleOwner){
+        viewModel?.error?.observe(viewLifecycleOwner){
         }
 
         binding?.materialToolbar?.setNavigationOnClickListener {

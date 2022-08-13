@@ -6,8 +6,6 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
@@ -36,7 +34,7 @@ import technology.dubaileading.maccessemployee.utils.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJiginViewModel>() {
+class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>() {
 
     var t : Timer = Timer()
     lateinit var gpsTracker : GPSTracker
@@ -64,13 +62,13 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             finish()
         }
 
-        gpsTracker = GPSTracker(this@CheckOutJiginActivity)
+        gpsTracker = GPSTracker(this@CheckOutActivity)
         gpsTracker.location
 
         binding.placeName.text = AppShared(applicationContext).getPlace()
 
         binding.endShift.setOnClickListener{
-            val builder = AlertDialog.Builder(this@CheckOutJiginActivity)
+            val builder = AlertDialog.Builder(this@CheckOutActivity)
             builder.setTitle("End Shift?")
             builder.setMessage("Do you really want to End the Shift?")
             builder.setPositiveButton(
@@ -111,7 +109,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
     }
 
     private fun showAlert(msg : String){
-        android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
+        android.app.AlertDialog.Builder(this@CheckOutActivity)
             .setTitle("Alert")
             .setMessage(msg)
             .setCancelable(false)
@@ -249,8 +247,8 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             override fun run() {
 
                 runOnUiThread(Runnable {
-                    val savedTime = AppShared(this@CheckOutJiginActivity).getTiming()!!
-                    val hours: String = AppShared(this@CheckOutJiginActivity).getHours()!!
+                    val savedTime = AppShared(this@CheckOutActivity).getTiming()!!
+                    val hours: String = AppShared(this@CheckOutActivity).getHours()!!
 
                     if(savedTime == "") {
                         t.cancel()
@@ -300,7 +298,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             .obtainEndpointProxy(EmployeeEndpoint::class.java)
             .breakIN(breakIn)
 
-        val request = requestFactory.newHttpRequest<Any>(this@CheckOutJiginActivity)
+        val request = requestFactory.newHttpRequest<Any>(this@CheckOutActivity)
             .withEndpoint(call)
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<BreakInResponse?> {
@@ -316,13 +314,13 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
 
                         performTimerLogic()
                     }else if (user?.status == "notok" && user?.statuscode == "500"){
-                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
-                        AppShared(this@CheckOutJiginActivity).saveToken("")
+                        Toast.makeText(this@CheckOutActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutActivity).saveToken("")
 
                         startActivity(Intent(applicationContext, LoginActivity::class.java))
                         finish()
                     } else {
-                        android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
+                        android.app.AlertDialog.Builder(this@CheckOutActivity)
                             .setTitle("Alert")
                             .setMessage(user?.message)
                             .setPositiveButton(
@@ -356,7 +354,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             .obtainEndpointProxy(EmployeeEndpoint::class.java)
             .breakOut(breakOut)
 
-        val request = requestFactory.newHttpRequest<Any>(this@CheckOutJiginActivity)
+        val request = requestFactory.newHttpRequest<Any>(this@CheckOutActivity)
             .withEndpoint(call)
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<BreakOutResponse?> {
@@ -375,14 +373,14 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
 
                         performTimerLogic()
                     }else if (user?.status == "notok" && user?.statuscode == "500"){
-                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
-                        AppShared(this@CheckOutJiginActivity).saveToken("")
+                        Toast.makeText(this@CheckOutActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutActivity).saveToken("")
 
                         startActivity(Intent(applicationContext, LoginActivity::class.java))
                         finish()
                     }else{
 
-                        android.app.AlertDialog.Builder(this@CheckOutJiginActivity)
+                        android.app.AlertDialog.Builder(this@CheckOutActivity)
                             .setTitle("Alert")
                             .setMessage(user?.message)
                             .setPositiveButton(
@@ -399,7 +397,6 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                 }
             }
             ) {
-                //Toast.makeText(this@CheckOutJiginActivity, "error", Toast.LENGTH_LONG).show()
             }.build()
         request.executeAsync()
     }
@@ -420,7 +417,7 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
             .obtainEndpointProxy(EmployeeEndpoint::class.java)
             .checkOut(checkOutRequest)
 
-        val request = requestFactory.newHttpRequest<Any>(this@CheckOutJiginActivity)
+        val request = requestFactory.newHttpRequest<Any>(this@CheckOutActivity)
             .withEndpoint(call)
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<CheckOutResponse?> {
@@ -432,17 +429,17 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                         AppShared(applicationContext).setBreakOut(false)
                         AppShared(applicationContext).setBreakStarted(false)
 
-                        val intent = Intent(this@CheckOutJiginActivity, HomeActivity::class.java)
+                        val intent = Intent(this@CheckOutActivity, HomeActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else if (user?.status == "notok" && user?.statuscode == "500"){
-                        Toast.makeText(this@CheckOutJiginActivity, "Token expired", Toast.LENGTH_LONG).show()
-                        AppShared(this@CheckOutJiginActivity).saveToken("")
+                        Toast.makeText(this@CheckOutActivity, "Token expired", Toast.LENGTH_LONG).show()
+                        AppShared(this@CheckOutActivity).saveToken("")
 
                         startActivity(Intent(applicationContext, LoginActivity::class.java))
                         finish()
                     } else {
-                             AlertDialog.Builder(this@CheckOutJiginActivity)
+                             AlertDialog.Builder(this@CheckOutActivity)
                             .setTitle("Alert")
                             .setMessage(user?.message)
                             .setPositiveButton(
@@ -455,15 +452,11 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
                 }
             }
             ) {
-                //Toast.makeText(this@CheckOutJiginActivity, "error", Toast.LENGTH_LONG).show()
             }.build()
         request.executeAsync()
     }
 
 
-    override fun onResume() {
-        super.onResume()
-    }
 
     override fun onRestart() {
         super.onRestart()
@@ -472,8 +465,8 @@ class CheckOutJiginActivity : BaseActivity<ActivityCheckOutBinding,CheckOutJigin
         }
     }
 
-    override fun createViewModel(): CheckOutJiginViewModel {
-        return ViewModelProvider(this).get(CheckOutJiginViewModel::class.java)
+    override fun createViewModel(): CheckOutViewModel {
+        return ViewModelProvider(this).get(CheckOutViewModel::class.java)
     }
 
     override fun createViewBinding(layoutInflater: LayoutInflater): ActivityCheckOutBinding {

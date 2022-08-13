@@ -32,7 +32,6 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
     private var IS_FROM_DATE = false
     private var fromDate : String = ""
     private var toDate : String = ""
-    private lateinit var dataList : List<DataItem>
     var cal = Calendar.getInstance()
 
     override fun createViewModel(): AttendanceViewModel {
@@ -49,7 +48,6 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
         attendanceReportAdapter = AttendanceReportAdapter(this@AttendanceActivity)
         binding?.reportsRv?.itemAnimator = DefaultItemAnimator()
         binding?.reportsRv?.layoutManager = LinearLayoutManager(this@AttendanceActivity)
-        dataList = ArrayList<DataItem>()
         binding?.reportsRv?.adapter = attendanceReportAdapter
 
 
@@ -115,7 +113,16 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
             }
 
             var reportRequest = ReportRequest(fromDate,toDate)
-            getReport(reportRequest)
+
+            viewModel.getReport(this@AttendanceActivity,reportRequest)
+
+
+            viewModel.attendanceList.observe(this){
+                if (it.attendanceData?.data != null){
+                    attendanceReportAdapter.addList(it.attendanceData?.data as ArrayList<DataItem>)
+                }
+
+            }
         }
 
 
@@ -136,10 +143,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
             .withSuccessAndFailureCallback(object : SuccessCallback<AttendenceReport?> {
                 override fun onSuccess(attendenceReport: AttendenceReport?) {
                     if (attendenceReport?.status == "ok") {
-                        if (attendenceReport.attendanceData?.data != null){
-                            dataList = attendenceReport?.attendanceData?.data as List<DataItem>
-                            attendanceReportAdapter.addList(dataList as ArrayList<DataItem>)
-                        }
+
 
                     } else if (attendenceReport?.status == "notok" && attendenceReport?.statuscode == "500"){
                         Toast.makeText(this@AttendanceActivity, "Token expired", Toast.LENGTH_LONG).show()

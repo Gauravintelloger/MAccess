@@ -39,7 +39,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
         //observing the validUser livedata from ViewModel
         viewModel.validUser.observe(this){
-            AppShared(this@LoginActivity).saveToken(it.token)
+            AppShared(this@LoginActivity).saveToken(it.token.toString())
 
             AppShared(this@LoginActivity).saveUser(it)
 

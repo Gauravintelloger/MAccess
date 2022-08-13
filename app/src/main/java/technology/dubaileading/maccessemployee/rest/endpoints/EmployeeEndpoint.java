@@ -19,6 +19,7 @@ import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse;
 import technology.dubaileading.maccessemployee.rest.entity.Notifications;
 import technology.dubaileading.maccessemployee.rest.entity.Posts;
+import technology.dubaileading.maccessemployee.rest.entity.Profile;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
 
 public interface EmployeeEndpoint {
@@ -49,5 +50,8 @@ public interface EmployeeEndpoint {
 
     @POST("employee/likePost")
     Call<ApiResponse> likePost(@Body LikePost likePost);
+
+    @GET("employee/employeeProfileView")
+    Call<Profile> getProfile();
 
 }

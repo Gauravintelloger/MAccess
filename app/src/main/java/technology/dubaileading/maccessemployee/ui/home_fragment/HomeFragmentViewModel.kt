@@ -5,10 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import technology.dubaileading.maccessemployee.base.BaseViewModel
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.rest.entity.LikePost
-import technology.dubaileading.maccessemployee.rest.entity.Notifications
 import technology.dubaileading.maccessemployee.rest.entity.Posts
 import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
-import technology.dubaileading.maccessemployee.ui.notifications.NotificationsRepo
+
 
 class HomeFragmentViewModel : BaseViewModel(),HomeCallback {
     private var homeRepo = HomeRepo(this)
