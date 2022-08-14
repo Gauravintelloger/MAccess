@@ -1,5 +1,8 @@
 package technology.dubaileading.maccessemployee.ui.profile
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -10,8 +13,12 @@ import coil.transform.CircleCropTransformation
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentProfileBinding
+import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessemployee.ui.change_password.ChangePasswordActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
+import technology.dubaileading.maccessemployee.ui.settings.SettingsActivity
+import technology.dubaileading.maccessemployee.utils.AppShared
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>() {
 
@@ -46,11 +53,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         binding?.sl?.layoutParams = linearSlViewParams
 
         val linearClViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,clLeaves)
-        // linearAlViewParams.weight = clLeaves
+        //linearAlViewParams.weight = clLeaves
         binding?.cl?.layoutParams = linearClViewParams
 
         val linearAvaillViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,availableLeaves)
-        //    linearAlViewParams.weight = availableLeaves
+        //linearAlViewParams.weight = availableLeaves
         binding?.restLeave?.layoutParams = linearAvaillViewParams
 
         binding?.progressView?.weightSum = totalLeaves
@@ -60,6 +67,10 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         binding?.progressView?.addView(binding?.cl)
         binding?.progressView?.addView(binding?.restLeave)
 
+        binding?.materialToolbar?.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
+
         binding?.personalInfo?.setOnClickListener {
             startActivity(Intent(activity, PersonalInfoActivity::class.java))
         }
@@ -67,6 +78,34 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         binding?.changePass?.setOnClickListener {
             startActivity(Intent(activity, ChangePasswordActivity::class.java))
         }
+
+        binding?.attendanceLog?.setOnClickListener {
+            startActivity(Intent(activity, AttendanceActivity::class.java))
+        }
+
+        binding?.settings?.setOnClickListener {
+            startActivity(Intent(activity, SettingsActivity::class.java))
+        }
+
+        binding?.logOut?.setOnClickListener {
+            var alertDialog = AlertDialog.Builder(activity as Context)
+            alertDialog.setTitle("Logout?")
+            alertDialog.setMessage("Do you want to logout from mAccess?")
+            alertDialog.setPositiveButton("Yes") { _, _ ->
+                run {
+                    AppShared(activity as Context).clearAll()
+                    startActivity(Intent(activity, LoginActivity::class.java))
+                    (activity as Activity).finishAffinity()
+                }
+            }
+            alertDialog.setNegativeButton("No") { dialog, which ->
+                dialog.dismiss()
+
+            }
+
+            alertDialog.show()
+        }
+
     }
 
 

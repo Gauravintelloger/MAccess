@@ -55,7 +55,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
         }
 
         binding.timesheetLayout.setOnClickListener{
-            startActivity(Intent(applicationContext, AttendanceActivity::class.java))
+            startActivity(Intent(this@CheckOutActivity, AttendanceActivity::class.java))
         }
 
         binding.materialToolbar.setNavigationOnClickListener {

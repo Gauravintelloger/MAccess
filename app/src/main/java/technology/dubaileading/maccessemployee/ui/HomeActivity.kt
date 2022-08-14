@@ -20,6 +20,7 @@ import technology.dubaileading.maccessemployee.ui.login.LoginViewModel
 import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
 import technology.dubaileading.maccessemployee.ui.profile.ProfileFragment
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
+import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 
 
 class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
@@ -88,7 +89,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
                     R.id.fragment_container,
                     fragment
                 )
-//                .addToBackStack(fragment.getTag())
+                .addToBackStack(fragment.tag)
                 .commit()
             return true
         }

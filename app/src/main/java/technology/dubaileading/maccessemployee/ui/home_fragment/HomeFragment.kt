@@ -109,6 +109,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         }
         binding?.service?.setOnClickListener{
+
             ComingSoonDialog(activity as Context).show()
         }
 
@@ -116,23 +117,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             ComingSoonDialog(activity as Context).show()
         }
 
-        binding?.lock?.setOnClickListener{
-            var alertDialog = AlertDialog.Builder(activity as Context)
-            alertDialog.setTitle("Logout?")
-            alertDialog.setMessage("Do you want to logout from mAccess?")
-            alertDialog.setPositiveButton("Yes") { _, _ ->
-                run {
-                    AppShared(activity as Context).clearAll()
-
-//                    TickTokTimer.cancelTimer()
-
-                    t.cancel()
-                    startActivity(Intent(activity,LoginActivity::class.java))
-                    (activity as Activity).finishAffinity()
-                }
-            }
-            alertDialog.show()
-        }
     }
 
     private fun showAlert(){

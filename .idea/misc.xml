@@ -20,6 +20,7 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_arrow_icon.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_attechment.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_back.xml" value="0.2905" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_banking.xml" value="0.228" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_bottom_arrow.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_cal_small.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_calander_2.xml" value="0.265" />
@@ -28,6 +29,9 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_change_password_icon.xml" value="0.351" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_document.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_insurance_1.xml" value="0.297" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_insurance_2.xml" value="0.228" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_insurance_3.xml" value="0.228" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_insurance_4.xml" value="0.228" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_personal_info_icon.xml" value="0.351" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_profiel_edit.xml" value="0.351" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_profiel_nav.xml" value="0.352" />
@@ -43,6 +47,7 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_home.xml" value="0.33" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_login.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_personal_info.xml" value="0.35052083333333334" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_settings.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/activity_timelog.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/alert_error_log.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/bottom_bar.xml" value="0.35052083333333334" />
@@ -52,6 +57,7 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_profile.xml" value="0.33" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_requests.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_services.xml" value="0.35052083333333334" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/fragment_services2.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/item_time_log.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/layout_feeds.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/layout_home_fragments.xml" value="0.35052083333333334" />

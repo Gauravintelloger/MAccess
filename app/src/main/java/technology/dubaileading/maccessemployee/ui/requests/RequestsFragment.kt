@@ -77,6 +77,9 @@ class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewMode
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        binding?.materialToolbar?.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
         binding?.requestsRv?.itemAnimator = DefaultItemAnimator()
         binding?.requestsRv?.layoutManager = LinearLayoutManager(activity)
         binding?.requestsRv?.adapter = RequestsAdapter()

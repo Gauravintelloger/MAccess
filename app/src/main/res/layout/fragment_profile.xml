@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:background="@drawable/home_bg"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent=".35"
+            app:layout_constraintHeight_percent=".37"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -502,6 +502,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/attendanceLog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -536,11 +537,13 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:background="@color/seperator" />
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -580,6 +583,7 @@
                     android:background="@color/seperator" />
 
                 <LinearLayout
+                    android:id="@+id/settings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -619,6 +623,7 @@
                     android:background="@color/seperator" />
 
                 <LinearLayout
+                    android:id="@+id/logOut"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"

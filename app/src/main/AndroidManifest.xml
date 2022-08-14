@@ -17,9 +17,13 @@
         android:theme="@style/Theme.MAccess"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/HomeActivity.Theme" />
+        <activity
             android:name=".ui.change_password.ChangePasswordActivity"
             android:exported="false"
-            android:theme="@style/HomeActivity.Theme"/>
+            android:theme="@style/HomeActivity.Theme" />
         <activity
             android:name=".ui.personal_info.PersonalInfoActivity"
             android:exported="false"
@@ -30,11 +34,11 @@
         <!--  -->
         <!-- </activity> -->
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity"
+            android:name=".ui.attendance.AttendanceActivity"
             android:exported="false"
             android:theme="@style/HomeActivity.Theme" />
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity"
+            android:name=".ui.check_out.CheckOutActivity"
             android:exported="false"
             android:theme="@style/HomeActivity.Theme" />
 
@@ -43,16 +47,16 @@
             android:value="AIzaSyAF8myPEYufyG3mDQzhiXqqG0VRPwyHL2Q" />
 
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.login.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity"
+            android:name=".ui.check_in.CheckInActivity"
             android:exported="true" />
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.splash.SplashActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true" />
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.splash_gif.SplashGifActivity"
+            android:name=".ui.splash_gif.SplashGifActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,7 +65,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="technology.dubaileading.maccessemployee.ui.HomeActivity"
+            android:name=".ui.HomeActivity"
             android:exported="true"
             android:theme="@style/HomeActivity.Theme" />
     </application>

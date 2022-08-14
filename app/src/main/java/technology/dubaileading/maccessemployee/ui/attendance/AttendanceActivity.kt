@@ -80,6 +80,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
             onBackPressed()
         }
 
+
         val datePickerDialog = DatePickerDialog(this@AttendanceActivity,
             this@AttendanceActivity, today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
 

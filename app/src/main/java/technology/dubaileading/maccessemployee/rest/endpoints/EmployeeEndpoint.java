@@ -10,6 +10,7 @@ import technology.dubaileading.maccessemployee.rest.entity.BreakInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.BreakOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.BreakOutResponse;
+import technology.dubaileading.maccessemployee.rest.entity.ChangePassword;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
@@ -18,6 +19,7 @@ import technology.dubaileading.maccessemployee.rest.entity.LikePost;
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse;
 import technology.dubaileading.maccessemployee.rest.entity.Notifications;
+import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest;
 import technology.dubaileading.maccessemployee.rest.entity.Posts;
 import technology.dubaileading.maccessemployee.rest.entity.Profile;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
@@ -53,5 +55,8 @@ public interface EmployeeEndpoint {
 
     @GET("employee/employeeProfileView")
     Call<Profile> getProfile();
+
+    @POST("employee/changeEmployeePassword")
+    Call<ChangePassword> changePassword(@Body PasswordRequest passwordRequest);
 
 }

@@ -162,12 +162,6 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/lock"
-                        android:layout_width="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_height="25dp"
-                        android:src="@android:drawable/ic_lock_lock"/>
                 </LinearLayout>
 
                 <TextView

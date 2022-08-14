@@ -20,7 +20,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
         binding.submitBt.setOnClickListener{
             var username = binding.usename.text.toString()
-            var password = Utils.md5(binding.password.text.toString())
+            var password = Utils.md5(binding.password.text.toString().trim())
             var deviceToken = Utils.getUniqueID(this@LoginActivity)
 
 
