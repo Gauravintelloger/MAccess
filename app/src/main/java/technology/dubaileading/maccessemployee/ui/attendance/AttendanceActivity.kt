@@ -3,13 +3,18 @@ package technology.dubaileading.maccessemployee.ui.attendance
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.DatePicker
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityTimelogBinding
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
@@ -44,6 +49,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        backGroundColor()
 
         attendanceReportAdapter = AttendanceReportAdapter(this@AttendanceActivity)
         binding?.reportsRv?.itemAnimator = DefaultItemAnimator()
@@ -182,6 +188,15 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
         super.onBackPressed()
         startActivity(Intent(this@AttendanceActivity, HomeActivity::class.java))
         finish()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun backGroundColor() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
     }
 
 }

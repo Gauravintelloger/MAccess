@@ -20,7 +20,6 @@ import technology.dubaileading.maccessemployee.ui.login.LoginViewModel
 import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
 import technology.dubaileading.maccessemployee.ui.profile.ProfileFragment
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
-import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 
 
 class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
@@ -45,7 +44,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
             when (item.title){
                 "Services" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(ComingSoonFragment())
+
                     binding
                 }
                 "Requests" -> {

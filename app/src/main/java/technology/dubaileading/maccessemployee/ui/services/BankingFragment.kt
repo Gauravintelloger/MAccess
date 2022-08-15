@@ -8,20 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
-import technology.dubaileading.maccessemployee.databinding.FragmentProfileBinding
+import technology.dubaileading.maccessemployee.databinding.FragmentBankingBinding
 import technology.dubaileading.maccessemployee.databinding.FragmentServicesBinding
-import technology.dubaileading.maccessemployee.ui.profile.ProfileViewModel
 
-class ServicesFragment : BaseFragment<FragmentServicesBinding, ServicesViewModel>() {
+class BankingFragment : BaseFragment<FragmentBankingBinding, BankingViewModel>() {
 
 
-    override fun createViewModel(): ServicesViewModel {
-        return ViewModelProvider(this).get(ServicesViewModel::class.java)
+    override fun createViewModel(): BankingViewModel {
+        return ViewModelProvider(this).get(BankingViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentServicesBinding {
-        return FragmentServicesBinding.inflate(layoutInflater!!);
+    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentBankingBinding {
+        return FragmentBankingBinding.inflate(layoutInflater!!);
     }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

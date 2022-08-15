@@ -23,20 +23,6 @@ class AppShared(context : Context) {
     /*----------*/
 
     /*----------*/
-    fun saveUserName(user : LoginResponse){
-        val edit = shared.edit()
-        edit.putString("userName",Gson().toJson(user))
-        edit.apply()
-    }
-
-    fun getUserName() : LoginResponse{
-        var userS = shared.getString("userName","");
-        return Gson().fromJson(userS,LoginResponse::class.java)
-    }
-    /*----------*/
-
-
-    /*----------*/
     fun saveToken(token : String){
         val edit = shared.edit()
         edit.putString("token",token)

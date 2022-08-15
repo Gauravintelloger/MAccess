@@ -7,6 +7,8 @@ import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -19,6 +21,7 @@ import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
 import technology.dubaileading.maccessemployee.ui.settings.SettingsActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utils.Constants
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>() {
 
@@ -32,6 +35,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         return ViewModelProvider(this).get(ProfileViewModel::class.java)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+
     override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentProfileBinding {
         return FragmentProfileBinding.inflate(layoutInflater!!);
     }
@@ -39,8 +47,31 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        binding?.profilePicView?.load(R.drawable.dlt_single_logo){
+        var user = AppShared(requireContext()).getUser()
+        var logo = Constants.photoUrl+user.data?.organisationLogo
+
+        binding?.profilePicView?.load(logo){
             transformations(CircleCropTransformation())
+        }
+
+        viewModel?.getProfile(requireContext())
+
+        viewModel?.profileData?.observe(viewLifecycleOwner){
+            if (it.profileData?.photo != null){
+                binding?.profilePicView?.load(it.profileData?.photo){
+                    transformations(CircleCropTransformation())
+                }
+            }else{
+                binding?.profilePicView?.load(logo){
+                    transformations(CircleCropTransformation())
+                }
+            }
+
+            binding?.nameText?.text = it.profileData?.name.toString()
+            binding?.positionTv?.text = it.profileData?.designation?.title.toString()
+
+
+
         }
 
         val linearAlViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,alLeaves)

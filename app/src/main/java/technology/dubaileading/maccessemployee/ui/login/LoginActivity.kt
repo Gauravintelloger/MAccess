@@ -9,6 +9,7 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Utils
 
@@ -43,7 +44,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
             AppShared(this@LoginActivity).saveUser(it)
 
-            startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+            startActivity(Intent(this@LoginActivity, SplashActivity::class.java))
             finish()
         }
 

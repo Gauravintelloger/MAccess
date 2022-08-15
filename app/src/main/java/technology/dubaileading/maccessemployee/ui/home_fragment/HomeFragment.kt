@@ -1,7 +1,6 @@
 package technology.dubaileading.maccessemployee.ui.home_fragment
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
@@ -14,9 +13,13 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
+import coil.transform.RoundedCornersTransformation
 
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
@@ -26,9 +29,9 @@ import technology.dubaileading.maccessemployee.rest.entity.LikePost
 import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
-import technology.dubaileading.maccessemployee.ui.dialog.ComingSoonDialog
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utils.Constants
 import technology.dubaileading.maccessemployee.utils.TimerHelper
 import java.util.*
 
@@ -77,7 +80,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         Log.d("token", token.toString());
 
         var user = AppShared(activity as Context).getUser()
-        binding?.username?.text = user.data?.username
+        binding?.username?.text = user.data?.name
+        var logo = Constants.photoUrl+user.data?.organisationLogo
+        if (user.data?.photo != null){
+            binding?.userImage?.load(user.data?.photo){
+                transformations(RoundedCornersTransformation(16f))
+            }
+        }else{
+            binding?.userImage?.load(logo){
+                transformations(RoundedCornersTransformation(16f))
+            }
+        }
 
         binding?.welcomText?.text = buildSpannedString {
             inSpans(
@@ -109,12 +122,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         }
         binding?.service?.setOnClickListener{
-
-            ComingSoonDialog(activity as Context).show()
+            /*val fragment = ServiceFragment()
+            val fragmentManager: FragmentManager = requireFragmentManager()
+            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragment_container, fragment, "tag")
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()*/
         }
 
         binding?.request?.setOnClickListener{
-            ComingSoonDialog(activity as Context).show()
+            val fragment = RequestsFragment()
+            val fragmentManager: FragmentManager = requireFragmentManager()
+            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragment_container, fragment, "tag")
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
         }
 
     }

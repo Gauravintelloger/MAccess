@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@color/white"
-        app:title="Time Clock"
+        app:title="Attendance Log"
         app:titleCentered="true"
         app:titleTextAppearance="@style/tittle"
         app:titleTextColor="@color/white" />

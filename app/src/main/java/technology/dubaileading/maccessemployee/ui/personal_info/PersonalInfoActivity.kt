@@ -2,12 +2,17 @@ package technology.dubaileading.maccessemployee.ui.personal_info
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.DatePicker
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityPersonalInfoBinding
 import java.util.*
@@ -17,6 +22,7 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
     var cal = Calendar.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        backGroundColor()
         viewModel.getProfile(this@PersonalInfoActivity)
         viewModel.profileData.observe(this){
             binding?.name?.setText(it?.profileData?.name.toString())
@@ -60,5 +66,13 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
 
     override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityPersonalInfoBinding {
         return ActivityPersonalInfoBinding.inflate(layoutInflater!!)
+    }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun backGroundColor() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
     }
 }

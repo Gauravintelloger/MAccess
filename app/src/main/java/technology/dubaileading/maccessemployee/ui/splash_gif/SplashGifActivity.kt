@@ -13,6 +13,7 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashGifBinding
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Utils
 
@@ -27,10 +28,9 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
             val token = AppShared(this@SplashGifActivity).getToken()
 
             if(token?.isEmpty() == false){
-                startActivity(Intent(applicationContext, HomeActivity::class.java))
+                startActivity(Intent(applicationContext, SplashActivity::class.java))
                 finish()
-            }
-            else {
+            } else {
                 startActivity(Intent(applicationContext, LoginActivity::class.java))
                 finish()
             }
@@ -39,6 +39,7 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
 
         val gifFromAssets = GifDrawable(assets, "splash_gif.gif")
         binding.splashGif.setImageDrawable(gifFromAssets)
+
 
     }
 
