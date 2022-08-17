@@ -15,6 +15,7 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
+import technology.dubaileading.maccessemployee.rest.entity.LeaveTypes;
 import technology.dubaileading.maccessemployee.rest.entity.LikePost;
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse;
@@ -58,5 +59,8 @@ public interface EmployeeEndpoint {
 
     @POST("employee/changeEmployeePassword")
     Call<ChangePassword> changePassword(@Body PasswordRequest passwordRequest);
+
+    @GET("getLeaveTypesnew")
+    Call<LeaveTypes> getLeaveTypes();
 
 }

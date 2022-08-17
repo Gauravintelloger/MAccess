@@ -19,7 +19,7 @@ import java.util.*
 
 
 class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalInfoViewModel>(){
-    var cal = Calendar.getInstance()
+    private var cal = Calendar.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         backGroundColor()
@@ -30,14 +30,12 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
             binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())
 
         }
-        val dateSetListener = object : DatePickerDialog.OnDateSetListener {
-            override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int,
-                                   dayOfMonth: Int) {
+        val dateSetListener =
+            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             }
-        }
 
 
         binding?.dob?.setOnClickListener {

@@ -30,6 +30,7 @@ import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
+import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Constants
 import technology.dubaileading.maccessemployee.utils.TimerHelper
@@ -122,12 +123,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         }
         binding?.service?.setOnClickListener{
-            /*val fragment = ServiceFragment()
+            val fragment = ServicesFragment()
             val fragmentManager: FragmentManager = requireFragmentManager()
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragment_container, fragment, "tag")
             fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()*/
+            fragmentTransaction.commit()
         }
 
         binding?.request?.setOnClickListener{

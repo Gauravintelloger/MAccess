@@ -72,15 +72,13 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
 
         val today = Calendar.getInstance()
 
-        val dateSetListener = object : DatePickerDialog.OnDateSetListener {
-            override fun onDateSet(view: DatePicker, year: Int, monthOfYear: Int,
-                                   dayOfMonth: Int) {
+        val dateSetListener =
+            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 updateDateInView()
             }
-        }
 
         binding?.materialToolbar?.setNavigationOnClickListener {
             onBackPressed()

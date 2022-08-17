@@ -126,9 +126,9 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="8dp"
-                    android:inputType="textEmailAddress"
                     android:background="@drawable/edittext_background"
                     android:fontFamily="@font/normal400"
+                    android:inputType="textEmailAddress"
                     android:minHeight="55dp"
                     android:paddingLeft="16dp" />
 
@@ -218,8 +218,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="8dp"
-                    android:focusable="false"
                     android:background="@drawable/edittext_background"
+                    android:focusable="false"
                     android:fontFamily="@font/normal400"
                     android:keyboardNavigationCluster="false"
                     android:minHeight="55dp"
