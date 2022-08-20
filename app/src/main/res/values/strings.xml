@@ -23,5 +23,8 @@
     <string name="un_sync_log">Un Sync Log</string>
     <string name="personal_information">Personal Information</string>
 
+    <string name="leave">Leave</string>
+    <string name="document">Document</string>
+
 
 </resources>

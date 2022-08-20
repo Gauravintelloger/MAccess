@@ -2,6 +2,7 @@ package technology.dubaileading.maccessemployee.ui.profile
 
 import android.content.Context
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
+import technology.dubaileading.maccessemployee.rest.entity.GetLeave
 import technology.dubaileading.maccessemployee.rest.entity.Profile
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
@@ -21,6 +22,24 @@ class ProfileRepo(var callback: ProfileCallback) {
                 }
             }) {
                 callback.profileFailure(it)
+            }.build()
+        request.executeAsync()
+    }
+
+    fun getLeaves(context : Context){
+        val requestFactory = ServerRequestFactory()
+        val call = requestFactory
+            .obtainEndpointProxy(EmployeeEndpoint::class.java).leaves
+
+        val request = requestFactory.newHttpRequest<Any>(context)
+            .withEndpoint(call)
+            .withProgressDialogue()
+            .withSuccessAndFailureCallback(object : SuccessCallback<GetLeave?> {
+                override fun onSuccess(getLeave: GetLeave?) {
+                    callback.getLeaveResponse(getLeave)
+                }
+            }) {
+                callback.getLeaveFailure(it)
             }.build()
         request.executeAsync()
     }

@@ -1,10 +1,15 @@
 package technology.dubaileading.maccessemployee.rest.endpoints;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Query;
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse;
+import technology.dubaileading.maccessemployee.rest.entity.ApplyLeave;
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInResponse;
@@ -15,6 +20,10 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
+import technology.dubaileading.maccessemployee.rest.entity.DocumentRequest;
+import technology.dubaileading.maccessemployee.rest.entity.EmployeeRequests;
+import technology.dubaileading.maccessemployee.rest.entity.GetLeave;
+import technology.dubaileading.maccessemployee.rest.entity.GetRequests;
 import technology.dubaileading.maccessemployee.rest.entity.LeaveTypes;
 import technology.dubaileading.maccessemployee.rest.entity.LikePost;
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest;
@@ -24,6 +33,7 @@ import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest;
 import technology.dubaileading.maccessemployee.rest.entity.Posts;
 import technology.dubaileading.maccessemployee.rest.entity.Profile;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
+import technology.dubaileading.maccessemployee.rest.entity.RequestType;
 
 public interface EmployeeEndpoint {
 
@@ -57,10 +67,29 @@ public interface EmployeeEndpoint {
     @GET("employee/employeeProfileView")
     Call<Profile> getProfile();
 
+    @GET("employee/getLeaveDetails")
+    Call<GetLeave> getLeaves();
+
     @POST("employee/changeEmployeePassword")
     Call<ChangePassword> changePassword(@Body PasswordRequest passwordRequest);
 
     @GET("getLeaveTypesnew")
     Call<LeaveTypes> getLeaveTypes();
+
+    @POST("applyLeaveApplication")
+    Call<ApiResponse> applyLeave(@Body ApplyLeave applyLeave);
+
+    @GET("getRequestTypes")
+    Call<RequestType> getRequestTypes();
+
+    @POST("makeEmployeeRequestnew")
+    Call<ApiResponse> requestDocument(@Body DocumentRequest documentRequest);
+
+    @Multipart
+    @POST("makeEmployeeRequestnew")
+    Call<ApiResponse> requestDocument(@Part MultipartBody.Part file, @Query("subject") String subject, @Query("description") String description, @Query("request_type") Integer request_type, @Query("required_by") String required_by, @Query("email") String email);
+
+    @POST("getEmployeeRequestsnew")
+    Call<EmployeeRequests> getEmployeeRequests(@Body GetRequests getRequests);
 
 }

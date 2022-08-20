@@ -22,8 +22,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
         super.onCreate(savedInstanceState)
 
         var user = AppShared(this@SplashActivity).getUser()
-        var logo = Constants.photoUrl+user.data?.organisationLogo
-        binding.image.load(logo){
+        binding.image.load(user.data?.organisationLogo){
             crossfade(true)
             crossfade(800)
         }

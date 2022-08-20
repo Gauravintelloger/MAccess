@@ -34,6 +34,7 @@ import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Constants
 import technology.dubaileading.maccessemployee.utils.TimerHelper
+import technology.dubaileading.maccessemployee.utils.Utils
 import java.util.*
 
 class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),onLikeClickListener {
@@ -78,17 +79,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         timerText = binding?.timer!!
 
         val token = AppShared(activity).getToken()
+        var deviceToken = Utils.getUniqueID(requireContext())
         Log.d("token", token.toString());
+        Log.d("token", deviceToken.toString());
 
         var user = AppShared(activity as Context).getUser()
         binding?.username?.text = user.data?.name
-        var logo = Constants.photoUrl+user.data?.organisationLogo
+
         if (user.data?.photo != null){
             binding?.userImage?.load(user.data?.photo){
                 transformations(RoundedCornersTransformation(16f))
             }
         }else{
-            binding?.userImage?.load(logo){
+            binding?.userImage?.load(user.data?.organisationLogo){
                 transformations(RoundedCornersTransformation(16f))
             }
         }

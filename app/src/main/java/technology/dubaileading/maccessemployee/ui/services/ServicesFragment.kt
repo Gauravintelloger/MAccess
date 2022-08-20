@@ -33,7 +33,7 @@ class ServicesFragment : BaseFragment<FragmentServicesBinding, ServicesViewModel
 
 
         val fragmentManager: FragmentManager = activity?.supportFragmentManager !!
-        binding?.viewPager?.adapter = FragmentAdapter(fragmentManager,lifecycle)
+        binding?.viewPager?.adapter = ServicesFragmentAdapter(fragmentManager,lifecycle)
 
         binding?.tabLay?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -51,14 +51,10 @@ class ServicesFragment : BaseFragment<FragmentServicesBinding, ServicesViewModel
         binding?.viewPager?.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                binding?.tabLay?.selectTab(  binding?.tabLay?.getTabAt(position))
+                binding?.tabLay?.selectTab( binding?.tabLay?.getTabAt(position))
+
             }
         })
-
-
-
-
-
 
     }
 

@@ -8,5 +8,10 @@ data class ApiResponse(
 	val code: Int? = null,
 
 	@field:SerializedName("message")
-	val message: String? = null
+	val message: String? = null,
+
+	@field:SerializedName("status")
+	val status: String? = null
+
+
 )

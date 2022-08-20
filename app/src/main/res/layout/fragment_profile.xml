@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:background="@drawable/home_bg"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent=".37"
+            app:layout_constraintHeight_percent=".40"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -53,6 +53,7 @@
             android:layout_height="35dp"
             android:scaleType="centerCrop"
             android:layout_marginLeft="-26dp"
+            android:visibility="gone"
             android:src="@drawable/ic_profiel_edit"
             app:layout_constraintBottom_toBottomOf="@id/profilePicView"
             app:layout_constraintStart_toEndOf="@+id/profilePicView" />
@@ -140,19 +141,22 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/totalLeavesData"
+                                android:id="@+id/available_leave"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="15"
+                                android:text=""
                                 android:fontFamily="@font/bold700"
                                 android:textColor="@color/blue"
                                 android:textSize="18sp" />
 
                             <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/total_leave"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="/46"
+                                android:text=""
                                 android:textSize="@dimen/smallTextSize" />
+
+
 
                         </LinearLayout>
 
@@ -172,20 +176,33 @@
                             android:textSize="13sp"
                             android:fontFamily="@font/medium500"/>
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/leavesRequestedData"
+                            android:id="@+id/leave_requested"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/bold700"
                             android:textColor="@color/black"
-                            android:text="5"
+                            android:text=""
                             android:textSize="18sp" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/leaveRv"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/lay1" />
 
-                <LinearLayout
+
+               <!-- <LinearLayout
                     android:id="@+id/progressView"
                     android:layout_width="match_parent"
                     android:layout_height="18dp"
@@ -194,6 +211,7 @@
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/rounded_corner_bg"
                     android:orientation="horizontal"
+                    android:visibility="gone"
                     android:weightSum="4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -293,17 +311,19 @@
                     app:layout_constraintTop_toBottomOf="@id/alLeft_Heading">
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/alLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/bold700"
-                        android:text="15"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="18sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/alTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/46"
+                        android:text=""
                         android:textSize="@dimen/smallTextSize" />
 
                 </LinearLayout>
@@ -321,17 +341,19 @@
                     app:layout_constraintTop_toBottomOf="@id/alLeft_Heading">
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/clLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/bold700"
-                        android:text="15"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="18sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/clTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/46"
+                        android:text=""
                         android:textSize="@dimen/smallTextSize" />
 
                 </LinearLayout>
@@ -350,20 +372,22 @@
                     app:layout_constraintTop_toBottomOf="@id/alLeft_Heading">
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/slLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/bold700"
-                        android:text="15"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="18sp" />
 
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/slTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/46"
+                        android:text=""
                         android:textSize="@dimen/smallTextSize" />
 
-                </LinearLayout>
+                </LinearLayout>-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

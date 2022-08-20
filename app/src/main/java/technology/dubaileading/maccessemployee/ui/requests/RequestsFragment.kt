@@ -1,31 +1,50 @@
 package technology.dubaileading.maccessemployee.ui.requests
 
+import android.Manifest
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.tabs.TabLayout
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
-import technology.dubaileading.maccessemployee.rest.entity.LeaveTypeData
+import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewModel>() {
     private var cal = Calendar.getInstance()
-    var list = ArrayList<LeaveTypeData>()
+    private var leaveTypeList = ArrayList<LeaveTypeData>()
+    private var docTypeList = ArrayList<RequestTypeItem>()
     private var fromDate : String = ""
     private var toDate : String = ""
+    private var reqDate : String = ""
     private var IS_FROM_DATE = false
+    private var REQUEST_CODE_PICK_DOC = 101
+    private var doc_type_id : Int? = null
+    private lateinit var uri : Uri
+
+    private lateinit var path :String
 
     override fun createViewModel(): RequestsViewModel {
         return ViewModelProvider(this).get(RequestsViewModel::class.java)
@@ -40,6 +59,7 @@ class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewMode
         binding?.newRequest?.setOnClickListener {
             newRequest()
         }
+        checkPermission()
 
     }
 
@@ -66,30 +86,164 @@ class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewMode
         val btnsheet = layoutInflater.inflate(R.layout.document_request, null)
         var newDocDialog = BottomSheetDialog(requireContext())
 
-
-        newDocDialog.setContentView(btnsheet)
-        newDocDialog.show()
-
-    }
-
-    private fun newLeaveRequest() {
-        val btnsheet = layoutInflater.inflate(R.layout.leave_request, null)
-        var newLeaveDialog = BottomSheetDialog(requireContext())
-        val leaveType = btnsheet.findViewById<AppCompatSpinner>(R.id.leaveType)
+        val spinnerDocType = btnsheet.findViewById<AppCompatSpinner>(R.id.spinnerDocType)
+        val dateCard = btnsheet.findViewById<CardView>(R.id.dateCard)
+        val date = btnsheet.findViewById<EditText>(R.id.date)
+        val email = btnsheet.findViewById<EditText>(R.id.email)
+        val attachment = btnsheet.findViewById<EditText>(R.id.attachment)
         val desc = btnsheet.findViewById<EditText>(R.id.desc)
-        val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
-        val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
-        val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
 
+        val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
 
-        leaveBal.text = list[0].shortCode + "Left:" + list[0].balanceLeaves + " of " +list[0].noOfLeaves
+        var docType = ArrayList<String>()
+        for (i in docTypeList.indices){
+            docType.add(docTypeList[i].type.toString())
+        }
+        val arrayAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_dropdown_item, docType)
+        spinnerDocType.adapter = arrayAdapter
+        doc_type_id = docTypeList[0].id
+
+        spinnerDocType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
+                val docType = docTypeList[i].type
+                doc_type_id = docTypeList[i].id
+                if (docType.equals("Others")){
+
+                }
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {
+
+            }
+        }
+
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                val myFormat = "yyyy-MM-dd"
+                val myFormat = "dd-MM-yyyy"
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                reqDate = sdf.format(cal.time)
+                date.setText(reqDate)
+            }
+
+        date.setOnClickListener {
+            DatePickerDialog(
+                requireActivity(),
+                dateSetListener,
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)).show()
+
+        }
+
+        var user = AppShared(activity as Context).getUser()
+        email.setText( user.data?.username)
+
+        attachment.setOnClickListener {
+            openFile()
+
+        }
+
+        submitBt.setOnClickListener {
+            val description = desc?.text?.toString()?.trim()
+            val mail = email?.text?.toString()?.trim()
+            var documentRequest = DocumentRequest("Document Request",description,"",doc_type_id,reqDate,mail)
+            viewModel?.documentRequest(requireContext(),documentRequest,uri)
+        }
+
+
+        viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(),it.message, Toast.LENGTH_LONG).show()
+            newDocDialog.dismiss()
+        }
+
+        viewModel?.documentRequestError?.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(),it.message, Toast.LENGTH_LONG).show()
+        }
+
+
+
+
+        newDocDialog.setContentView(btnsheet)
+        newDocDialog.show()
+
+    }
+
+    private fun openFile() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type =  "*/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        resultLauncher.launch(intent)
+    }
+
+    var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            uri = data?.data!!
+
+
+
+        }
+    }
+
+
+
+    private fun checkPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+            } else {
+                ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+            }
+        }
+    }
+
+    private fun newLeaveRequest() {
+        val btnsheet = layoutInflater.inflate(R.layout.leave_request, null)
+        var newLeaveDialog = BottomSheetDialog(requireContext())
+
+        val leaveType = btnsheet.findViewById<AppCompatSpinner>(R.id.leaveType)
+        val desc = btnsheet.findViewById<EditText>(R.id.desc)
+        val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
+        val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
+        val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
+        val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
+
+
+        leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " +leaveTypeList[0].noOfLeaves
+        var leave_type_id = leaveTypeList[0].id
+
+        var typeList = ArrayList<String>()
+        for (i in leaveTypeList.indices){
+            typeList.add(leaveTypeList[i].title.toString())
+        }
+        val arrayAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_dropdown_item, typeList)
+        leaveType.adapter = arrayAdapter
+
+        leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
+                val short_code = leaveTypeList[i].shortCode
+                val no_of_leaves = leaveTypeList[i].noOfLeaves
+                val balance_leaves = leaveTypeList[i].balanceLeaves
+                leave_type_id = leaveTypeList[i].id
+                leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+        }
+
+
+
+        val dateSetListener =
+            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                cal.set(Calendar.YEAR, year)
+                cal.set(Calendar.MONTH, monthOfYear)
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                val myFormat = "dd-MM-yyyy"
                 val sdf = SimpleDateFormat(myFormat, Locale.US)
                 if (IS_FROM_DATE){
                     fromDate = sdf.format(cal.time)
@@ -123,29 +277,41 @@ class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewMode
                 cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-
-
-
-        var typeList = ArrayList<String>()
-        for (i in list.indices){
-            typeList.add(list[i].title.toString())
-        }
-        val arrayAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_dropdown_item, typeList)
-        leaveType.adapter = arrayAdapter
-
-        leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                val short_code = list[i].shortCode
-                val no_of_leaves = list[i].noOfLeaves
-                val balance_leaves = list[i].balanceLeaves
-                leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
+        submitBt.setOnClickListener {
+            if(leave_type_id!!.equals(null)){
+                Toast.makeText(requireContext(),"Select Leave Type", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            val description = desc?.text?.toString()?.trim()
+            if(description!!.isEmpty()){
+                Toast.makeText(requireContext(),"Add Description", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
             }
 
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+            if(fromDate.isEmpty()){
+                Toast.makeText(requireContext(),"Start date is not selected", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            if(toDate.isEmpty()){
+                Toast.makeText(requireContext(),"End date is not selected", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            var applyLeave = ApplyLeave(leave_type_id,description,fromDate,toDate)
+
+            viewModel?.applyLeave(requireContext(),applyLeave)
+
+
         }
 
+        viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(),it.message, Toast.LENGTH_LONG).show()
+            newLeaveDialog.dismiss()
+        }
 
-
+        viewModel?.applyLeaveError?.observe(viewLifecycleOwner){
+            Toast.makeText(requireContext(),it.message, Toast.LENGTH_LONG).show()
+        }
 
         newLeaveDialog.setContentView(btnsheet)
         newLeaveDialog.show()
@@ -158,19 +324,61 @@ class RequestsFragment  : BaseFragment<FragmentRequestsBinding, RequestsViewMode
         binding?.materialToolbar?.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
-        binding?.requestsRv?.itemAnimator = DefaultItemAnimator()
-        binding?.requestsRv?.layoutManager = LinearLayoutManager(activity)
-        binding?.requestsRv?.adapter = RequestsAdapter()
+
+        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Leave"))
+        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Document"))
+
+
+        val fragmentManager: FragmentManager = activity?.supportFragmentManager !!
+
+
+
+        binding?.tabLay?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                binding?.viewPager?.currentItem = tab!!.position
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+        })
+
+        binding?.viewPager?.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                binding?.tabLay?.selectTab( binding?.tabLay?.getTabAt(position))
+
+            }
+        })
+
+
 
         viewModel?.getLeaveTypes(requireContext())
 
+        viewModel?.getRequestTypes(requireContext())
+
+        var getRequests = GetRequests(20,1)
+        viewModel?.getEmployeeRequests(requireContext(),getRequests)
+
+        viewModel?.getRequestSuccess?.observe(viewLifecycleOwner){
+            binding?.viewPager?.adapter =  RequestFragmentAdapter(fragmentManager,lifecycle,it.data?.leaveRequests,it.data?.otherRequests)
+        }
+
         viewModel?.leaveTypesData?.observe(viewLifecycleOwner){
-            list = it.data as ArrayList<LeaveTypeData>
+            leaveTypeList = it.data as ArrayList<LeaveTypeData>
+        }
+
+        viewModel?.requestTypesSuccess?.observe(viewLifecycleOwner){
+            docTypeList = it.requestTypeItem as ArrayList<RequestTypeItem>
         }
 
     }
 
-    fun View.hideKeyboard() {
+    private fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
