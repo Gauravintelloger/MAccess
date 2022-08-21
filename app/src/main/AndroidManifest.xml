@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="technology.dubaileading.maccessemployee">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,16 +18,9 @@
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.MAccess"
+        android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true">
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_path"/>
-        </provider>
+
 
 
         <activity
@@ -81,6 +75,16 @@
             android:name=".ui.HomeActivity"
             android:exported="true"
             android:theme="@style/HomeActivity.Theme" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                tools:replace="android:resource" />
+        </provider>
     </application>
 
 </manifest>

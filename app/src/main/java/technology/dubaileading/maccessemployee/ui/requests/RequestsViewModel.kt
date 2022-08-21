@@ -29,7 +29,7 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
     var getRequestError = MutableLiveData<EmployeeRequests>()
     var getRequestFailure = MutableLiveData<ErrorResponse>()
 
-
+    var selectedFileLiveData: MutableLiveData<String?>? = MutableLiveData()
 
     fun getLeaveTypes(context : Context){
         requestRepo.getLeaveTypes(context)
@@ -43,8 +43,8 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
         requestRepo.getRequestTypes(context)
     }
 
-    fun documentRequest(context: Context, documentRequest: DocumentRequest, uri: Uri, ){
-        requestRepo.documentRequest(context,documentRequest,uri)
+    fun documentRequest(context: Context, documentRequest: DocumentRequest){
+        requestRepo.documentRequest(context,documentRequest, selectedFileLiveData?.value)
     }
 
     fun getEmployeeRequests(context : Context,getRequests: GetRequests){

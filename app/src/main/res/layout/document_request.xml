@@ -217,6 +217,7 @@
                     android:textColor="@color/text_color_light2"
                     android:textSize="12sp" />
 
+
                 <EditText
                     android:id="@+id/desc"
                     android:layout_width="match_parent"
@@ -236,7 +237,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/attachCard"
+            android:id="@+id/attachCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -247,48 +248,47 @@
             app:cardCornerRadius="5dp"
             app:cardElevation="2dp">
 
-            <RelativeLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="65dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/hint5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="10dp"
                     android:fontFamily="@font/medium500"
                     android:text="Attach a File (Optional)"
                     android:textColor="@color/text_color_light2"
                     android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/attachment"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/hint5"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/edittext_background"
-                    android:focusable="false"
-                    android:fontFamily="@font/normal400"
-                    android:minHeight="55dp"
-                    android:paddingLeft="16dp" />
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/attachmentFileTextView"
+                        android:layout_width="0dp"
+                        android:layout_weight="1.0"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/normal400"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/edittext_background"
+                        android:focusable="false"
+                        android:textSize="@dimen/_12ssp"
+                        android:paddingStart="16dp"
+                       />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_margin="16dp"
+                        android:src="@drawable/ic_attechment" />
+                </LinearLayout>
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/ic_attechment" />
-
-
-            </RelativeLayout>
+            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>

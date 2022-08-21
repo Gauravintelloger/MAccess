@@ -3,4 +3,9 @@
     <declare-styleable name="PieChart">
         <attr name="text_type" format="string" />
     </declare-styleable>
+    <style name="RippleEffectTheme" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/grey</item>
+    </style>
+
 </resources>

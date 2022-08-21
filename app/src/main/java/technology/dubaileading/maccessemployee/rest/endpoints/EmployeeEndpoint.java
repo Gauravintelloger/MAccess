@@ -1,6 +1,7 @@
 package technology.dubaileading.maccessemployee.rest.endpoints;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -83,11 +84,28 @@ public interface EmployeeEndpoint {
     Call<RequestType> getRequestTypes();
 
     @POST("makeEmployeeRequestnew")
-    Call<ApiResponse> requestDocument(@Body DocumentRequest documentRequest);
+    Call<ApiResponse> requestDocumentWithFile(@Body DocumentRequest documentRequest);
 
     @Multipart
     @POST("makeEmployeeRequestnew")
-    Call<ApiResponse> requestDocument(@Part MultipartBody.Part file, @Query("subject") String subject, @Query("description") String description, @Query("request_type") Integer request_type, @Query("required_by") String required_by, @Query("email") String email);
+    Call<ApiResponse> requestDocumentWithFile(
+            @Part("subject")  RequestBody subject,
+            @Part("description")  RequestBody description,
+            @Part("request_type")  RequestBody request_type,
+            @Part("required_by")  RequestBody required_by,
+            @Part("email")  RequestBody email,
+            @Part  MultipartBody.Part NationalIDFile
+    );
+
+    @Multipart
+    @POST("makeEmployeeRequestnew")
+    Call<ApiResponse> requestDocumentWithoutFile(
+            @Part("subject")  RequestBody subject,
+            @Part("description")  RequestBody description,
+            @Part("request_type")  RequestBody request_type,
+            @Part("required_by")  RequestBody required_by,
+            @Part("email")  RequestBody email
+    );
 
     @POST("getEmployeeRequestsnew")
     Call<EmployeeRequests> getEmployeeRequests(@Body GetRequests getRequests);

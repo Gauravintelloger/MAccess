@@ -25,6 +25,11 @@
 
     <string name="leave">Leave</string>
     <string name="document">Document</string>
-
+    <!-- for permission alert-->
+    <string name="settings_permission">Settings</string>
+    <string name="camera_video_permission">To capture photos and videos, allow FilePicker access to your camera.\nTap Settings > Permissions, and turn Camera on.</string>
+    <string name="storage_permission">To send media, allow FilePicker access to your device photos, media, and files.\nTap Settings > Permissions, and "Files and media" on.</string>
+    <string name="call_permission">To call, allow FilePicker access to your microphone.\nTap Settings > Permissions, and turn Microphone on.</string>
+    <string name="not_now">Not Now</string>
 
 </resources>
