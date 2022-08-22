@@ -35,6 +35,8 @@
         android:layout_height="30dp"
         android:layout_marginTop="16dp"
         app:tabMode="auto"
+        app:tabSelectedTextColor="@color/blue"
+        app:tabTextColor="@color/white"
         app:tabBackground="@drawable/indicator_selector"
         app:tabIndicator="@android:color/transparent"
         android:background="@android:color/transparent"

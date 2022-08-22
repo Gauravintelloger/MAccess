@@ -9,6 +9,7 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordActivity
 import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.Utils
@@ -36,6 +37,10 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
                 viewModel.loginUser(this@LoginActivity, loginRequest)
             }
 
+        }
+
+        binding.forgotPass.setOnClickListener {
+            startActivity(Intent(this@LoginActivity, ForgotPasswordActivity::class.java))
         }
 
         //observing the validUser livedata from ViewModel

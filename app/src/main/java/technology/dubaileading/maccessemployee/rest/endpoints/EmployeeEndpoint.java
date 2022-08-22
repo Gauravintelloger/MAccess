@@ -23,6 +23,7 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
 import technology.dubaileading.maccessemployee.rest.entity.DocumentRequest;
 import technology.dubaileading.maccessemployee.rest.entity.EmployeeRequests;
+import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword;
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave;
 import technology.dubaileading.maccessemployee.rest.entity.GetRequests;
 import technology.dubaileading.maccessemployee.rest.entity.LeaveTypes;
@@ -35,6 +36,8 @@ import technology.dubaileading.maccessemployee.rest.entity.Posts;
 import technology.dubaileading.maccessemployee.rest.entity.Profile;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
 import technology.dubaileading.maccessemployee.rest.entity.RequestType;
+import technology.dubaileading.maccessemployee.rest.entity.ResetPassword;
+import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP;
 
 public interface EmployeeEndpoint {
 
@@ -83,9 +86,6 @@ public interface EmployeeEndpoint {
     @GET("getRequestTypes")
     Call<RequestType> getRequestTypes();
 
-    @POST("makeEmployeeRequestnew")
-    Call<ApiResponse> requestDocumentWithFile(@Body DocumentRequest documentRequest);
-
     @Multipart
     @POST("makeEmployeeRequestnew")
     Call<ApiResponse> requestDocumentWithFile(
@@ -109,5 +109,17 @@ public interface EmployeeEndpoint {
 
     @POST("getEmployeeRequestsnew")
     Call<EmployeeRequests> getEmployeeRequests(@Body GetRequests getRequests);
+
+    @POST("employee-forgot-password")
+    Call<ApiResponse> forgotPassword(@Body ForgotPassword forgotPassword);
+
+    @POST("employee-resend-otp")
+    Call<ApiResponse> resendOTP(@Body ForgotPassword forgotPassword);
+
+    @POST("employee-verify-otp")
+    Call<ApiResponse> verifyOTP(@Body VerifyOTP verifyOTP);
+
+    @POST("employee-reset-password")
+    Call<ApiResponse> resetPassword(@Body ResetPassword resetPassword);
 
 }

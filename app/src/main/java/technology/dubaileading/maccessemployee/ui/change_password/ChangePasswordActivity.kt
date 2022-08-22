@@ -52,13 +52,15 @@ class ChangePasswordActivity: BaseActivity<ActivityChangePasswordBinding, Change
 
             viewModel.changePassword(this,passwordRequest)
 
-            viewModel.changePasswordSuccess.observe(this){
-                Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
-            }
 
-            viewModel.error.observe(this){
-                Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
-            }
+        }
+
+        viewModel.changePasswordSuccess.observe(this){
+            Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
+        }
+
+        viewModel.error.observe(this){
+            Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
         }
 
     }

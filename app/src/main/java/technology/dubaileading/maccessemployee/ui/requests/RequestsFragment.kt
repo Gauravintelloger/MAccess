@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +25,6 @@ import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBindi
 import technology.dubaileading.maccessemployee.rest.entity.*
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
-import technology.dubaileading.maccessemployee.utils.AppUtils.START_POINT
 import technology.dubaileading.maccessemployee.utils.PermissionUtils
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,7 +40,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
     private var IS_FROM_DATE = false
     private var REQUEST_CODE_PICK_DOC = 101
     private var doc_type_id: Int? = null
-    private  var attachmentFileTextView: TextView? = null
+    private var attachmentFileTextView: TextView? = null
 
 
     override fun createViewModel(): RequestsViewModel {
