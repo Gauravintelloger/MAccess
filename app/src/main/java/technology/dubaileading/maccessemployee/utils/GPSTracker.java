@@ -68,6 +68,23 @@ public class GPSTracker extends Service implements LocationListener {
             } else {
                 this.canGetLocation = true;
 
+
+                if (location == null) {
+                    if (isGPSEnabled) {
+
+                        locationManager.requestLocationUpdates(
+                                LocationManager.GPS_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        //Log.d("GPS Enabled", "GPS Enabled");
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            updateGPSCoordinates();
+                        }
+
+                    }
+                }
+
 //First get location from Network Provider
                 if (isNetworkEnabled) {
                     //if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -86,21 +103,6 @@ public class GPSTracker extends Service implements LocationListener {
 
                 //if GPS Enabled get lat/long using GPS Services
 
-                if (location == null) {
-                    if (isGPSEnabled) {
-
-                        locationManager.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        //Log.d("GPS Enabled", "GPS Enabled");
-                        if (locationManager != null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            updateGPSCoordinates();
-                        }
-
-                    }
-                }
 
 
                 if (location == null) {

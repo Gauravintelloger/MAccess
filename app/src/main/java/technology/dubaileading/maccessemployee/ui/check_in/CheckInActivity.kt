@@ -14,6 +14,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
@@ -48,6 +50,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
     private val MIN_TIME: Long = 400
     private val MIN_DISTANCE = 1000f
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,6 +60,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
             startActivity(Intent(applicationContext, CheckOutActivity::class.java))
             finish()
         }
+        checkLocationPermission()
 
 
         binding.timeSheet.setOnClickListener{
@@ -75,7 +79,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
         binding.map.onCreate(savedInstanceState)
         binding.map.getMapAsync(this)
 
-        checkLocationPermission()
+
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
             LocationManager.NETWORK_PROVIDER,
@@ -145,6 +149,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
                         val nowTime = sdf.format(Date())
 
                         AppShared(applicationContext).saveTiming(nowTime)
+                        AppShared(applicationContext).setTimerRunning(true)
                         AppShared(applicationContext).savePlace(binding.placeName.text.toString())
 
                         startActivity(Intent(applicationContext, CheckOutActivity::class.java))
@@ -174,7 +179,6 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
 
         request.executeAsync()
     }
-
 
 
     override fun onResume() {

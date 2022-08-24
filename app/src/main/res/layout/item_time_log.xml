@@ -27,8 +27,8 @@
         android:fontFamily="@font/bold700"
         android:text="Check In"
         android:textColor="@color/black"
-        android:textSize="17sp"
-        app:layout_constraintEnd_toStartOf="@+id/comp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/remark"
         app:layout_constraintStart_toEndOf="@+id/status_img"
         app:layout_constraintTop_toTopOf="@+id/status_img" />
 
@@ -38,9 +38,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/bold700"
-        android:text="Remark"
+        android:text="Source"
         android:textColor="@color/black"
-        android:textSize="17sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/status_img" />
 
@@ -49,17 +49,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2022-02-10 13:04:28"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/status_img"
-        app:layout_constraintStart_toStartOf="@+id/status" />
+        app:layout_constraintStart_toStartOf="@+id/status"
+        app:layout_constraintTop_toBottomOf="@+id/status" />
 
     <TextView
         android:id="@+id/comp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Comp"
-        android:visibility="gone"
+        android:textSize="12sp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/status_img"
-        app:layout_constraintEnd_toEndOf="@+id/remark" />
+        app:layout_constraintEnd_toEndOf="@+id/remark"
+        app:layout_constraintTop_toBottomOf="@+id/remark" />
 
     <View
         android:layout_width="match_parent"

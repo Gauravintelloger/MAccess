@@ -38,10 +38,10 @@ class HomeRepo (var callback: HomeCallback) {
             .withProgressDialogue()
             .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse?> {
                 override fun onSuccess(apiResponse: ApiResponse?) {
-                    callback.likePostFailure(apiResponse!!)
+                    callback.likePostSuccess(apiResponse!!)
                 }
             }) {
-                callback.postsFailure(it)
+                callback.likePostFailure(it)
             }.build()
         request.executeAsync()
     }

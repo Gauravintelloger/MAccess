@@ -126,11 +126,13 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="8dp"
+                    android:editable="false"
                     android:background="@drawable/edittext_background"
                     android:fontFamily="@font/normal400"
                     android:inputType="textEmailAddress"
                     android:minHeight="55dp"
-                    android:paddingLeft="16dp" />
+                    android:paddingLeft="16dp"
+                    tools:ignore="Deprecated" />
 
 
             </RelativeLayout>
@@ -172,9 +174,9 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="8dp"
-                    android:inputType="number"
                     android:background="@drawable/edittext_background"
                     android:fontFamily="@font/normal400"
+                    android:inputType="number"
                     android:minHeight="55dp"
                     android:paddingLeft="16dp" />
 

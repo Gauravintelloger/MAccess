@@ -54,6 +54,7 @@ class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveReq
     }
 
     fun setData(leaveRequestsData: ArrayList<LeaveRequestsItem>) {
+        leaveRequests.clear()
         leaveRequests?.addAll(leaveRequestsData)
         notifyDataSetChanged()
     }

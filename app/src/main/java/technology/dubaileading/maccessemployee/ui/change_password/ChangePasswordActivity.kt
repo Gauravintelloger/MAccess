@@ -1,6 +1,7 @@
 package technology.dubaileading.maccessemployee.ui.change_password
 
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +14,8 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityChangePasswordBinding
 import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest
+import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.Utils
 
 
@@ -25,21 +28,24 @@ class ChangePasswordActivity: BaseActivity<ActivityChangePasswordBinding, Change
         }
 
         binding?.submit?.setOnClickListener {
-            if(binding?.oldPass?.text?.trim()!!?.isEmpty()){
+            var oldPassword = binding?.oldPass?.text?.trim()
+            var newPassword = binding?.newPass?.text?.trim()
+            var rePassword = binding?.rePass?.text?.trim()
+            if(oldPassword!!.isEmpty()){
                 Toast.makeText(this@ChangePasswordActivity,"Enter Old Password", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            if(binding?.newPass?.text?.trim()!!?.isEmpty()){
+            if(newPassword!!.isEmpty()){
                 Toast.makeText(this@ChangePasswordActivity,"Enter New Password", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if(binding?.rePass?.text?.trim()!!?.isEmpty()){
+            if(rePassword!!.isEmpty()){
                 Toast.makeText(this@ChangePasswordActivity,"Re-Enter New Password", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if (binding?.rePass?.text?.trim() != binding?.newPass?.text?.trim()){
+            if (newPassword != rePassword){
                 Toast.makeText(this@ChangePasswordActivity,"New Password and Re-Enter Password is not match", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -57,6 +63,8 @@ class ChangePasswordActivity: BaseActivity<ActivityChangePasswordBinding, Change
 
         viewModel.changePasswordSuccess.observe(this){
             Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
+            startActivity(Intent(this@ChangePasswordActivity, HomeActivity::class.java))
+            finish()
         }
 
         viewModel.error.observe(this){

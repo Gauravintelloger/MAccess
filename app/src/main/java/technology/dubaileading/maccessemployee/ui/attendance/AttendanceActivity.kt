@@ -68,7 +68,15 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
         binding.toDate.text = sdf.format(date)
 
         var reportRequest = ReportRequest(fromDate,toDate)
-        getReport(reportRequest)
+        viewModel.getReport(this@AttendanceActivity,reportRequest)
+
+        viewModel.attendanceList.observe(this){
+            if (it.attendanceData?.data != null){
+                attendanceReportAdapter.addList(it.attendanceData.data as ArrayList<DataItem>)
+            }
+
+        }
+
 
         val today = Calendar.getInstance()
 
@@ -121,13 +129,6 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
 
             viewModel.getReport(this@AttendanceActivity,reportRequest)
 
-
-            viewModel.attendanceList.observe(this){
-                if (it.attendanceData?.data != null){
-                    attendanceReportAdapter.addList(it.attendanceData?.data as ArrayList<DataItem>)
-                }
-
-            }
         }
 
 
@@ -136,34 +137,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
 
 
 
-    private fun getReport(reportRequest: ReportRequest) {
-        val requestFactory = ServerRequestFactory()
-        val call = requestFactory
-            .obtainEndpointProxy(EmployeeEndpoint::class.java)
-            .getAttendanceReport(reportRequest)
 
-        val request = requestFactory.newHttpRequest<Any>(this@AttendanceActivity)
-            .withEndpoint(call)
-            .withProgressDialogue()
-            .withSuccessAndFailureCallback(object : SuccessCallback<AttendenceReport?> {
-                override fun onSuccess(attendenceReport: AttendenceReport?) {
-                    if (attendenceReport?.status == "ok") {
-
-
-                    } else if (attendenceReport?.status == "notok" && attendenceReport?.statuscode == "500"){
-                        Toast.makeText(this@AttendanceActivity, "Token expired", Toast.LENGTH_LONG).show()
-                        AppShared(this@AttendanceActivity).saveToken("")
-
-                        startActivity(Intent(applicationContext, LoginActivity::class.java))
-                        finish()
-                    }
-
-                }
-            }) {
-                Toast.makeText(this@AttendanceActivity, "error", Toast.LENGTH_LONG).show()
-            }.build()
-        request.executeAsync()
-    }
 
     private fun updateDateInView() {
         val myFormat = "yyyy-MM-dd" // mention the format you need

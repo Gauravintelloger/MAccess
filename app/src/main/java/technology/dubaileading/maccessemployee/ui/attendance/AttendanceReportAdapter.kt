@@ -30,6 +30,8 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
         if (dataList[position]!!.remarks != null){
             holder.remark.text = dataList[position]!!.remarks.toString()
         }
+        holder.comp.text = dataList[position].sources.toString()
+
         if (dataList[position].mode!! == "in"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_in))
             holder.status.text = "Break-in"

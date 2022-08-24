@@ -25,9 +25,21 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
         backGroundColor()
         viewModel.getProfile(this@PersonalInfoActivity)
         viewModel.profileData.observe(this){
-            binding?.name?.setText(it?.profileData?.name.toString())
-            binding?.email?.setText(it?.profileData?.email.toString())
-            binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())
+            if (it?.profileData?.name != null){
+                binding?.name?.setText(it?.profileData?.name.toString())
+            }
+
+            if (it?.profileData?.email != null){
+                binding?.email?.setText(it?.profileData?.email.toString())
+            }
+
+            if (it?.profileData?.dateOfBirth != null){
+                binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())
+            }
+
+            if (it?.profileData?.personalContactNumber != null){
+                binding?.number?.setText(it?.profileData.personalContactNumber.toString())
+            }
 
         }
         val dateSetListener =

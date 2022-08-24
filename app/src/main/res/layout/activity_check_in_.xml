@@ -106,6 +106,7 @@
             android:layout_marginTop="18dp"
             android:fontFamily="@font/medium500"
             android:gravity="center"
+            android:visibility="gone"
             android:text="Last Logged In at"
             android:textColor="@color/black" />
 
@@ -115,6 +116,7 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/medium500"
             android:gravity="center"
+            android:visibility="gone"
             android:text="2022-02-23 12:00:00" />
 
         <LinearLayout

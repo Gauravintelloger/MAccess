@@ -27,6 +27,8 @@ class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotP
     private lateinit var otp2 : String
     private lateinit var otp3 : String
     private lateinit var otp4 : String
+    private lateinit var otp5 : String
+    private lateinit var otp6 : String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,20 +97,58 @@ class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotP
 
             override fun afterTextChanged(s: Editable?) {
                 if (s?.length == 1) {
-                    binding.otpEdit2.requestFocus()
+                    binding.otpEdit5.requestFocus()
+                }
+            }
+
+        })
+
+        binding.otpEdit5.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s?.length == 1) {
+                    binding.otpEdit6.requestFocus()
+                }
+            }
+
+        })
+
+        binding.otpEdit6.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s?.length == 1) {
                     hideKeyboard()
                 }
             }
 
         })
 
+
+
+
         binding.submit.setOnClickListener {
             otp1 =  binding.otpEdit1.text.toString().trim()
             otp2 =  binding.otpEdit2.text.toString().trim()
             otp3 =  binding.otpEdit3.text.toString().trim()
             otp4 =  binding.otpEdit4.text.toString().trim()
+            otp5 =  binding.otpEdit5.text.toString().trim()
+            otp6 =  binding.otpEdit6.text.toString().trim()
             if (isOtpValid()){
-                var otp = otp1+otp2+otp3+otp4
+                var otp = otp1+otp2+otp3+otp4+otp5+otp6
                 var verifyOTP = VerifyOTP(email,otp)
                 viewModel.verifyOTP(this@VerifyOTPActivity,verifyOTP)
 
@@ -169,6 +209,16 @@ class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotP
         }
         if (binding.otpEdit4.text != null && TextUtils.isEmpty(binding.otpEdit4.text)) {
             binding.otpEdit4.requestFocus()
+            return false
+        }
+
+        if (binding.otpEdit5.text != null && TextUtils.isEmpty(binding.otpEdit5.text)) {
+            binding.otpEdit5.requestFocus()
+            return false
+        }
+
+        if (binding.otpEdit6.text != null && TextUtils.isEmpty(binding.otpEdit6.text)) {
+            binding.otpEdit6.requestFocus()
             return false
         }
         return true

@@ -12,9 +12,12 @@ import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
 class HomeFragmentViewModel : BaseViewModel(),HomeCallback {
     private var homeRepo = HomeRepo(this)
     var postsList = MutableLiveData<Posts>()
-    var likePost = MutableLiveData<ApiResponse>()
     var postsFailure = MutableLiveData<ErrorResponse>()
     var invalidUser = MutableLiveData<Posts>()
+
+    var likePost = MutableLiveData<ApiResponse>()
+    var likeError = MutableLiveData<ApiResponse>()
+    var likeFailure = MutableLiveData<ErrorResponse>()
 
 
 
@@ -27,21 +30,32 @@ class HomeFragmentViewModel : BaseViewModel(),HomeCallback {
     }
 
     override fun postsResponse(posts: Posts?) {
-        postsList.value = posts!!
-        /*if (posts?.status == "ok") {
+        if (posts?.status == "ok") {
             postsList.value = posts!!
         }
         else {
             invalidUser.value = posts!!
-        }*/
+        }
     }
 
     override fun postsFailure(error: ErrorResponse) {
+        postsFailure.value = error
     }
 
-    override fun likePostFailure(apiResponse: ApiResponse) {
-        likePost.value = apiResponse
+    override fun likePostSuccess(apiResponse: ApiResponse) {
+        if (apiResponse?.status == "ok") {
+            likePost.value = apiResponse!!
+        }
+        else {
+            likeError.value = apiResponse!!
+        }
     }
+
+    override fun likePostFailure(error: ErrorResponse) {
+        likeFailure.value = error
+    }
+
+
 
 
 }

@@ -7,5 +7,7 @@ import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
 interface HomeCallback {
     fun postsResponse(posts: Posts?)
     fun postsFailure(error : ErrorResponse)
-    fun likePostFailure(apiResponse: ApiResponse)
+
+    fun likePostSuccess(apiResponse: ApiResponse)
+    fun likePostFailure(error : ErrorResponse)
 }

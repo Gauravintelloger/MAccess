@@ -51,6 +51,7 @@ class DocumentRequestAdapter(val context: Context) : RecyclerView.Adapter<Docume
     }
 
     fun setData(otherRequestsItem: ArrayList<OtherRequestsItem>) {
+        otherRequestsData.clear()
         otherRequestsData?.addAll(otherRequestsItem)
         notifyDataSetChanged()
     }

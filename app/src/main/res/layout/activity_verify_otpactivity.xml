@@ -75,10 +75,9 @@
 
                 <EditText
                     android:id="@+id/otpEdit1"
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
                     android:inputType="phone"
                     android:maxLength="1"
                     android:textAlignment="center"
@@ -86,10 +85,9 @@
 
                 <EditText
                     android:id="@+id/otpEdit2"
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
                     android:inputType="phone"
                     android:maxLength="1"
                     android:textAlignment="center"
@@ -97,10 +95,9 @@
 
                 <EditText
                     android:id="@+id/otpEdit3"
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
                     android:inputType="phone"
                     android:maxLength="1"
                     android:textAlignment="center"
@@ -108,10 +105,29 @@
 
                 <EditText
                     android:id="@+id/otpEdit4"
-                    android:layout_width="50dp"
+                    android:layout_width="40dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:layout_marginRight="10dp"
+                    android:inputType="phone"
+                    android:maxLength="1"
+                    android:textAlignment="center"
+                    app:boxBackgroundMode="filled"/>
+
+                <EditText
+                    android:id="@+id/otpEdit5"
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:inputType="phone"
+                    android:maxLength="1"
+                    android:textAlignment="center"
+                    app:boxBackgroundMode="filled"/>
+
+                <EditText
+                    android:id="@+id/otpEdit6"
+                    android:layout_width="40dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
                     android:inputType="phone"
                     android:maxLength="1"
                     android:textAlignment="center"

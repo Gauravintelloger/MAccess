@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -40,6 +41,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
     lateinit var gpsTracker : GPSTracker
     var IS_SHIFT_OVER = false;
     var is_mock : Boolean = false
+    private lateinit var locationManager :LocationManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +55,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
             startActivity(Intent(applicationContext, CheckInActivity::class.java))
             finish()
         }
-
+        locationManager = getSystemService(BaseActivity.LOCATION_SERVICE) as LocationManager
         binding.timesheetLayout.setOnClickListener{
             startActivity(Intent(this@CheckOutActivity, AttendanceActivity::class.java))
         }
@@ -74,7 +76,9 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
             builder.setPositiveButton(
                 "Yes"
             ) { _, _ ->
-                if (is_mock){
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    showAlert("You need give location access to use app")
+                } else if (is_mock){
                     showAlert("Please disable fake location to be able to mark attendance")
                 } else if (!isAutoTimeZoneEnabled()){
                     showAlert("Please enable the Automatic time zone to be able to mark attendance")
@@ -109,14 +113,14 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
     }
 
     private fun showAlert(msg : String){
-        android.app.AlertDialog.Builder(this@CheckOutActivity)
+        AlertDialog.Builder(this@CheckOutActivity)
             .setTitle("Alert")
             .setMessage(msg)
             .setCancelable(false)
             .setPositiveButton(
                 "Ok"
-            ) { dialog, which ->
-
+            ) { dialog, _ ->
+                dialog.dismiss()
             }
             .show()
     }
@@ -213,7 +217,16 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
             binding.breakInTxt.setTextColor(resources.getColor(R.color.color_break_in))
 
             binding.breakInLayout.setOnClickListener{
-                breakIn()
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    showAlert("You need give location access to use app")
+                } else if (is_mock){
+                    showAlert("Please disable fake location to be able to mark attendance")
+                } else if (!isAutoTimeZoneEnabled()){
+                    showAlert("Please enable the Automatic time zone to be able to mark attendance")
+                } else {
+                    breakIn()
+                }
+
             }
         }
     }
@@ -231,7 +244,16 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
             binding.breakOutTxt.setTextColor(resources.getColor(R.color.color_break_out))
 
             binding.breakOutLayout.setOnClickListener{
-                breakOut()
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    showAlert("You need give location access to use app")
+                } else if (is_mock){
+                    showAlert("Please disable fake location to be able to mark attendance")
+                } else if (!isAutoTimeZoneEnabled()){
+                    showAlert("Please enable the Automatic time zone to be able to mark attendance")
+                } else {
+                    breakOut()
+                }
+
             }
         }
     }
@@ -309,7 +331,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
 
                         AppShared(applicationContext).saveTiming(tt)
                         AppShared(applicationContext).setBreakOut(false)
-
+                        AppShared(applicationContext).setTimerRunning(true)
                         AppShared(applicationContext).setBreakStarted(true)
 
                         performTimerLogic()
@@ -367,6 +389,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
                         AppShared(applicationContext).saveTiming(tt)
 
                         AppShared(applicationContext).setBreakOut(true)
+                        AppShared(applicationContext).setTimerRunning(false)
                         AppShared(applicationContext).saveHours(binding.timer.text.toString())
 
                         AppShared(applicationContext).setBreakStarted(true)
@@ -428,6 +451,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
                         AppShared(applicationContext).saveHours("")
                         AppShared(applicationContext).setBreakOut(false)
                         AppShared(applicationContext).setBreakStarted(false)
+                        AppShared(applicationContext).setTimerRunning(false)
 
                         val intent = Intent(this@CheckOutActivity, HomeActivity::class.java)
                         startActivity(intent)

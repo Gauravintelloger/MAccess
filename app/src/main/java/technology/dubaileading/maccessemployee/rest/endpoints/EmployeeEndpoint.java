@@ -62,10 +62,10 @@ public interface EmployeeEndpoint {
     @POST("employee/notificationList")
     Call<Notifications> getNotifications();
 
-    @GET("employee/listPosts")
+    @GET("employee/listPostsnew")
     Call<Posts> getPosts();
 
-    @POST("employee/likePost")
+    @POST("employee/likePostnew")
     Call<ApiResponse> likePost(@Body LikePost likePost);
 
     @GET("employee/employeeProfileView")

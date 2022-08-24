@@ -5,6 +5,8 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -23,6 +25,8 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.PermissionUtils
@@ -41,6 +45,8 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
     private var REQUEST_CODE_PICK_DOC = 101
     private var doc_type_id: Int? = null
     private var attachmentFileTextView: TextView? = null
+    private lateinit var newDocDialog : BottomSheetDialog
+    private lateinit var newLeaveDialog : BottomSheetDialog
 
 
     override fun createViewModel(): RequestsViewModel {
@@ -80,7 +86,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
     private fun newDocRequest() {
         val btnsheet = layoutInflater.inflate(R.layout.document_request, null)
-        var newDocDialog = BottomSheetDialog(requireContext())
+        newDocDialog = BottomSheetDialog(requireContext())
 
         val spinnerDocType = btnsheet.findViewById<AppCompatSpinner>(R.id.spinnerDocType)
         val dateCard = btnsheet.findViewById<CardView>(R.id.dateCard)
@@ -126,15 +132,17 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
                 reqDate = sdf.format(cal.time)
                 date.setText(reqDate)
             }
+        var datePicker = DatePickerDialog(
+            requireActivity(),
+            dateSetListener,
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        )
 
         date.setOnClickListener {
-            DatePickerDialog(
-                requireActivity(),
-                dateSetListener,
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            datePicker.show()
+            datePicker.datePicker.minDate = cal.timeInMillis
 
         }
 
@@ -154,14 +162,6 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         }
 
 
-        viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            newDocDialog.dismiss()
-        }
-
-        viewModel?.documentRequestError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
 
         newDocDialog.setContentView(btnsheet)
         newDocDialog.show()
@@ -230,7 +230,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
     }
     private fun newLeaveRequest() {
         val btnsheet = layoutInflater.inflate(R.layout.leave_request, null)
-        var newLeaveDialog = BottomSheetDialog(requireContext())
+        newLeaveDialog = BottomSheetDialog(requireContext())
 
         val leaveType = btnsheet.findViewById<AppCompatSpinner>(R.id.leaveType)
         val desc = btnsheet.findViewById<EditText>(R.id.desc)
@@ -336,15 +336,6 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
         }
 
-        viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            newLeaveDialog.dismiss()
-        }
-
-        viewModel?.applyLeaveError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
-
         newLeaveDialog.setContentView(btnsheet)
         newLeaveDialog.show()
 
@@ -420,6 +411,33 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         viewModel?.requestTypesSuccess?.observe(viewLifecycleOwner) {
             docTypeList = it.requestTypeItem as ArrayList<RequestTypeItem>
         }
+
+        viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                var getRequests = GetRequests(20, 1)
+                viewModel?.getEmployeeRequests(requireContext(), getRequests)
+                newDocDialog.dismiss()
+            },2000)
+        }
+
+        viewModel?.documentRequestError?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                var getRequests = GetRequests(20, 1)
+                viewModel?.getEmployeeRequests(requireContext(), getRequests)
+                newLeaveDialog.dismiss()
+            },2000)
+        }
+
+        viewModel?.applyLeaveError?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+        }
+
 
     }
 

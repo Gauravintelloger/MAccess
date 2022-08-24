@@ -66,7 +66,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
 
         viewModel?.profileData?.observe(viewLifecycleOwner){
             if (it.profileData?.photo != null){
-                binding?.profilePicView?.load(it.profileData?.photo){
+                binding?.profilePicView?.load(it.profileData.photo){
                     transformations(CircleCropTransformation())
                 }
             }else{
@@ -136,9 +136,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         }
 
         binding?.logOut?.setOnClickListener {
+            var isTimerRunning =  AppShared(requireContext()).isTimerRunning()
             var alertDialog = AlertDialog.Builder(activity as Context)
             alertDialog.setTitle("Logout?")
-            alertDialog.setMessage("Do you want to logout from mAccess?")
+            if (isTimerRunning){
+                alertDialog.setMessage("Timer is Running,Timer will get cleared Do you want to logout from mAccess?")
+            }else{
+                alertDialog.setMessage("Do you want to logout from mAccess?")
+            }
+
             alertDialog.setPositiveButton("Yes") { _, _ ->
                 run {
                     AppShared(activity as Context).clearAll()

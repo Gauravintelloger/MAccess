@@ -1,8 +1,10 @@
 package technology.dubaileading.maccessemployee.ui.home_fragment
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.text.style.ForegroundColorSpan
@@ -10,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -20,7 +23,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.RoundedCornersTransformation
-
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.base.BaseFragment
@@ -32,7 +34,6 @@ import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
 import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
-import technology.dubaileading.maccessemployee.utils.Constants
 import technology.dubaileading.maccessemployee.utils.TimerHelper
 import technology.dubaileading.maccessemployee.utils.Utils
 import java.util.*
@@ -45,6 +46,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
     lateinit var activity: Context
     lateinit var homeAdapter: HomeAdapter
+
+    var PERMISSION_ID = 44
+
+    private var likePosition: Int = 0
+    private lateinit var likePostData: PostData
 
     override fun createViewModel(): HomeFragmentViewModel {
         return ViewModelProvider(this).get(HomeFragmentViewModel::class.java)
@@ -72,9 +78,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             homeAdapter.addList(it.data as ArrayList<PostData>)
         }
 
-        viewModel?.likePost?.observe(viewLifecycleOwner){
 
-        }
 
         timerText = binding?.timer!!
 
@@ -110,10 +114,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         val locationManager = activity.getSystemService(BaseActivity.LOCATION_SERVICE) as LocationManager
 
         binding?.timeClock?.setOnClickListener{
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                startActivity(Intent(activity,CheckInActivity::class.java))
-            } else {
+            if (!checkLocationPermission()){
+                requestPermission()
+            }else if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 showAlert()
+            } else {
+                startActivity(Intent(activity,CheckInActivity::class.java))
             }
 
         }
@@ -143,7 +149,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             fragmentTransaction.commit()
         }
 
+        viewModel?.likePost?.observe(viewLifecycleOwner){
+            if (likePostData.liked!!){
+                likePostData.liked = false
+                likePostData.likedUsersCount =  likePostData.likedUsersCount!! -1
+            }else{
+                likePostData.liked = true
+                likePostData.likedUsersCount =  likePostData.likedUsersCount!! + 1
+            }
+
+            homeAdapter.updateLike(likePostData,likePosition)
+
+        }
+
     }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),PERMISSION_ID)
+    }
+
+    private fun checkLocationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+    ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onLikeClick(postData: PostData, position: Int) {
+        likePosition = position
+        likePostData = postData
+        var likePost = LikePost(postData.id)
+        viewModel?.likePost(requireContext(),likePost)
+
+    }
+
 
     private fun showAlert(){
         android.app.AlertDialog.Builder(activity)
@@ -151,7 +188,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             .setMessage("You need give location access to use app")
             .setPositiveButton(
                 "Ok"
-            ) { dialog, which ->
+            ) { dialog, _ ->
             dialog.dismiss()
             }
             .show()
@@ -201,8 +238,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
     override fun onDestroy() {
         super.onDestroy()
-
-//        TickTokTimer.cancelTimer()
         t.cancel()
     }
 
@@ -213,21 +248,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
     private fun runTimer() {
 
-//        TickTokTimer.cancelTimer()
+
 
         t = Timer()
 
         binding?.timeLayout?.visibility = View.VISIBLE
         binding?.view?.visibility = View.VISIBLE
 
-//        TickTokTimer.schedule(activity = activity as Activity,object : TickTokTimer.CallBack{
-//            override fun timerCallback(string: String) {
-//                (activity as Activity).runOnUiThread(Runnable {
-//                    timerText.text = string
-//                })
-//            }
-//
-//        })
 
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
@@ -254,6 +281,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
                         AppShared(activity).saveHours("")
                         AppShared(activity).setBreakOut(false)
                         AppShared(activity).setBreakStarted(false)
+                        AppShared(activity).setTimerRunning(false)
                         binding?.timeLayout?.visibility = View.GONE
                         binding?.view?.visibility = View.GONE
                     }
@@ -264,10 +292,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         }, 0, 1000)
     }
 
-    override fun onLikeClick(postData: PostData, position: Int) {
-        var likePost = LikePost(postData.id)
-        viewModel?.likePost(requireContext(),likePost)
 
-    }
 
 }

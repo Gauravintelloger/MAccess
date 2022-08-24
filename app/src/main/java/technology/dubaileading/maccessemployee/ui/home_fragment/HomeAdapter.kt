@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -35,6 +36,18 @@ class HomeAdapter( private val context: Context, private val onLikeClickListener
 
         holder.like.setOnClickListener {
             onLikeClickListener.onLikeClick(dataList[position], position)
+            /*if (dataList[position].liked!!){
+                holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like))
+            }else{
+                holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like_red))
+            }*/
+
+        }
+        
+        if (dataList[position].liked!!){
+            holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like_red))
+        }else{
+            holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like))
         }
     }
 
@@ -49,10 +62,16 @@ class HomeAdapter( private val context: Context, private val onLikeClickListener
         notifyDataSetChanged()
     }
 
+    fun updateLike(likePostData: PostData, likePosition: Int) {
+        dataList.add(likePosition, likePostData)
+        notifyItemChanged(likePosition)
+    }
+
+
     class PostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var view = itemView.findViewById<View>(R.id.gap)
-
         var postImage = itemView.findViewById<View>(R.id.postImage) as ImageView
+        var like_img = itemView.findViewById<View>(R.id.like_img) as ImageView
         var crated_at = itemView.findViewById<View>(R.id.crated_at) as TextView
         var likeCount = itemView.findViewById<View>(R.id.likeCount) as TextView
         var title = itemView.findViewById<View>(R.id.title) as TextView

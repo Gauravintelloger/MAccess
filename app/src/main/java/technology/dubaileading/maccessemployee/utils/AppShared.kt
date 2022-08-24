@@ -97,6 +97,21 @@ class AppShared(context : Context) {
         return shared.getBoolean("breakStarted", false)
     }
 
+    fun isTimerRunning(): Boolean {
+        return shared.getBoolean("isTimerRunning", false)
+    }
+
+    fun setTimerRunning(value: Boolean) {
+        val edit: SharedPreferences.Editor = shared.edit()
+        edit.putBoolean("isTimerRunning", value)
+        edit.apply()
+    }
+
+
+
+
+
+
     fun clearAll() {
         var editor = shared.edit()
         editor.clear()
