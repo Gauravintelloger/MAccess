@@ -414,11 +414,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
         viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            Handler(Looper.getMainLooper()).postDelayed({
-                var getRequests = GetRequests(20, 1)
-                viewModel?.getEmployeeRequests(requireContext(), getRequests)
-                newDocDialog.dismiss()
-            },2000)
+            newDocDialog.dismiss()
         }
 
         viewModel?.documentRequestError?.observe(viewLifecycleOwner) {
@@ -427,11 +423,8 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
         viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            Handler(Looper.getMainLooper()).postDelayed({
-                var getRequests = GetRequests(20, 1)
-                viewModel?.getEmployeeRequests(requireContext(), getRequests)
-                newLeaveDialog.dismiss()
-            },2000)
+            newLeaveDialog.dismiss()
+
         }
 
         viewModel?.applyLeaveError?.observe(viewLifecycleOwner) {

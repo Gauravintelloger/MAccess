@@ -51,6 +51,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
     private var likePosition: Int = 0
     private lateinit var likePostData: PostData
+    private var dataList = ArrayList<PostData>()
 
     override fun createViewModel(): HomeFragmentViewModel {
         return ViewModelProvider(this).get(HomeFragmentViewModel::class.java)
@@ -75,7 +76,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         viewModel?.getPosts(requireContext())
         viewModel?.postsList?.observe(viewLifecycleOwner){
-            homeAdapter.addList(it.data as ArrayList<PostData>)
+            dataList = it.data as ArrayList<PostData>
+            homeAdapter.addList(dataList)
         }
 
 
@@ -150,15 +152,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         }
 
         viewModel?.likePost?.observe(viewLifecycleOwner){
-            if (likePostData.liked!!){
+            /*if (likePostData.liked!!){
                 likePostData.liked = false
                 likePostData.likedUsersCount =  likePostData.likedUsersCount!! -1
             }else{
                 likePostData.liked = true
                 likePostData.likedUsersCount =  likePostData.likedUsersCount!! + 1
+            }*/
+
+
+            if (dataList[likePosition].liked!!){
+
+                dataList[likePosition].liked = false
+                dataList[likePosition].likedUsersCount =  dataList[likePosition].likedUsersCount!! -1
+            } else {
+                dataList[likePosition].liked = true
+                dataList[likePosition].likedUsersCount =  dataList[likePosition].likedUsersCount!! + 1
             }
 
-            homeAdapter.updateLike(likePostData,likePosition)
+            homeAdapter.addList(dataList)
 
         }
 

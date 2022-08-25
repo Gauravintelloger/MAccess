@@ -32,7 +32,7 @@ data class Data(
 	val name: String? = null,
 
 	@field:SerializedName("photo")
-	val photo: Any? = null,
+	val photo: String? = null,
 
 	@field:SerializedName("organisation")
 	val organisation: String? = null,
@@ -44,5 +44,8 @@ data class Data(
 	val id: Int? = null,
 
 	@field:SerializedName("username")
-	val username: String? = null
+	val username: String? = null,
+
+	@field:SerializedName("email")
+	val email: String? = null
 )

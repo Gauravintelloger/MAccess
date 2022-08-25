@@ -108,10 +108,6 @@ class AppShared(context : Context) {
     }
 
 
-
-
-
-
     fun clearAll() {
         var editor = shared.edit()
         editor.clear()
