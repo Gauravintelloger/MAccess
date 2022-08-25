@@ -15,7 +15,6 @@ import pl.droidsonroids.gif.GifDrawable
 
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashGifBinding
-import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared

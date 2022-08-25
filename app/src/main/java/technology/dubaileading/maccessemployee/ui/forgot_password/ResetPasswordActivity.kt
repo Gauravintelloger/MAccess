@@ -2,7 +2,6 @@ package technology.dubaileading.maccessemployee.ui.forgot_password
 
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.WindowManager
@@ -13,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityResetPasswordBinding
-import technology.dubaileading.maccessemployee.databinding.ActivityVerifyOtpactivityBinding
 import technology.dubaileading.maccessemployee.rest.entity.ResetPassword
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.Utils

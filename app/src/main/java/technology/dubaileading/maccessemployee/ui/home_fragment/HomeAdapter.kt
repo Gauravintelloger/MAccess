@@ -36,12 +36,6 @@ class HomeAdapter( private val context: Context, private val onLikeClickListener
 
         holder.like.setOnClickListener {
             onLikeClickListener.onLikeClick(dataList[position], position)
-            /*if (dataList[position].liked!!){
-                holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like))
-            }else{
-                holder.like_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.like_red))
-            }*/
-
         }
         
         if (dataList[position].liked!!){
@@ -62,10 +56,6 @@ class HomeAdapter( private val context: Context, private val onLikeClickListener
         notifyDataSetChanged()
     }
 
-    fun updateLike(likePostData: PostData, likePosition: Int) {
-        dataList.add(likePosition, likePostData)
-        notifyItemChanged(likePosition)
-    }
 
 
     class PostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

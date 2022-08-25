@@ -8,7 +8,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.Query;
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse;
 import technology.dubaileading.maccessemployee.rest.entity.ApplyLeave;
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport;
@@ -21,7 +20,6 @@ import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutRequest;
 import technology.dubaileading.maccessemployee.rest.entity.CheckOutResponse;
-import technology.dubaileading.maccessemployee.rest.entity.DocumentRequest;
 import technology.dubaileading.maccessemployee.rest.entity.EmployeeRequests;
 import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword;
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave;
@@ -80,7 +78,7 @@ public interface EmployeeEndpoint {
     @GET("getLeaveTypesnew")
     Call<LeaveTypes> getLeaveTypes();
 
-    @POST("applyLeaveApplication")
+    @POST("applyLeaveApplicationnew")
     Call<ApiResponse> applyLeave(@Body ApplyLeave applyLeave);
 
     @GET("getRequestTypes")

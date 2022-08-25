@@ -1,6 +1,6 @@
 package technology.dubaileading.maccessemployee.ui.splash
 
-import android.content.Context
+
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -13,7 +13,7 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashBinding
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
-import technology.dubaileading.maccessemployee.utils.Constants
+
 
 
 class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {

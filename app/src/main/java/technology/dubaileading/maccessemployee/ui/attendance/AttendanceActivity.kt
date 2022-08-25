@@ -1,6 +1,5 @@
 package technology.dubaileading.maccessemployee.ui.attendance
 
-import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
 import android.os.Build
@@ -14,18 +13,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityTimelogBinding
-import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
-import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport
 import technology.dubaileading.maccessemployee.rest.entity.DataItem
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest
-import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
-import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
 import technology.dubaileading.maccessemployee.ui.HomeActivity
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,7 +31,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
     private var IS_FROM_DATE = false
     private var fromDate : String = ""
     private var toDate : String = ""
-    var cal = Calendar.getInstance()
+
 
     override fun createViewModel(): AttendanceViewModel {
         return ViewModelProvider(this).get(AttendanceViewModel::class.java)
@@ -78,41 +72,56 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
         }
 
 
-        val today = Calendar.getInstance()
 
-        val dateSetListener =
-            OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                updateDateInView()
-            }
 
         binding?.materialToolbar?.setNavigationOnClickListener {
             onBackPressed()
         }
 
 
-        val datePickerDialog = DatePickerDialog(this@AttendanceActivity,
-            this@AttendanceActivity, today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
-
         binding.fromDate.setOnClickListener{
-            IS_FROM_DATE = true
-            DatePickerDialog(this@AttendanceActivity,
-                dateSetListener,
-                // set DatePickerDialog to point to today's date when it loads up
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)).show()
+            val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
+            datePicker.show(supportFragmentManager, "DatePicker")
+
+            // Setting up the event for when ok is clicked
+            datePicker.addOnPositiveButtonClickListener {
+                val myFormat = "yyyy-MM-dd" // mention the format you need
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                binding?.fromDate?.text = sdf.format(datePicker.selection?.first)
+                Toast.makeText(this, "${datePicker.headerText} is selected", Toast.LENGTH_LONG).show()
+            }
+            // Setting up the event for when cancelled is clicked
+            datePicker.addOnNegativeButtonClickListener {
+
+            }
+            // Setting up the event for when back button is pressed
+            datePicker.addOnCancelListener {
+
+            }
+
         }
+
+
+
         binding.toDate.setOnClickListener {
-            IS_FROM_DATE = false
-            DatePickerDialog(this@AttendanceActivity,
-                dateSetListener,
-                // set DatePickerDialog to point to today's date when it loads up
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)).show()
+            val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
+            datePicker.show(supportFragmentManager, "DatePicker")
+
+            // Setting up the event for when ok is clicked
+            datePicker.addOnPositiveButtonClickListener {
+                val myFormat = "yyyy-MM-dd" // mention the format you need
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                binding?.toDate?.text = sdf.format(datePicker.selection?.first)
+                Toast.makeText(this, "${datePicker.headerText} is selected", Toast.LENGTH_LONG).show()
+            }
+            // Setting up the event for when cancelled is clicked
+            datePicker.addOnNegativeButtonClickListener {
+
+            }
+            // Setting up the event for when back button is pressed
+            datePicker.addOnCancelListener {
+
+            }
         }
 
         binding.search.setOnClickListener {
@@ -136,26 +145,6 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
     }
 
 
-
-
-
-    private fun updateDateInView() {
-        val myFormat = "yyyy-MM-dd" // mention the format you need
-        val sdf = SimpleDateFormat(myFormat, Locale.US)
-        if (IS_FROM_DATE){
-            fromDate = sdf.format(cal.getTime())
-            binding?.fromDate?.text = sdf.format(cal.getTime())
-        }else{
-            toDate = sdf.format(cal.getTime())
-            binding?.toDate?.text = sdf.format(cal.getTime())
-        }
-
-    }
-
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-
-    }
-
     override fun onBackPressed() {
         super.onBackPressed()
         startActivity(Intent(this@AttendanceActivity, HomeActivity::class.java))
@@ -169,6 +158,10 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
         window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
         window.setBackgroundDrawableResource(R.drawable.statusbar_color)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+    }
+
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+
     }
 
 }

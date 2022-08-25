@@ -152,17 +152,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         }
 
         viewModel?.likePost?.observe(viewLifecycleOwner){
-            /*if (likePostData.liked!!){
-                likePostData.liked = false
-                likePostData.likedUsersCount =  likePostData.likedUsersCount!! -1
-            }else{
-                likePostData.liked = true
-                likePostData.likedUsersCount =  likePostData.likedUsersCount!! + 1
-            }*/
-
-
             if (dataList[likePosition].liked!!){
-
                 dataList[likePosition].liked = false
                 dataList[likePosition].likedUsersCount =  dataList[likePosition].likedUsersCount!! -1
             } else {

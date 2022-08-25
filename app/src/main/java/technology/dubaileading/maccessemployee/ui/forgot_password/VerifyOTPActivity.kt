@@ -19,8 +19,7 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityVerifyOtpactivityBinding
 import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword
 import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
+
 
 class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotPasswordViewModel>(){
     private lateinit var otp1 : String

@@ -15,7 +15,6 @@ import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityChangePasswordBinding
 import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest
 import technology.dubaileading.maccessemployee.ui.HomeActivity
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.Utils
 
 

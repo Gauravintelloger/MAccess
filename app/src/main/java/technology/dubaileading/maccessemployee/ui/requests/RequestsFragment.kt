@@ -5,8 +5,6 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -25,8 +23,6 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.PermissionUtils

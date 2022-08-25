@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
-import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordActivity
 import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
 import technology.dubaileading.maccessemployee.utils.AppShared

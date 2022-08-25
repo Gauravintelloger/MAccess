@@ -1,16 +1,15 @@
 package technology.dubaileading.maccessemployee.ui.requests
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import technology.dubaileading.maccessemployee.base.BaseViewModel
 import technology.dubaileading.maccessemployee.rest.entity.*
 import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
 
 
-class RequestsViewModel : BaseViewModel(),RequestCallback {
+class RequestsViewModel() : BaseViewModel(),RequestCallback {
     var requestRepo = RequestRepo(this)
-
+    lateinit var context: Context
     var leaveTypesData = MutableLiveData<LeaveTypes>()
     var leaveTypesFailure = MutableLiveData<ErrorResponse>()
 
@@ -36,6 +35,7 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
     }
 
     fun applyLeave(context : Context, applyLeave: ApplyLeave){
+        this.context = context
         requestRepo.applyLeave(context,applyLeave)
     }
 
@@ -44,14 +44,13 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
     }
 
     fun documentRequest(context: Context, documentRequest: DocumentRequest){
+        this.context = context
         requestRepo.documentRequest(context,documentRequest, selectedFileLiveData?.value)
     }
 
     fun getEmployeeRequests(context : Context,getRequests: GetRequests){
         requestRepo.getEmployeeRequests(context,getRequests)
     }
-
-
 
 
     override fun leaveTypesResponse(leaveTypes: LeaveTypes) {
@@ -69,6 +68,9 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
     override fun applyLeaveSuccess(apiResponse: ApiResponse) {
         if (apiResponse?.status == "ok") {
             applyLeaveSuccess.value = apiResponse!!
+            var getRequests = GetRequests(20, 1)
+            requestRepo.getEmployeeRequests(context,getRequests)
+
         }
         else {
             applyLeaveError.value = apiResponse!!
@@ -95,6 +97,9 @@ class RequestsViewModel : BaseViewModel(),RequestCallback {
     override fun documentRequestSuccess(apiResponse: ApiResponse) {
         if (apiResponse?.status == "ok") {
             documentRequestSuccess.value = apiResponse!!
+            var getRequests = GetRequests(20, 1)
+            requestRepo.getEmployeeRequests(context,getRequests)
+
         }
         else {
             documentRequestError.value = apiResponse!!
