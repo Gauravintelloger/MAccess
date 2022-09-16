@@ -14,32 +14,24 @@ import technology.dubaileading.maccessemployee.rest.entity.OtherRequestsItem
 class DocumentRequestAdapter(val context: Context) : RecyclerView.Adapter<DocumentRequestAdapter.DocumentRequestsViewHolder>() {
 
     private var otherRequestsData = ArrayList<OtherRequestsItem>()
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): DocumentRequestsViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.document_request_holder, parent, false)
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentRequestsViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.document_request_holder, parent, false)
         return DocumentRequestsViewHolder(view)
     }
 
-    override fun onBindViewHolder(
-        holder: DocumentRequestsViewHolder,
-        position: Int
-    ) {
+    override fun onBindViewHolder(holder: DocumentRequestsViewHolder, position: Int) {
         holder.request_type.text = otherRequestsData[position].description
         holder.metadata.text = otherRequestsData[position].requesttype?.type
 
         holder.request_on.text = otherRequestsData[position].createdAt
         holder.status.text = otherRequestsData[position].statusId
-        if (otherRequestsData[position].statusId.equals("pending")){
+        if (otherRequestsData[position].statusId.equals("Pending")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.pending_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
-        } else if (otherRequestsData[position].statusId.equals("approved")){
+        } else if (otherRequestsData[position].statusId.equals("Approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
-        } else if (otherRequestsData[position].statusId.equals("declined")){
+        } else if (otherRequestsData[position].statusId.equals("Rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
         }

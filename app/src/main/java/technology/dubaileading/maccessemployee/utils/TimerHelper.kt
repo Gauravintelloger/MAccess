@@ -1,8 +1,10 @@
 package technology.dubaileading.maccessemployee.utils
 
 import android.net.ParseException
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class TimerHelper {
     public var totalHours = 0;
@@ -62,34 +64,23 @@ class TimerHelper {
     }
 
     private fun findDifference(start_date: String, end_date: String): String {
-        val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+
         try {
-            val d1 = sdf.parse(start_date)
-            val d2 = sdf.parse(end_date)
+            val d1 = parseDate(start_date)
+            val d2 = parseDate(end_date)
 
             // Calucalte time difference
             // in milliseconds
-            val difference_In_Time = d2.time - d1.time
+
+            val differenceInMillis = d2!!.time - d1!!.time
+            val formattedText = formatElapsedTime(differenceInMillis / 1000)
+
 
             // Calucalte time difference in
             // seconds, minutes, hours, years,
             // and days
-            val difference_In_Seconds = ((difference_In_Time
-                    / 1000)
-                    % 60)
-            val difference_In_Minutes = ((difference_In_Time
-                    / (1000 * 60))
-                    % 60)
-            val difference_In_Hours = ((difference_In_Time
-                    / (1000 * 60 * 60))
-                    % 24)
-            val difference_In_Years = (difference_In_Time
-                    / (1000L * 60 * 60 * 24 * 365))
-            val difference_In_Days = ((difference_In_Time
-                    / (1000 * 60 * 60 * 24))
-                    % 365)
-            totalHours = difference_In_Seconds.toInt();
-            return "$difference_In_Hours:$difference_In_Minutes:$difference_In_Seconds"
+
+            return formattedText.toString()
         } // Catch the Exception
         catch (e: ParseException) {
             e.printStackTrace()
@@ -97,6 +88,26 @@ class TimerHelper {
             e.printStackTrace()
         }
         return ""
+    }
+
+    private fun parseDate(strDate: String?): Date? {
+        val dateFormat: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        var date1: Date? = null
+        try {
+            date1 = dateFormat.parse(strDate)
+        } catch (e: java.text.ParseException) {
+            e.printStackTrace()
+        }
+        return date1
+    }
+
+    private fun formatElapsedTime(seconds: Long): String? {
+        var seconds = seconds
+        val hours: Long = TimeUnit.SECONDS.toHours(seconds)
+        seconds -= TimeUnit.HOURS.toSeconds(hours)
+        val minutes: Long = TimeUnit.SECONDS.toMinutes(seconds)
+        seconds -= TimeUnit.MINUTES.toSeconds(minutes)
+        return String.format("%d:%d:%d", hours, minutes, seconds)
     }
 
 

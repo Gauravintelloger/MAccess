@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -24,11 +25,12 @@ import technology.dubaileading.maccessemployee.utils.Utils
 private const val UPDATE_REQUEST_CODE = 123
 
 class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewModel>() {
-    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private lateinit var appUpdateManager : AppUpdateManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appUpdateManager = AppUpdateManagerFactory.create(this)
 
         Log.e("android ID", Utils.getUniqueID(applicationContext))
         appUpdateManager.appUpdateInfo.addOnSuccessListener {
@@ -55,14 +57,13 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
     private fun navtoHome() {
         Handler(Looper.getMainLooper()).postDelayed({
         val token = AppShared(this@SplashGifActivity).getToken()
-
-       if(token?.isEmpty() == false){
-           startActivity(Intent(applicationContext, SplashActivity::class.java))
-           finish()
-       } else {
-           startActivity(Intent(applicationContext, LoginActivity::class.java))
-           finish()
-        }
+            if (token.equals(null) || token!!.isEmpty()){
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(applicationContext, SplashActivity::class.java))
+                finish()
+            }
 
        },2000)
     }

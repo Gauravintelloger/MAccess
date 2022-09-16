@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
+import coil.transform.RoundedCornersTransformation
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentProfileBinding
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave
@@ -53,10 +54,18 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
         var user = AppShared(requireContext()).getUser()
 
 
-        binding?.profilePicView?.load(user.data?.organisationLogo){
-            transformations(CircleCropTransformation())
-        }
-        leaveAdapter = LeaveAdapter()
+
+
+        /*if (user.data?.photo != null){
+            binding?.profilePicView?.load(user.data?.photo){
+                transformations(CircleCropTransformation())
+            }
+        }else{
+            binding?.profilePicView?.load(user.data?.organisationLogo){
+                transformations(CircleCropTransformation())
+            }
+        }*/
+        leaveAdapter = LeaveAdapter(requireContext())
         binding?.leaveRv?.itemAnimator = DefaultItemAnimator()
         binding?.leaveRv?.layoutManager = LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false)
         binding?.leaveRv?.adapter = leaveAdapter
@@ -74,7 +83,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
                     transformations(CircleCropTransformation())
                 }
             }
-
+            AppShared(requireContext()).saveImage(it.profileData?.photo)
             binding?.nameText?.text = it.profileData?.name.toString()
             binding?.positionTv?.text = it.profileData?.designation?.title.toString()
 

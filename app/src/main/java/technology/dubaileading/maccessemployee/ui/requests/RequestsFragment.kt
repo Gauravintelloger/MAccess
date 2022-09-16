@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.braver.tool.picker.BraverDocPathUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
@@ -26,8 +27,10 @@ import technology.dubaileading.maccessemployee.rest.entity.*
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.PermissionUtils
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel>() {
@@ -43,6 +46,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
     private var attachmentFileTextView: TextView? = null
     private lateinit var newDocDialog : BottomSheetDialog
     private lateinit var newLeaveDialog : BottomSheetDialog
+    private val dateFormat = "dd-MM-yyyy"
 
 
     override fun createViewModel(): RequestsViewModel {
@@ -123,8 +127,8 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                val myFormat = "dd-MM-yyyy"
-                val sdf = SimpleDateFormat(myFormat, Locale.US)
+
+                val sdf = SimpleDateFormat(dateFormat, Locale.US)
                 reqDate = sdf.format(cal.time)
                 date.setText(reqDate)
             }
@@ -135,11 +139,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
             cal.get(Calendar.MONTH),
             cal.get(Calendar.DAY_OF_MONTH)
         )
+        datePicker.datePicker.minDate = cal.timeInMillis
 
         date.setOnClickListener {
             datePicker.show()
-            datePicker.datePicker.minDate = cal.timeInMillis
-
         }
 
         var user = AppShared(activity as Context).getUser()
@@ -234,16 +237,17 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
         val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
-
-
-        leaveBal.text =
-            leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
-        var leave_type_id = leaveTypeList[0].id
-
         var typeList = ArrayList<String>()
-        for (i in leaveTypeList.indices) {
-            typeList.add(leaveTypeList[i].title.toString())
+        if (leaveTypeList != null){
+            leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
+
+            for (i in leaveTypeList.indices) {
+                typeList.add(leaveTypeList[i].title.toString())
+            }
+
         }
+        var leave_type_id = leaveTypeList[0]?.id
+
         val arrayAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
         leaveType.adapter = arrayAdapter
@@ -261,46 +265,75 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         }
 
 
-        val dateSetListener =
-            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                val myFormat = "dd-MM-yyyy"
-                val sdf = SimpleDateFormat(myFormat, Locale.US)
-                if (IS_FROM_DATE) {
-                    fromDate = sdf.format(cal.time)
-                    startDate.setText(fromDate)
-                } else {
-                    toDate = sdf.format(cal.time)
-                    endDate.setText(toDate)
-
-                }
-            }
 
         startDate.setOnClickListener {
             it.hideKeyboard()
-            IS_FROM_DATE = true
-            DatePickerDialog(
-                requireActivity(),
-                dateSetListener,
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
+            datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
+
+            // Setting up the event for when ok is clicked
+            datePicker.addOnPositiveButtonClickListener {
+                val sdf = SimpleDateFormat(dateFormat, Locale.US)
+                fromDate = sdf.format(datePicker.selection?.first)
+                startDate.setText(fromDate)
+                toDate =  sdf.format(datePicker.selection?.second)
+                endDate.setText(toDate)
+
+                val startDate: Long? = datePicker.selection?.first
+                val endDate: Long? = datePicker.selection?.second
+
+                val msDiff = endDate!!.minus(startDate!!)
+                val daysDiff: Long = TimeUnit.MILLISECONDS.toDays(msDiff)
+
+                val days = daysDiff + 1;
+
+                submitBt.text = "Submit($days day)"
+            }
+            // Setting up the event for when cancelled is clicked
+            datePicker.addOnNegativeButtonClickListener {
+
+            }
+            // Setting up the event for when back button is pressed
+            datePicker.addOnCancelListener {
+
+            }
         }
 
         endDate.setOnClickListener {
             it.hideKeyboard()
-            IS_FROM_DATE = false
-            DatePickerDialog(
-                requireActivity(),
-                dateSetListener,
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
+            datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
+
+            // Setting up the event for when ok is clicked
+            datePicker.addOnPositiveButtonClickListener {
+                val sdf = SimpleDateFormat(dateFormat, Locale.US)
+                fromDate = sdf.format(datePicker.selection?.first)
+                startDate.setText(fromDate)
+                toDate =  sdf.format(datePicker.selection?.second)
+                endDate.setText(toDate)
+
+
+                val startDate: Long? = datePicker.selection?.first
+                val endDate: Long? = datePicker.selection?.second
+
+                val msDiff = endDate!!.minus(startDate!!)
+                val daysDiff: Long = TimeUnit.MILLISECONDS.toDays(msDiff)
+
+                val days = daysDiff + 1;
+
+                submitBt.text = "Submit($days day)"
+
+
+            }
+            // Setting up the event for when cancelled is clicked
+            datePicker.addOnNegativeButtonClickListener {
+
+            }
+            // Setting up the event for when back button is pressed
+            datePicker.addOnCancelListener {
+
+            }
         }
 
         submitBt.setOnClickListener {
@@ -336,6 +369,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         newLeaveDialog.show()
 
     }
+
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

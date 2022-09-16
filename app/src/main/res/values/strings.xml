@@ -32,4 +32,6 @@
     <string name="call_permission">To call, allow FilePicker access to your microphone.\nTap Settings > Permissions, and turn Microphone on.</string>
     <string name="not_now">Not Now</string>
 
+    <string name="default_notification_channel_id">101</string>
+
 </resources>

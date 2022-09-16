@@ -2,9 +2,14 @@ package technology.dubaileading.maccessemployee.ui.login
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
@@ -18,7 +23,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        backGroundColor()
         binding.submitBt.setOnClickListener{
             var username = binding.usename.text.toString()
             var password = Utils.md5(binding.password.text.toString().trim())
@@ -47,6 +52,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
             AppShared(this@LoginActivity).saveToken(it.token.toString())
 
             AppShared(this@LoginActivity).saveUser(it)
+            AppShared(this@LoginActivity).saveImage(it.data?.photo)
 
             startActivity(Intent(this@LoginActivity, SplashActivity::class.java))
             finish()
@@ -72,6 +78,14 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
     override fun createViewBinding(layoutInflater: LayoutInflater): ActivityLoginBinding {
         return ActivityLoginBinding.inflate(layoutInflater)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun backGroundColor() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.login_bg)
+        window.navigationBarColor = ContextCompat.getColor(this,  R.color.login_bg)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.login_bg)
     }
 
 }

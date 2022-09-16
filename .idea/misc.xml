@@ -16,6 +16,7 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/container_bg2.xml" value="0.228" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/declined_bg.xml" value="0.329" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/edittext_background.xml" value="0.297" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/grey_to_white_gradient_top_bottom.xml" value="0.332" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/home_background.xml" value="0.297" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_add_plus.xml" value="0.265" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/drawable/ic_arrow_icon.xml" value="0.265" />
@@ -81,6 +82,7 @@
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/layout_feeds.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/layout_home_fragments.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/leave_request.xml" value="0.33" />
+        <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/leave_request_holder.xml" value="0.35052083333333334" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/leave_type_holder.xml" value="0.67" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/new_request_layout.xml" value="0.3494791666666667" />
         <entry key="..\:/Code Green Projects/DLT mAccess 2.2 Employee/app/src/main/res/layout/notification_holder.xml" value="0.5" />

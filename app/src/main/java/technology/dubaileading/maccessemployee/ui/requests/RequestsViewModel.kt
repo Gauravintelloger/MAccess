@@ -16,8 +16,8 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
     var requestTypesSuccess = MutableLiveData<RequestType>()
     var requestTypesFailure = MutableLiveData<ErrorResponse>()
 
-    var applyLeaveSuccess = MutableLiveData<ApiResponse>()
-    var applyLeaveError = MutableLiveData<ApiResponse>()
+    var applyLeaveSuccess = MutableLiveData<ApiResponse2>()
+    var applyLeaveError = MutableLiveData<ApiResponse2>()
     var applyLeaveFailure = MutableLiveData<ErrorResponse>()
 
     var documentRequestSuccess = MutableLiveData<ApiResponse>()
@@ -65,7 +65,7 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
 
 
 
-    override fun applyLeaveSuccess(apiResponse: ApiResponse) {
+    override fun applyLeaveSuccess(apiResponse: ApiResponse2) {
         if (apiResponse?.status == "ok") {
             applyLeaveSuccess.value = apiResponse!!
             var getRequests = GetRequests(20, 1)

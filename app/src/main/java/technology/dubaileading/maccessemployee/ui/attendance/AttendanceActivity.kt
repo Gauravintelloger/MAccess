@@ -31,7 +31,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
     private var IS_FROM_DATE = false
     private var fromDate : String = ""
     private var toDate : String = ""
-
+    var cal = Calendar.getInstance()
 
     override fun createViewModel(): AttendanceViewModel {
         return ViewModelProvider(this).get(AttendanceViewModel::class.java)
@@ -66,7 +66,7 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
 
         viewModel.attendanceList.observe(this){
             if (it.attendanceData?.data != null){
-                attendanceReportAdapter.addList(it.attendanceData.data as ArrayList<DataItem>)
+                attendanceReportAdapter.addList(it.attendanceData?.data as ArrayList<DataItem>)
             }
 
         }
@@ -88,7 +88,9 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
                 val myFormat = "yyyy-MM-dd" // mention the format you need
                 val sdf = SimpleDateFormat(myFormat, Locale.US)
                 binding?.fromDate?.text = sdf.format(datePicker.selection?.first)
-                Toast.makeText(this, "${datePicker.headerText} is selected", Toast.LENGTH_LONG).show()
+                binding?.toDate?.text = sdf.format(datePicker.selection?.second)
+                fromDate = sdf.format(datePicker.selection?.first)
+                toDate = sdf.format(datePicker.selection?.second)
             }
             // Setting up the event for when cancelled is clicked
             datePicker.addOnNegativeButtonClickListener {
@@ -111,8 +113,10 @@ class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewMod
             datePicker.addOnPositiveButtonClickListener {
                 val myFormat = "yyyy-MM-dd" // mention the format you need
                 val sdf = SimpleDateFormat(myFormat, Locale.US)
-                binding?.toDate?.text = sdf.format(datePicker.selection?.first)
-                Toast.makeText(this, "${datePicker.headerText} is selected", Toast.LENGTH_LONG).show()
+                binding?.fromDate?.text = sdf.format(datePicker.selection?.first)
+                binding?.toDate?.text = sdf.format(datePicker.selection?.second)
+                fromDate = sdf.format(datePicker.selection?.first)
+                toDate =sdf.format(datePicker.selection?.second)
             }
             // Setting up the event for when cancelled is clicked
             datePicker.addOnNegativeButtonClickListener {

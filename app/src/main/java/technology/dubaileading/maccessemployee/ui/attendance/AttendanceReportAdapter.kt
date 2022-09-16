@@ -34,12 +34,14 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
 
         if (dataList[position].mode!! == "in"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_in))
-            holder.status.text = "Break-in"
+            holder.status.text = "Break-In"
         } else if (dataList[position].mode!! == "out"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_out))
-            holder.status.text = "Break-out"
-        } else {
-            holder.status.text = dataList[position].mode
+            holder.status.text = "Break-Out"
+        }  else if (dataList[position].mode!! == "check-in"){
+            holder.status.text = "Check-In"
+        }else if (dataList[position].mode!! == "check-out"){
+            holder.status.text = "Check-Out"
         }
 
     }

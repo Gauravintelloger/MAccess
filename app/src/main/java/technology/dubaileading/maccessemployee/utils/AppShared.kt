@@ -60,6 +60,18 @@ class AppShared(context : Context) {
 
     /*---------*/
 
+    fun saveImage(date: String?) {
+        val edit: SharedPreferences.Editor = shared.edit()
+        edit.putString("profileImage", date)
+        edit.apply()
+    }
+
+    fun getImage(): String? {
+        return shared.getString("profileImage", "")
+    }
+
+    /*---------*/
+
     fun isBreakOut(): Boolean {
         return shared.getBoolean("breakOut", false)
     }

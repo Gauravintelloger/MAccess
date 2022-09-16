@@ -12,6 +12,7 @@ import coil.load
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashBinding
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 
 
@@ -26,10 +27,16 @@ class SplashActivity : BaseActivity<ActivitySplashBinding, SplashViewModel>() {
             crossfade(true)
             crossfade(800)
         }
-
+        val token = AppShared(this@SplashActivity).getToken()
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(applicationContext, HomeActivity::class.java))
-            finish()
+            if (token.equals(null) || token!!.isEmpty()){
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(applicationContext, HomeActivity::class.java))
+                finish()
+            }
+
         },2000)
 
     }

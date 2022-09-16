@@ -22,12 +22,6 @@ data class LoginResponse(
 
 data class Data(
 
-	@field:SerializedName("status_id")
-	val statusId: Int? = null,
-
-	@field:SerializedName("role_id")
-	val roleId: Int? = null,
-
 	@field:SerializedName("name")
 	val name: String? = null,
 
@@ -46,6 +40,4 @@ data class Data(
 	@field:SerializedName("username")
 	val username: String? = null,
 
-	@field:SerializedName("email")
-	val email: String? = null
 )

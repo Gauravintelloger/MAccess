@@ -36,7 +36,11 @@ import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.TimerHelper
 import technology.dubaileading.maccessemployee.utils.Utils
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),onLikeClickListener {
 
@@ -90,10 +94,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         Log.d("token", deviceToken.toString());
 
         var user = AppShared(activity as Context).getUser()
+        var image = AppShared(activity as Context).getImage()
         binding?.username?.text = user.data?.name
 
-        if (user.data?.photo != null){
-            binding?.userImage?.load(user.data?.photo){
+        if (image != null){
+            binding?.userImage?.load(image){
                 transformations(RoundedCornersTransformation(16f))
             }
         }else{
@@ -261,9 +266,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
         t.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
 
-                (activity as Activity)?.runOnUiThread(Runnable {
+                (activity as Activity).runOnUiThread(Runnable {
                     val savedTime = AppShared(activity as Context).getTiming()!!
                     val hours: String = AppShared(activity as Context).getHours()!!
+
 
                     if(savedTime == "") {
                         t.cancel()
@@ -275,7 +281,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
                     val h1 = timerTime.split(":").toTypedArray()
                     val hour1 = h1[0].toInt()
                     //val minute1 = h1[1].toInt()
-
 
                     if (hour1 >= 18){
                         t.cancel()

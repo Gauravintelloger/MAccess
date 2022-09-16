@@ -25,12 +25,8 @@ import technology.dubaileading.maccessemployee.utils.AppShared;
  */
 public class RetrofitFactory {
 
-    //public static final String BASE_URL = "http://staging.dubaileading.technology/maccess-saas/api/public/api/";
-    public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
-
-
-//    public static final String BASE_IMAGE_URL = BASE_URL+"api/images/getProductImage?path=";
-//    public static final String BASE_RESTAURANT_IMAGE_URL = BASE_URL+"api/images/getRestaurantImage?path=";
+    public static final String BASE_URL = "http://staging.dubaileading.technology/maccess-saas/api/public/api/";
+    //public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
 
     private OkHttpClient httpClient;
 

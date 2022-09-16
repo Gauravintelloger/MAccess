@@ -1,15 +1,18 @@
 package technology.dubaileading.maccessemployee.ui.profile
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.LeaveDataItem
 
 
-class LeaveAdapter : RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder>() {
+class LeaveAdapter(var context: Context) : RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder>() {
     private var dataList = ArrayList<LeaveDataItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaveViewHolder {
@@ -20,7 +23,17 @@ class LeaveAdapter : RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder>() {
     override fun onBindViewHolder(holder: LeaveViewHolder, position: Int) {
         holder.leaveLeft_Heading.text = dataList[position].leaveCode+" Left"
         holder.leaveLeft.text = dataList[position].remainingLeaves.toString()
-        holder.leaveTotal.text = dataList[position].totalLeaves.toString()
+        holder.leaveTotal.text = "/"+dataList[position].totalLeaves.toString()
+
+        if (position % 4 == 0){
+            holder.imageView.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.sl_circular_dot_bg))
+        } else if (position % 4 == 1){
+            holder.imageView.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.cl_circular_dot_bg))
+        } else if (position % 4 == 2){
+            holder.imageView.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.al_circular_dot_bg))
+        }else {
+            holder.imageView.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.sl_circular_dot_bg))
+        }
 
     }
 
@@ -38,6 +51,7 @@ class LeaveAdapter : RecyclerView.Adapter<LeaveAdapter.LeaveViewHolder>() {
         var leaveLeft_Heading = itemView.findViewById<View>(R.id.leaveLeft_Heading) as TextView
         var leaveLeft = itemView.findViewById<View>(R.id.leaveLeft) as TextView
         var leaveTotal = itemView.findViewById<View>(R.id.leaveTotal) as TextView
+        var imageView = itemView.findViewById<View>(R.id.imageView) as ImageView
 
     }
 }

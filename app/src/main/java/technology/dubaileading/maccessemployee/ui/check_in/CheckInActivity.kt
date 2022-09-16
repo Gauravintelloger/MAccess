@@ -36,6 +36,7 @@ import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.GPSTracker
 import technology.dubaileading.maccessemployee.utils.Utils
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -232,7 +233,7 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
                 currentLoc.latitude,
                 currentLoc.longitude,
                 1
-            ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            )!! // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             return addresses[0].getAddressLine(0)
         } catch (e: Exception) {
 //            e.toString()

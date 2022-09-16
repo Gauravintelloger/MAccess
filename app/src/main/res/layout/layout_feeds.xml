@@ -62,7 +62,7 @@
                 <ImageView
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:src="@drawable/ic_insurance_1" />
+                    android:src="@drawable/dp_post_updates" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

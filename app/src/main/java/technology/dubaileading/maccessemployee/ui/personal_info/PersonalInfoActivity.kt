@@ -28,9 +28,6 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
                 binding?.name?.setText(it?.profileData?.name.toString())
             }
 
-            if (it?.profileData?.email != null){
-                binding?.email?.setText(it?.profileData?.email.toString())
-            }
 
             if (it?.profileData?.dateOfBirth != null){
                 binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())

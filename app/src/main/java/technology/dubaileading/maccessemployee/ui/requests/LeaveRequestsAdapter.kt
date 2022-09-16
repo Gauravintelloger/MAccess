@@ -33,7 +33,7 @@ class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveReq
         holder.request_type.text = leaveRequests[position].description
         holder.metadata.text = leaveRequests[position].leaveType?.title
         holder.days.text = leaveRequests[position].days.toString()+" Days"
-        holder.from_to.text = leaveRequests[position].fromDate +"-"+ leaveRequests[position].toDate
+        holder.from_to.text = leaveRequests[position].fromDate +"  -  "+ leaveRequests[position].toDate
         holder.request_on.text = leaveRequests[position].createdAt
         holder.status.text = leaveRequests[position].status
         if (leaveRequests[position].status.equals("pending")){
@@ -42,7 +42,7 @@ class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveReq
         } else if (leaveRequests[position].status.equals("approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
-        } else if (leaveRequests[position].status.equals("declined")){
+        } else if (leaveRequests[position].status.equals("rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
         }

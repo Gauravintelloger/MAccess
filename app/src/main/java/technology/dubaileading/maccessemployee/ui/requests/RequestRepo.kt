@@ -60,8 +60,8 @@ class RequestRepo(var callback: RequestCallback) {
         val request = requestFactory.newHttpRequest<Any>(context)
             .withEndpoint(call)
             .withProgressDialogue()
-            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse?> {
-                override fun onSuccess(apiResponse: ApiResponse?) {
+            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse2?> {
+                override fun onSuccess(apiResponse: ApiResponse2?) {
                     callback.applyLeaveSuccess(apiResponse!!)
                 }
             }) {

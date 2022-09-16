@@ -9,6 +9,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse;
+import technology.dubaileading.maccessemployee.rest.entity.ApiResponse2;
 import technology.dubaileading.maccessemployee.rest.entity.ApplyLeave;
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport;
 import technology.dubaileading.maccessemployee.rest.entity.BreakInRequest;
@@ -79,7 +80,7 @@ public interface EmployeeEndpoint {
     Call<LeaveTypes> getLeaveTypes();
 
     @POST("applyLeaveApplicationnew")
-    Call<ApiResponse> applyLeave(@Body ApplyLeave applyLeave);
+    Call<ApiResponse2> applyLeave(@Body ApplyLeave applyLeave);
 
     @GET("getRequestTypes")
     Call<RequestType> getRequestTypes();
