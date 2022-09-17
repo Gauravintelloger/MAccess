@@ -36,6 +36,7 @@ import technology.dubaileading.maccessemployee.rest.entity.Profile;
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest;
 import technology.dubaileading.maccessemployee.rest.entity.RequestType;
 import technology.dubaileading.maccessemployee.rest.entity.ResetPassword;
+import technology.dubaileading.maccessemployee.rest.entity.TokenRequest;
 import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP;
 
 public interface EmployeeEndpoint {
@@ -120,5 +121,8 @@ public interface EmployeeEndpoint {
 
     @POST("employee-reset-password")
     Call<ApiResponse> resetPassword(@Body ResetPassword resetPassword);
+
+    @POST("employee/notificationToken")
+    Call<ApiResponse> notificationToken(@Body TokenRequest tokenRequest);
 
 }

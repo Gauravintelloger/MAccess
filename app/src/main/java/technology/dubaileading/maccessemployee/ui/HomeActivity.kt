@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
 
     lateinit var navView : BottomNavigationView
+    lateinit var im : ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         backGroundColor()

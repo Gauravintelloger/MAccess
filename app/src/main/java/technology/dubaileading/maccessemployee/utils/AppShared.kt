@@ -36,6 +36,19 @@ class AppShared(context : Context) {
     /*----------*/
 
 
+    fun saveFirebaseToken(token : String){
+        val edit = shared.edit()
+        edit.putString("fcm_token",token)
+        edit.apply()
+    }
+
+    fun getFirebaseToken() : String?{
+        var token = shared.getString("fcm_token","");
+        return token
+    }
+    /*----------*/
+
+
     fun savePlace(place: String?) {
         val edit: SharedPreferences.Editor = shared.edit()
         edit.putString("place", place)

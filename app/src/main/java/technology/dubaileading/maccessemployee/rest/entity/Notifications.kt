@@ -34,6 +34,12 @@ data class NotificationData(
 	@field:SerializedName("title")
 	val title: String? = null,
 
+	@field:SerializedName("type")
+	val type: String? = null,
+
+	@field:SerializedName("remarks")
+	val remarks: String? = null,
+
 	@field:SerializedName("message")
 	val message: String? = null
 )

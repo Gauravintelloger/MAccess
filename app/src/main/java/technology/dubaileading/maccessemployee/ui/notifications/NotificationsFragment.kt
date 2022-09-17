@@ -25,7 +25,7 @@ class NotificationsFragment : BaseFragment<FragmentNotificationsBinding, Notific
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notificationAdapter = NotificationAdapter()
+        notificationAdapter = NotificationAdapter(requireContext())
 
     }
 

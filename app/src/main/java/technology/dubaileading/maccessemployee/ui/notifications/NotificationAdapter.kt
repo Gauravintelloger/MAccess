@@ -1,15 +1,18 @@
 package technology.dubaileading.maccessemployee.ui.notifications
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.NotificationData
 
 
-class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
+class NotificationAdapter(var context: Context) : RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
 
     private var dataList = ArrayList<NotificationData>()
 
@@ -24,6 +27,21 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.Notificatio
         holder.notification.text = dataList[position].title
         holder.message.text = dataList[position].message
         holder.time.text = dataList[position].dateOfNotificationWithTime
+        if (dataList[position].remarks != null){
+            holder.remarks.text = dataList[position].remarks
+            holder.remarks.visibility = View.VISIBLE
+        }else{
+            holder.remarks.visibility = View.GONE
+        }
+
+        if (dataList[position].type.equals("Document Request")){
+            holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.document_notification))
+        } else if (dataList[position].type.equals("Leave Application")){
+            holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.leave_notification))
+        } else {
+            holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_insurance_1))
+        }
+
 
     }
 
@@ -41,6 +59,8 @@ class NotificationAdapter : RecyclerView.Adapter<NotificationAdapter.Notificatio
         var notification = itemView.findViewById<View>(R.id.notification) as TextView
         var message = itemView.findViewById<View>(R.id.message) as TextView
         var time = itemView.findViewById<View>(R.id.time) as TextView
+        var remarks = itemView.findViewById<View>(R.id.remarks) as TextView
+        var image = itemView.findViewById<View>(R.id.image) as ImageView
 
     }
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.check_out.CheckOutActivity"
-    android:background="#F6F7F8">
+    android:background="#F6F7F8"
+    tools:context=".ui.check_out.CheckOutActivity">
 
     <View
         android:id="@+id/view"
@@ -72,12 +73,12 @@
 
                     <TextView
                         android:id="@+id/statusName"
-                        android:gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"
                         android:fontFamily="@font/bold700"
+                        android:gravity="center"
                         android:text="Break In"
                         android:textColor="@color/color_break_in"
                         android:textSize="12sp" />
@@ -85,17 +86,17 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:id="@+id/checkIn"
                     android:layout_width="120dp"
                     android:layout_height="80dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <pl.droidsonroids.gif.GifImageView
-                        android:src="@color/image_tint"
                         android:id="@+id/check_in_gif"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:src="@color/image_tint" />
 
                 </LinearLayout>
 
@@ -152,6 +153,7 @@
     </androidx.cardview.widget.CardView>
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -162,7 +164,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
 
             <androidx.cardview.widget.CardView
@@ -185,13 +187,13 @@
                         android:id="@+id/breakOutLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="12dp"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_marginBottom="12dp">
+                        android:padding="16dp">
 
                         <ImageView
                             android:id="@+id/img_break_out"
@@ -229,12 +231,12 @@
                         android:id="@+id/breakInLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="16dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginEnd="12dp"
                         android:layout_marginBottom="12dp"
-                        android:orientation="horizontal">
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
                         <ImageView
                             android:id="@+id/img_break_in"
@@ -336,15 +338,15 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
+                android:gravity="center"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:text="End Shift"
                 android:textColor="@color/white"
                 app:icon="@drawable/ic_exit"
-                app:iconTint="@color/white"
-                app:iconSize="32dp"
                 app:iconGravity="textStart"
-                android:gravity="center"/>
+                app:iconSize="32dp"
+                app:iconTint="@color/white" />
 
         </LinearLayout>
     </ScrollView>
