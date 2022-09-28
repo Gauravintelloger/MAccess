@@ -30,13 +30,30 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
 
     var selectedFileLiveData: MutableLiveData<String?>? = MutableLiveData()
 
+
+    var deleteDocRequestSuccess = MutableLiveData<ApiResponse>()
+    var deleteDocRequestError = MutableLiveData<ApiResponse>()
+    var deleteDocRequestFailure = MutableLiveData<ErrorResponse>()
+
+    var deleteLeaveRequestSuccess = MutableLiveData<ApiResponse>()
+    var deleteLeaveRequestError = MutableLiveData<ApiResponse>()
+    var deleteLeaveRequestFailure = MutableLiveData<ErrorResponse>()
+
+
+
+
     fun getLeaveTypes(context : Context){
         requestRepo.getLeaveTypes(context)
     }
 
     fun applyLeave(context : Context, applyLeave: ApplyLeave){
         this.context = context
-        requestRepo.applyLeave(context,applyLeave)
+        requestRepo.applyLeave(context,applyLeave, selectedFileLiveData?.value)
+    }
+
+    fun updateLeave(context : Context, updateLeave: UpdateLeave){
+        this.context = context
+        requestRepo.updateLeave(context,updateLeave)
     }
 
     fun getRequestTypes(context : Context){
@@ -48,9 +65,29 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
         requestRepo.documentRequest(context,documentRequest, selectedFileLiveData?.value)
     }
 
+    fun updateDocumentRequest(context: Context, updateDocumentRequest: UpdateDocumentRequest){
+        this.context = context
+        requestRepo.updateDocumentRequest(context,updateDocumentRequest, selectedFileLiveData?.value)
+    }
+
     fun getEmployeeRequests(context : Context,getRequests: GetRequests){
         requestRepo.getEmployeeRequests(context,getRequests)
     }
+
+
+    fun deleteDocRequest(context: Context, deleteReq: DeleteReq){
+        requestRepo.deleteDocRequest(context,deleteReq)
+    }
+
+    fun deleteLeaveRequest(context: Context, deleteReq: DeleteReq){
+        requestRepo.deleteLeaveRequest(context,deleteReq)
+    }
+
+
+
+
+
+
 
 
     override fun leaveTypesResponse(leaveTypes: LeaveTypes) {
@@ -81,7 +118,18 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
         applyLeaveFailure.value = error
     }
 
+    override fun updateLeaveSuccess(apiResponse: ApiResponse2) {
+        if (apiResponse?.status == "ok") {
+            applyLeaveSuccess.value = apiResponse!!
+        }
+        else {
+            applyLeaveError.value = apiResponse!!
+        }
+    }
 
+    override fun updateLeaveFailure(error: ErrorResponse) {
+        applyLeaveFailure.value = error
+    }
 
 
     override fun requestTypesSuccess(requestType: RequestType) {
@@ -110,6 +158,18 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
         documentRequestFailure.value = error
     }
 
+    override fun updateDocumentRequestSuccess(apiResponse: ApiResponse) {
+        if (apiResponse?.status == "ok") {
+            documentRequestSuccess.value = apiResponse!!
+        }
+        else {
+            documentRequestError.value = apiResponse!!
+        }
+    }
+
+    override fun updateDocumentRequestFailure(error: ErrorResponse) {
+        documentRequestFailure.value = error
+    }
 
 
     override fun getRequestSuccess(employeeRequests: EmployeeRequests) {
@@ -125,6 +185,33 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
     override fun getRequestFailure(error: ErrorResponse) {
         getRequestFailure.value = error
 
+    }
+
+    override fun deleteDocRequestSuccess(apiResponse: ApiResponse) {
+        if (apiResponse?.status == "ok") {
+            deleteDocRequestSuccess.value = apiResponse!!
+        }
+        else {
+            deleteDocRequestError.value = apiResponse!!
+        }
+
+    }
+
+    override fun deleteDocRequestFailure(error: ErrorResponse) {
+        deleteDocRequestFailure.value = error
+    }
+
+    override fun deleteLeaveRequestSuccess(apiResponse: ApiResponse) {
+        if (apiResponse?.status == "ok") {
+            deleteLeaveRequestSuccess.value = apiResponse!!
+        }
+        else {
+            deleteLeaveRequestError.value = apiResponse!!
+        }
+    }
+
+    override fun deleteLeaveRequestFailure(error: ErrorResponse) {
+        deleteLeaveRequestFailure.value = error
     }
 
 }

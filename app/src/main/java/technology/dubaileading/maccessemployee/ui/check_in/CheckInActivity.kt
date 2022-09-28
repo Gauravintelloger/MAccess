@@ -36,7 +36,6 @@ import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.GPSTracker
 import technology.dubaileading.maccessemployee.utils.Utils
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -125,12 +124,13 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
     }
 
     private fun processChecking() {
-
+        val versionName = getAppVersion(this)
         var checkInRequest = CheckInRequest(
             mode = 1,
             date = Utils.getCurrentDate(),
             time = Utils.getCurrentTime(),
             lat_long = gpsTracker.latitude.toString() + "," + gpsTracker.longitude,
+            versionName
         )
 
         val requestFactory = ServerRequestFactory()
@@ -177,6 +177,19 @@ class CheckInActivity : BaseActivity<ActivityCheckInBinding,CheckInViewModel>(),
             }.build()
 
         request.executeAsync()
+    }
+
+
+    fun getAppVersion(context: Context): String {
+        var version = ""
+        try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            version = pInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+        return version
     }
 
 

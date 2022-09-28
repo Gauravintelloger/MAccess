@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySettingsBinding
+import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -31,42 +32,26 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding, SettingsViewModel
         val versionName = getAppVersion(this)
         binding?.appVersion?.text = "App Version : $versionName"
 
-
-
-
-       /* val startDate = parseDate("12-10-2013 13:00:00")
-        val endDate = parseDate("13-10-2013 06:00:00")
-
-        val differenceInMillis = endDate!!.time - startDate!!.time
-        val formattedText = formatElapsedTime(differenceInMillis / 1000)*/
-
-
-
-
-
-
-    }
-
-
-    fun parseDate(strDate: String?): Date? {
-        val dateFormat: DateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-        var date1: Date? = null
-        try {
-            date1 = dateFormat.parse(strDate)
-        } catch (e: ParseException) {
-            e.printStackTrace()
+        binding?.notifications?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked){
+                AppShared(this).setNotification(true)
+            } else {
+                AppShared(this).setNotification(false)
+            }
         }
-        return date1
+
+        val isEnable = AppShared(this).isNotification()
+
+        binding?.notifications?.isChecked = isEnable
+
+
+
+
+
     }
 
-    fun formatElapsedTime(seconds: Long): String? {
-        var seconds = seconds
-        val hours: Long = TimeUnit.SECONDS.toHours(seconds)
-        seconds -= TimeUnit.HOURS.toSeconds(hours)
-        val minutes: Long = TimeUnit.SECONDS.toMinutes(seconds)
-        seconds -= TimeUnit.MINUTES.toSeconds(minutes)
-        return String.format("%d:%d:%d", hours, minutes, seconds)
-    }
+
+
 
     override fun createViewModel(): SettingsViewModel {
         return ViewModelProvider(this).get(SettingsViewModel::class.java)

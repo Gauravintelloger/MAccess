@@ -18,6 +18,7 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import technology.dubaileading.maccessemployee.BaseApplication;
+import technology.dubaileading.maccessemployee.BuildConfig;
 import technology.dubaileading.maccessemployee.utils.AppShared;
 
 /**
@@ -25,8 +26,8 @@ import technology.dubaileading.maccessemployee.utils.AppShared;
  */
 public class RetrofitFactory {
 
-    public static final String BASE_URL = "http://staging.dubaileading.technology/maccess-saas/api/public/api/";
-    //public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
+    //public static final String BASE_URL = "http://staging.dubaileading.technology/maccess-saas/api/public/api/";
+    public static final String BASE_URL = "http://maccess-saas-api.dubaileading.technology/api/";
 
     private OkHttpClient httpClient;
 
@@ -67,7 +68,7 @@ public class RetrofitFactory {
      */
     public Retrofit getRetrofit() {
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(this.gson))
                 .client(this.httpClient)
                 .build();

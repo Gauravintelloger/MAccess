@@ -133,6 +133,17 @@ class AppShared(context : Context) {
     }
 
 
+    fun isNotification(): Boolean {
+        return shared.getBoolean("notification", false)
+    }
+
+    fun setNotification(value: Boolean) {
+        val edit: SharedPreferences.Editor = shared.edit()
+        edit.putBoolean("notification", value)
+        edit.apply()
+    }
+
+
     fun clearAll() {
         var editor = shared.edit()
         editor.clear()

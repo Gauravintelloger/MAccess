@@ -39,6 +39,9 @@ data class EmployeeRequestData(
 @Parcelize
 data class LeaveRequestsItem(
 
+	@field:SerializedName("id")
+	val id: Int? = null,
+
 	@field:SerializedName("description")
 	val description: String? = null,
 
@@ -77,8 +80,14 @@ data class LeaveType(
 @Parcelize
 data class OtherRequestsItem(
 
+    @field:SerializedName("id")
+    val id: Int? = null,
+
 	@field:SerializedName("description")
 	val description: String? = null,
+
+	@field:SerializedName("required_by")
+	val required_by: String? = null,
 
 	@field:SerializedName("requesttype")
 	val requesttype: RequestItemType? = null,
@@ -91,6 +100,9 @@ data class OtherRequestsItem(
 
 	@field:SerializedName("status_id")
 	val statusId: String? = null,
+
+	@field:SerializedName("doc_url_from_admin")
+	val doc_url_from_admin: String? = null,
 
 ) : Parcelable
 

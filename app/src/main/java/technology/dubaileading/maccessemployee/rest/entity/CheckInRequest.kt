@@ -5,4 +5,5 @@ class CheckInRequest (
     var date : String,
     var time : String,
     var lat_long : String,
+    var app_version : String,
 )

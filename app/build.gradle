@@ -15,8 +15,8 @@ android {
         applicationId "technology.dubaileading.maccessemployee"
         minSdk 21
         targetSdk 33
-        versionCode 10
-        versionName "2.0.10"
+        versionCode 12
+        versionName "2.0.12"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +36,32 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+
+    flavorDimensions "Full"
+    productFlavors {
+        staging {
+            dimension "Full"
+        }
+        production {
+            dimension "Full"
+        }
+    }
+
+    applicationVariants.all { variant ->
+
+        if (variant.flavorName == 'staging') {
+            buildConfigField "String", "BASE_URL", '"http://staging.dubaileading.technology/maccess-saas/api/public/api/"'
+        } else if (variant.flavorName == 'production') {
+            buildConfigField "String", "BASE_URL", '"http://maccess-saas-api.dubaileading.technology/api/"'
+
+        }
+
+        variant.outputs.all {
+            def pointedTo = variant.flavorName
+            def buildVariant = variant.buildType.name
+            outputFileName = "${pointedTo}_${buildVariant}_${versionName}_.apk"
+        }
     }
 
 

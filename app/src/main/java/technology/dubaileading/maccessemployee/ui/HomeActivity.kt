@@ -1,5 +1,6 @@
 package technology.dubaileading.maccessemployee.ui
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,24 +10,24 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
-import technology.dubaileading.maccessemployee.base.BaseViewModel
 import technology.dubaileading.maccessemployee.databinding.ActivityHomeBinding
 import technology.dubaileading.maccessemployee.ui.home_fragment.HomeFragment
-import technology.dubaileading.maccessemployee.ui.login.LoginViewModel
 import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
 import technology.dubaileading.maccessemployee.ui.profile.ProfileFragment
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
 import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 
 
-class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
+class HomeActivity : BaseActivity<ActivityHomeBinding,HomeViewModel>() {
 
     lateinit var navView : BottomNavigationView
     lateinit var im : ImageView
+    private lateinit var count : BadgeDrawable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         backGroundColor()
@@ -38,6 +39,22 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
 
         binding.imgORDR.setOnClickListener{
             navView.selectedItemId = R.id.bnm_home
+        }
+
+        count = navView.getOrCreateBadge(R.id.bnm_notification)
+        count.backgroundColor = Color.RED
+        count.badgeTextColor = Color.WHITE
+
+        viewModel.getNotificationsCount(this)
+
+        viewModel.notificationCountSuccess.observe(this){
+
+            if (it.data !=0){
+                count.number = it.data!!
+                count.isVisible = true
+            } else{
+                count.isVisible = false
+            }
         }
 
 
@@ -60,6 +77,7 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
                 "Notifications" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
                     loadFragment(NotificationsFragment())
+                    count.isVisible = false
                 }
                 "Profile" -> {
                     binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
@@ -73,8 +91,8 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,BaseViewModel>() {
 
     }
 
-    override fun createViewModel(): BaseViewModel {
-        return ViewModelProvider(this).get(LoginViewModel::class.java)
+    override fun createViewModel(): HomeViewModel {
+        return ViewModelProvider(this).get(HomeViewModel::class.java)
     }
 
     override fun createViewBinding(layoutInflater: LayoutInflater): ActivityHomeBinding {

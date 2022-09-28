@@ -83,6 +83,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             dataList = it.data as ArrayList<PostData>
             homeAdapter.addList(dataList)
         }
+        viewModel?.invalidUser?.observe(viewLifecycleOwner){
+            if (it.status.equals("notok")){
+
+            }
+
+        }
 
 
 
@@ -90,6 +96,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         val token = AppShared(activity).getToken()
         var deviceToken = Utils.getUniqueID(requireContext())
+        var Token =  AppShared(activity).getFirebaseToken()
         Log.d("token", token.toString());
         Log.d("token", deviceToken.toString());
 

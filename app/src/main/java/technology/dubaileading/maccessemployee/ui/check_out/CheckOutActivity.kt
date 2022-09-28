@@ -40,7 +40,7 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
     var t : Timer = Timer()
     lateinit var gpsTracker : GPSTracker
     var IS_SHIFT_OVER = false;
-    var is_mock : Boolean = false
+    private var is_mock : Boolean = false
     private lateinit var locationManager :LocationManager
 
 
@@ -92,13 +92,16 @@ class CheckOutActivity : BaseActivity<ActivityCheckOutBinding,CheckOutViewModel>
         }
 
         try {
-            is_mock = isMockLocationOn(
-                gpsTracker.location,
-                applicationContext
-            ) || isMockLocationOn(
-                gpsTracker.location,
-                applicationContext
-            )
+            if (gpsTracker.location != null){
+                is_mock = isMockLocationOn(
+                    gpsTracker.location,
+                    applicationContext
+                ) || isMockLocationOn(
+                    gpsTracker.location,
+                    applicationContext
+                )
+            }
+
         }catch(e : Exception){
             e.printStackTrace()
         }

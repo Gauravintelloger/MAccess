@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.LeaveRequestsItem
 
 
-class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveRequestsAdapter.RequestsViewHolder>() {
+class LeaveRequestsAdapter(val context: Context,val onClickListener: leaveClickListener) : RecyclerView.Adapter<LeaveRequestsAdapter.RequestsViewHolder>() {
 
     private var leaveRequests = ArrayList<LeaveRequestsItem>()
     override fun onCreateViewHolder(
@@ -47,6 +48,14 @@ class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveReq
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
         }
 
+        holder.delete.setOnClickListener {
+            onClickListener.onClick(leaveRequests[position].id!!)
+        }
+
+        holder.edit.setOnClickListener {
+            onClickListener.updateLeaveRequest(leaveRequests[position])
+        }
+
     }
 
     override fun getItemCount(): Int {
@@ -66,5 +75,7 @@ class LeaveRequestsAdapter(val context: Context) : RecyclerView.Adapter<LeaveReq
         var from_to = itemView.findViewById<View>(R.id.from_to) as TextView
         var request_on = itemView.findViewById<View>(R.id.request_on) as TextView
         var status = itemView.findViewById<View>(R.id.status) as TextView
+        var delete = itemView.findViewById<View>(R.id.delete) as ImageView
+        var edit = itemView.findViewById<View>(R.id.edit) as ImageView
     }
 }

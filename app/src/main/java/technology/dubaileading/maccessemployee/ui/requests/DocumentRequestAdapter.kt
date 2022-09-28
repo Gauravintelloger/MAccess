@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,8 @@ import technology.dubaileading.maccessemployee.R
 
 import technology.dubaileading.maccessemployee.rest.entity.OtherRequestsItem
 
-class DocumentRequestAdapter(val context: Context) : RecyclerView.Adapter<DocumentRequestAdapter.DocumentRequestsViewHolder>() {
+class DocumentRequestAdapter(val context: Context,val documentClickListener: documentClickListener) :
+    RecyclerView.Adapter<DocumentRequestAdapter.DocumentRequestsViewHolder>() {
 
     private var otherRequestsData = ArrayList<OtherRequestsItem>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DocumentRequestsViewHolder {
@@ -28,12 +30,29 @@ class DocumentRequestAdapter(val context: Context) : RecyclerView.Adapter<Docume
         if (otherRequestsData[position].statusId.equals("Pending")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.pending_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
+            holder.download.visibility = View.GONE
         } else if (otherRequestsData[position].statusId.equals("Approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
+            holder.download.visibility = View.VISIBLE
         } else if (otherRequestsData[position].statusId.equals("Rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
+            if (otherRequestsData[position].doc_url_from_admin != null){
+                holder.download.visibility = View.GONE
+            }
+        }
+
+        holder.delete.setOnClickListener {
+            documentClickListener.onClick(otherRequestsData[position].id!!)
+        }
+
+        holder.edit.setOnClickListener {
+            documentClickListener.updateDocRequest(otherRequestsData[position])
+        }
+
+        holder.download.setOnClickListener {
+            documentClickListener.downloadDoc(otherRequestsData[position])
         }
 
     }
@@ -53,5 +72,8 @@ class DocumentRequestAdapter(val context: Context) : RecyclerView.Adapter<Docume
         var metadata = itemView.findViewById<View>(R.id.metadata) as TextView
         var request_on = itemView.findViewById<View>(R.id.request_on) as TextView
         var status = itemView.findViewById<View>(R.id.status) as TextView
+        var delete = itemView.findViewById<View>(R.id.delete) as ImageView
+        var edit = itemView.findViewById<View>(R.id.edit) as ImageView
+        var download = itemView.findViewById<View>(R.id.download) as ImageView
     }
 }

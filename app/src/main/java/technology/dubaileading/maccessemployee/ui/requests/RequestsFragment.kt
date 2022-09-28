@@ -44,6 +44,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
     private var REQUEST_CODE_PICK_DOC = 101
     private var doc_type_id: Int? = null
     private var attachmentFileTextView: TextView? = null
+    private var leaveAttachmentFileTextView: TextView? = null
     private lateinit var newDocDialog : BottomSheetDialog
     private lateinit var newLeaveDialog : BottomSheetDialog
     private val dateFormat = "dd-MM-yyyy"
@@ -236,6 +237,8 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
         val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
         val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
+        val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
+        leaveAttachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
         var typeList = ArrayList<String>()
         if (leaveTypeList != null){
@@ -334,6 +337,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
             datePicker.addOnCancelListener {
 
             }
+        }
+
+        attachCardView.setOnClickListener {
+            callFileAccessIntent()
         }
 
         submitBt.setOnClickListener {
@@ -435,6 +442,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
             if (attachmentFileTextView != null){
                 val fileName = AppUtils.getFileNameFromPath(it)
                 attachmentFileTextView?.text = fileName
+            }
+            if (leaveAttachmentFileTextView != null){
+                val fileName = AppUtils.getFileNameFromPath(it)
+                leaveAttachmentFileTextView?.text = fileName
             }
         }
 

@@ -1,5 +1,6 @@
 package technology.dubaileading.maccessemployee.ui.splash_gif
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -54,6 +55,7 @@ class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewMo
 
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun navtoHome() {
         Handler(Looper.getMainLooper()).postDelayed({
         val token = AppShared(this@SplashGifActivity).getToken()

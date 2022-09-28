@@ -52,10 +52,40 @@ class RequestRepo(var callback: RequestCallback) {
         request.executeAsync()
     }
 
-    fun applyLeave(context: Context, applyLeave: ApplyLeave) {
+    fun applyLeave(context: Context, applyLeave: ApplyLeave, filePath: String?) {
+
+
+        val leave_type_id: RequestBody = applyLeave.leave_type_id.toString()
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val description: RequestBody = applyLeave.description
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val from_date: RequestBody = applyLeave.from_date
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val to_date: RequestBody = applyLeave.to_date
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
         val requestFactory = ServerRequestFactory()
-        val call = requestFactory
-            .obtainEndpointProxy(EmployeeEndpoint::class.java).applyLeave(applyLeave)
+        var call : Call<ApiResponse2>? = null
+        if (filePath != null) {
+            val fileToUpload = File(filePath)
+
+            val attachmentRequestBody =
+                fileToUpload.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val attachmentMultiPart = MultipartBody.Part.createFormData(
+                "document",
+                fileToUpload.name,
+                attachmentRequestBody
+            )
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java).applyLeaveWithFile(leave_type_id,description,from_date,to_date,attachmentMultiPart)
+        }else{
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java)
+                .applyLeaveWithoutFile(leave_type_id,description,from_date,to_date)
+        }
 
         val request = requestFactory.newHttpRequest<Any>(context)
             .withEndpoint(call)
@@ -66,6 +96,26 @@ class RequestRepo(var callback: RequestCallback) {
                 }
             }) {
                 callback.applyLeaveFailure(it)
+            }.build()
+        request.executeAsync()
+
+
+    }
+
+    fun updateLeave(context: Context, updateLeave: UpdateLeave) {
+        val requestFactory = ServerRequestFactory()
+        val call = requestFactory
+            .obtainEndpointProxy(EmployeeEndpoint::class.java).updateLeave(updateLeave)
+
+        val request = requestFactory.newHttpRequest<Any>(context)
+            .withEndpoint(call)
+            .withProgressDialogue()
+            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse2?> {
+                override fun onSuccess(apiResponse: ApiResponse2?) {
+                    callback.updateLeaveSuccess(apiResponse!!)
+                }
+            }) {
+                callback.updateLeaveFailure(it)
             }.build()
         request.executeAsync()
     }
@@ -128,6 +178,65 @@ class RequestRepo(var callback: RequestCallback) {
         request.executeAsync()
     }
 
+
+    fun updateDocumentRequest(context: Context, updateDocumentRequest: UpdateDocumentRequest, filePath: String?) {
+
+        val subject: RequestBody = updateDocumentRequest.subject
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val description: RequestBody = updateDocumentRequest.description
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val request_type: RequestBody = updateDocumentRequest.request_type.toString()
+            .toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val required_by: RequestBody = updateDocumentRequest.required_by
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val id: RequestBody = updateDocumentRequest.id.toString()
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+        val requestFactory = ServerRequestFactory()
+        var call : Call<ApiResponse>? = null
+        if (filePath != null) {
+            val fileToUpload = File(filePath)
+
+            val attachmentRequestBody =
+                fileToUpload.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val attachmentMultiPart = MultipartBody.Part.createFormData(
+                "document",
+                fileToUpload.name,
+                attachmentRequestBody
+            )
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java)
+                .updateEmployeeDocRequestWithFile(
+                    subject, description,
+                    request_type, required_by, id, attachmentMultiPart
+                )
+        }else{
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java)
+                .updateEmployeeDocRequestWithoutFile(
+                    subject, description,
+                    request_type, required_by, id
+                )
+        }
+
+
+
+        val request = requestFactory.newHttpRequest<Any>(context)
+            .withEndpoint(call)
+            .withProgressDialogue()
+            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse?> {
+                override fun onSuccess(apiResponse: ApiResponse?) {
+                    callback.updateDocumentRequestSuccess(apiResponse!!)
+                }
+            }) {
+                callback.updateDocumentRequestFailure(it)
+            }.build()
+        request.executeAsync()
+    }
+
     fun getEmployeeRequests(context: Context, getRequests: GetRequests) {
         val requestFactory = ServerRequestFactory()
         val call = requestFactory
@@ -145,4 +254,43 @@ class RequestRepo(var callback: RequestCallback) {
             }.build()
         request.executeAsync()
     }
+
+
+    fun deleteDocRequest(context: Context, deleteReq: DeleteReq) {
+        val requestFactory = ServerRequestFactory()
+        val call = requestFactory
+            .obtainEndpointProxy(EmployeeEndpoint::class.java).deleteDocRequest(deleteReq)
+
+        val request = requestFactory.newHttpRequest<Any>(context)
+            .withEndpoint(call)
+            .withProgressDialogue()
+            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse?> {
+                override fun onSuccess(apiResponse: ApiResponse?) {
+                    callback.deleteDocRequestSuccess(apiResponse!!)
+                }
+            }) {
+                callback.deleteDocRequestFailure(it)
+            }.build()
+        request.executeAsync()
+    }
+
+    fun deleteLeaveRequest(context: Context, deleteReq: DeleteReq) {
+        val requestFactory = ServerRequestFactory()
+        val call = requestFactory
+            .obtainEndpointProxy(EmployeeEndpoint::class.java).deleteLeaveRequest(deleteReq)
+
+        val request = requestFactory.newHttpRequest<Any>(context)
+            .withEndpoint(call)
+            .withProgressDialogue()
+            .withSuccessAndFailureCallback(object : SuccessCallback<ApiResponse?> {
+                override fun onSuccess(apiResponse: ApiResponse?) {
+                    callback.deleteLeaveRequestSuccess(apiResponse!!)
+                }
+            }) {
+                callback.deleteLeaveRequestFailure(it)
+            }.build()
+        request.executeAsync()
+    }
+
+
 }
