@@ -253,16 +253,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/hint5"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/medium500"
-                    android:text="Attach a File (Optional)"
-                    android:textColor="@color/text_color_light2"
-                    android:textSize="12sp" />
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/hint5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/medium500"
+                        android:text="Attach a File (Optional)"
+                        android:textColor="@color/text_color_light2"
+                        android:textSize="12sp" />
+                    <ImageView
+                        android:id="@+id/remove"
+                        android:src="@drawable/remove"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="13dp"
+                        android:padding="3dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"/>
+                </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

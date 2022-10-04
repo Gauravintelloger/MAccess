@@ -102,10 +102,44 @@ class RequestRepo(var callback: RequestCallback) {
 
     }
 
-    fun updateLeave(context: Context, updateLeave: UpdateLeave) {
+    fun updateLeave(context: Context, updateLeave: UpdateLeave, filePath: String?) {
+
+
+        val id: RequestBody = updateLeave.id.toString()
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val leave_type_id: RequestBody = updateLeave.leave_type_id.toString()
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val description: RequestBody = updateLeave.description
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val from_date: RequestBody = updateLeave.from_date
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
+        val to_date: RequestBody = updateLeave.to_date
+            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
+
         val requestFactory = ServerRequestFactory()
-        val call = requestFactory
-            .obtainEndpointProxy(EmployeeEndpoint::class.java).updateLeave(updateLeave)
+        var call : Call<ApiResponse2>? = null
+        if (filePath != null) {
+            val fileToUpload = File(filePath)
+
+            val attachmentRequestBody =
+                fileToUpload.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val attachmentMultiPart = MultipartBody.Part.createFormData(
+                "document",
+                fileToUpload.name,
+                attachmentRequestBody
+            )
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java).updateLeaveWithFile(id,leave_type_id,description,from_date,to_date,attachmentMultiPart)
+        }else{
+            call = requestFactory
+                .obtainEndpointProxy(EmployeeEndpoint::class.java)
+                .updateLeaveWithoutFile(id,leave_type_id,description,from_date,to_date)
+        }
+
 
         val request = requestFactory.newHttpRequest<Any>(context)
             .withEndpoint(call)

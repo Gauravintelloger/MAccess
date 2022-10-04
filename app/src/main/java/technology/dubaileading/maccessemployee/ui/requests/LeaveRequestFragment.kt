@@ -1,24 +1,31 @@
 package technology.dubaileading.maccessemployee.ui.requests
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.braver.tool.picker.BraverDocPathUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.datepicker.MaterialDatePicker
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentLeaveRequestBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.utils.AppUtils
 
 import technology.dubaileading.maccessemployee.utils.Constants
+import technology.dubaileading.maccessemployee.utils.PermissionUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -31,6 +38,7 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
     private var fromDate: String = ""
     private var toDate: String = ""
     private val dateFormat = "dd-MM-yyyy"
+    private var attachmentFileTextView: TextView? = null
 
     private lateinit var updateLeaveDialog : BottomSheetDialog
 
@@ -66,6 +74,8 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
         viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
             updateLeaveDialog.dismiss()
+            var getRequests = GetRequests(20, 1)
+            viewModel?.getEmployeeRequests(requireContext(), getRequests)
 
         }
 
@@ -73,7 +83,27 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
             Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
         }
 
+        viewModel?.deleteLeaveRequestSuccess?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+            var getRequests = GetRequests(20, 1)
+            viewModel?.getEmployeeRequests(requireContext(), getRequests)
+        }
 
+        viewModel?.deleteLeaveRequestError?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel?.getRequestSuccess?.observe(viewLifecycleOwner) {
+            leaveRequests = it.data?.leaveRequests as ArrayList<LeaveRequestsItem>
+            leaveRequestsAdapter.setData(leaveRequests)
+        }
+
+        viewModel?.selectedFileLiveData?.observe(viewLifecycleOwner) {
+            if (attachmentFileTextView != null){
+                val fileName = AppUtils.getFileNameFromPath(it)
+                attachmentFileTextView?.text = fileName
+            }
+        }
 
 
     }
@@ -91,8 +121,22 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
         val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
         val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
         val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
+        val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
+        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
+        attachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
         var typeList = java.util.ArrayList<String>()
+
+        desc.setText(leaveRequestsItem.description)
+        startDate.setText(leaveRequestsItem.fromDate)
+        endDate.setText(leaveRequestsItem.toDate)
+
+        remove.setOnClickListener {
+            viewModel?.clearAttachment()
+        }
+
+
+
         if (leaveTypeList != null){
             leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
 
@@ -101,11 +145,18 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
             }
 
         }
-        var leave_type_id = leaveTypeList[0]?.id
+        var leave_type_id = leaveRequestsItem.leaveType?.id
 
         val arrayAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
         leaveType.adapter = arrayAdapter
+
+        for (i in 0 until leaveType.count) {
+            if (leaveType.getItemAtPosition(i).equals(leaveRequestsItem.leaveType?.title)) {
+                leaveType.setSelection(i)
+                break
+            }
+        }
 
         leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
@@ -118,8 +169,6 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
         }
-
-
 
 
         startDate.setOnClickListener {
@@ -191,6 +240,11 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
             }
         }
 
+        attachCardView.setOnClickListener {
+            callFileAccessIntent()
+        }
+
+
         submitBt.setOnClickListener {
             if (leave_type_id!!.equals(null)) {
                 Toast.makeText(requireContext(), "Select Leave Type", Toast.LENGTH_LONG).show()
@@ -222,6 +276,60 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
 
         updateLeaveDialog.setContentView(btnsheet)
         updateLeaveDialog.show()
+
+    }
+
+
+    private fun callFileAccessIntent() {
+        if (PermissionUtils.isFileAccessPermissionGranted(requireContext())) {
+            openAttachments()
+        } else {
+            PermissionUtils.showFileAccessPermissionRequestDialog(requireContext())
+        }
+    }
+
+    private fun openAttachments() {
+        try {
+            val addAttachment = Intent(Intent.ACTION_GET_CONTENT)
+            addAttachment.type = "*/*"
+            addAttachment.action = Intent.ACTION_GET_CONTENT
+            addAttachment.action = Intent.ACTION_OPEN_DOCUMENT
+            activityResultLauncherForDocs.launch(addAttachment)
+        } catch (exception: Exception) {
+            AppUtils.printLogConsole("openAttachments", "Exception-------->" + exception.message)
+        }
+    }
+
+    var activityResultLauncherForDocs =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                try {
+                    //String tempFileAbsolutePath = "";
+                    val selectedDocUri = result.data!!.data
+                    if (selectedDocUri.toString().contains("video") || selectedDocUri.toString()
+                            .contains("mp4") || selectedDocUri.toString()
+                            .contains("mkv") || selectedDocUri.toString().contains("mov")
+                    ) {
+
+                        setSourcePathView(selectedDocUri.toString())
+                    } else {
+                        var tempFileAbsolutePath = BraverDocPathUtils.Companion.getSourceDocPath(
+                            requireContext(),
+                            selectedDocUri!!
+                        )
+                        setSourcePathView(tempFileAbsolutePath!!)
+                    }
+                } catch (e: java.lang.Exception) {
+                    AppUtils.printLogConsole(
+                        "activityResultLauncherForDocs",
+                        "Exception-------->" + e.message
+                    )
+                }
+            }
+        }
+
+    private fun setSourcePathView(path: String) {
+        viewModel?.selectedFileLiveData?.value = path
 
     }
 

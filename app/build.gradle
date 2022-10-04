@@ -22,6 +22,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            buildConfigField 'Boolean', 'enableCrashlytics', 'false'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

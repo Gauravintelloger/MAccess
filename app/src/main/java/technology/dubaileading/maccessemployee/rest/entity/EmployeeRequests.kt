@@ -42,8 +42,14 @@ data class LeaveRequestsItem(
 	@field:SerializedName("id")
 	val id: Int? = null,
 
+	@field:SerializedName("leave_type_id")
+	val leave_type_id: Int? = null,
+
 	@field:SerializedName("description")
 	val description: String? = null,
+
+	@field:SerializedName("reference_number")
+	val reference_number: String? = null,
 
 	@field:SerializedName("leave_type")
 	val leaveType: LeaveType? = null,
@@ -91,6 +97,9 @@ data class OtherRequestsItem(
 
 	@field:SerializedName("requesttype")
 	val requesttype: RequestItemType? = null,
+
+	@field:SerializedName("reference_number")
+	val reference_number: String? = null,
 
 	@field:SerializedName("subject")
 	val subject: String? = null,

@@ -53,7 +53,7 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
 
     fun updateLeave(context : Context, updateLeave: UpdateLeave){
         this.context = context
-        requestRepo.updateLeave(context,updateLeave)
+        requestRepo.updateLeave(context,updateLeave,selectedFileLiveData?.value)
     }
 
     fun getRequestTypes(context : Context){
@@ -83,10 +83,9 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
         requestRepo.deleteLeaveRequest(context,deleteReq)
     }
 
-
-
-
-
+    fun clearAttachment(){
+        selectedFileLiveData?.value = null
+    }
 
 
 

@@ -12,7 +12,7 @@ import technology.dubaileading.maccessemployee.R
 
 import technology.dubaileading.maccessemployee.rest.entity.OtherRequestsItem
 
-class DocumentRequestAdapter(val context: Context,val documentClickListener: documentClickListener) :
+class DocumentRequestAdapter(val context: Context, private val documentClickListener: documentClickListener) :
     RecyclerView.Adapter<DocumentRequestAdapter.DocumentRequestsViewHolder>() {
 
     private var otherRequestsData = ArrayList<OtherRequestsItem>()
@@ -27,17 +27,25 @@ class DocumentRequestAdapter(val context: Context,val documentClickListener: doc
 
         holder.request_on.text = otherRequestsData[position].createdAt
         holder.status.text = otherRequestsData[position].statusId
+        //holder.ref_number.text = otherRequestsData[position].reference_number
+
         if (otherRequestsData[position].statusId.equals("Pending")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.pending_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
             holder.download.visibility = View.GONE
+            holder.delete.visibility = View.VISIBLE
+            holder.edit.visibility = View.VISIBLE
         } else if (otherRequestsData[position].statusId.equals("Approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
             holder.download.visibility = View.VISIBLE
+            holder.delete.visibility = View.GONE
+            holder.edit.visibility = View.GONE
         } else if (otherRequestsData[position].statusId.equals("Rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
+            holder.delete.visibility = View.GONE
+            holder.edit.visibility = View.GONE
             if (otherRequestsData[position].doc_url_from_admin != null){
                 holder.download.visibility = View.GONE
             }
@@ -63,7 +71,7 @@ class DocumentRequestAdapter(val context: Context,val documentClickListener: doc
 
     fun setData(otherRequestsItem: ArrayList<OtherRequestsItem>) {
         otherRequestsData.clear()
-        otherRequestsData?.addAll(otherRequestsItem)
+        otherRequestsData.addAll(otherRequestsItem)
         notifyDataSetChanged()
     }
 
@@ -72,6 +80,7 @@ class DocumentRequestAdapter(val context: Context,val documentClickListener: doc
         var metadata = itemView.findViewById<View>(R.id.metadata) as TextView
         var request_on = itemView.findViewById<View>(R.id.request_on) as TextView
         var status = itemView.findViewById<View>(R.id.status) as TextView
+        //var ref_number = itemView.findViewById<View>(R.id.ref_number) as TextView
         var delete = itemView.findViewById<View>(R.id.delete) as ImageView
         var edit = itemView.findViewById<View>(R.id.edit) as ImageView
         var download = itemView.findViewById<View>(R.id.download) as ImageView

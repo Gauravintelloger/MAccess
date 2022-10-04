@@ -24,7 +24,7 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
     private var cal = Calendar.getInstance()
 
     private val dateFormat = "dd-MM-yyyy"
-    private lateinit var dob : String
+    private lateinit var dateOfBith : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,8 +67,8 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                dob = sdf.format(cal.time)
-                binding?.dob?.setText(dob)
+                dateOfBith = sdf.format(cal.time)
+                binding?.dob?.setText(dateOfBith)
             }
         var datePicker = DatePickerDialog(
             this@PersonalInfoActivity,
@@ -77,7 +77,6 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
             cal.get(Calendar.MONTH),
             cal.get(Calendar.DAY_OF_MONTH)
         )
-        datePicker.datePicker.minDate = cal.timeInMillis
 
 
         binding?.dob?.setOnClickListener {
@@ -87,27 +86,27 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
 
 
         binding?.save?.setOnClickListener {
-            val name = binding?.name?.text?.toString()?.trim()
-            val number = binding?.number?.text?.toString()?.trim()
-            dob = binding?.dob?.text?.toString()?.trim().toString()
+            val name = binding?.name?.text?.toString()?.trim()!!
+            val number = binding?.number?.text?.toString()?.trim()!!
+            val date = binding?.dob?.text?.toString()?.trim()!!
 
-            if (name!!.isEmpty()) {
+            if (name != null && name.isEmpty()) {
                 Toast.makeText(this@PersonalInfoActivity, "Enter Name", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if (number!!.isEmpty()) {
+            if (number != null && number.isEmpty()) {
                 Toast.makeText(this@PersonalInfoActivity, "Enter Mobile Number", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if (dob!!.isEmpty()) {
+            if (date != null && date.isEmpty()) {
                 Toast.makeText(this@PersonalInfoActivity, "Enter Date of birth", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            //var updateProfile = UpdateProfile(name,dob,number)
-            //viewModel?.updateProfile(this@PersonalInfoActivity,updateProfile)
+            var updateProfile = UpdateProfile(name,date,number)
+            viewModel?.updateProfile(this@PersonalInfoActivity,updateProfile)
 
         }
 

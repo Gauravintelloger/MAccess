@@ -95,6 +95,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         val email = btnsheet.findViewById<EditText>(R.id.email)
         val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
         val desc = btnsheet.findViewById<EditText>(R.id.desc)
+        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
         attachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
 
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
@@ -152,6 +153,11 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         attachCardView.setOnClickListener {
             callFileAccessIntent()
         }
+
+        remove.setOnClickListener {
+            viewModel?.clearAttachment()
+        }
+
 
         submitBt.setOnClickListener {
             val description = desc?.text?.toString()?.trim()
@@ -238,6 +244,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
         val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
         val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
+        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
         leaveAttachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
         var typeList = ArrayList<String>()
@@ -341,6 +348,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
         attachCardView.setOnClickListener {
             callFileAccessIntent()
+        }
+
+        remove.setOnClickListener {
+            viewModel?.clearAttachment()
         }
 
         submitBt.setOnClickListener {

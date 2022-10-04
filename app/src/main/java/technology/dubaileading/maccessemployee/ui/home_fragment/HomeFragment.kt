@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -31,6 +32,7 @@ import technology.dubaileading.maccessemployee.rest.entity.LikePost
 import technology.dubaileading.maccessemployee.rest.entity.PostData
 import technology.dubaileading.maccessemployee.ui.check_in.CheckInActivity
 import technology.dubaileading.maccessemployee.ui.check_out.CheckOutActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
 import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
 import technology.dubaileading.maccessemployee.utils.AppShared
@@ -84,8 +86,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
             homeAdapter.addList(dataList)
         }
         viewModel?.invalidUser?.observe(viewLifecycleOwner){
-            if (it.status.equals("notok")){
-
+            if (it.status.equals("notok") && it.message.equals("TOKEN_EXPIRED")){
+                AppShared(requireContext()).clearAll()
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
+                requireActivity().finishAffinity()
             }
 
         }

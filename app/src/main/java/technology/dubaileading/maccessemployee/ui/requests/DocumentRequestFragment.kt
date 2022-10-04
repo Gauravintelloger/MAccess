@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.braver.tool.picker.BraverDocPathUtils
@@ -25,14 +25,12 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentDocumentRequestBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
-
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.Constants
 import technology.dubaileading.maccessemployee.utils.PermissionUtils
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, RequestsViewModel>(),documentClickListener {
     private lateinit var documentRequestAdapter: DocumentRequestAdapter
@@ -85,18 +83,30 @@ class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, Re
 
 
         viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner){
+            docUpdate.dismiss()
             Toast.makeText(requireContext(),it.message.toString(),Toast.LENGTH_LONG).show()
             var getRequests = GetRequests(20, 1)
             viewModel?.getEmployeeRequests(requireContext(), getRequests)
         }
 
-        viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            docUpdate.dismiss()
-        }
 
         viewModel?.documentRequestError?.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel?.deleteDocRequestSuccess?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+            var getRequests = GetRequests(20, 1)
+            viewModel?.getEmployeeRequests(requireContext(), getRequests)
+        }
+
+        viewModel?.deleteDocRequestError?.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+        }
+
+        viewModel?.getRequestSuccess?.observe(viewLifecycleOwner) {
+            otherRequestsItem = it.data?.otherRequests as ArrayList<OtherRequestsItem>
+            documentRequestAdapter.setData(otherRequestsItem)
         }
 
     }
@@ -116,6 +126,7 @@ class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, Re
         val email = btnsheet.findViewById<EditText>(R.id.email)
         val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
         val desc = btnsheet.findViewById<EditText>(R.id.desc)
+        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
         attachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
 
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
@@ -130,15 +141,21 @@ class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, Re
         val arrayAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, docType)
         spinnerDocType.adapter = arrayAdapter
-        doc_type_id = docTypeList[0].id
+
+        for (i in 0 until spinnerDocType.count) {
+            if (spinnerDocType.getItemAtPosition(i).equals(otherRequestsItem.requesttype?.type)) {
+                spinnerDocType.setSelection(i)
+                break
+            }
+        }
+
+        doc_type_id = otherRequestsItem.requesttype?.id
 
         spinnerDocType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
                 val docType = docTypeList[i].type
                 doc_type_id = docTypeList[i].id
-                if (docType.equals("Others")) {
 
-                }
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {
@@ -177,6 +194,11 @@ class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, Re
         attachCardView.setOnClickListener {
             callFileAccessIntent()
         }
+
+        remove.setOnClickListener {
+            viewModel?.clearAttachment()
+        }
+
 
         submitBt.setOnClickListener {
             val description = desc?.text?.toString()?.trim()

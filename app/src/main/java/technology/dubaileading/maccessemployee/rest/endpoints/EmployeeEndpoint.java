@@ -75,7 +75,7 @@ public interface EmployeeEndpoint {
     @GET("employee/employeeProfileView")
     Call<Profile> getProfile();
 
-    @POST("employee/employeeProfileView")
+    @POST("employee/EmployeeUpdateProfile")
     Call<Profile> updateProfile(@Body UpdateProfile updateProfile);
 
     @GET("employee/getLeaveDetails")
@@ -86,9 +86,6 @@ public interface EmployeeEndpoint {
 
     @GET("getLeaveTypesnew")
     Call<LeaveTypes> getLeaveTypes();
-
-    @POST("updateEmployeeLeaveRequest")
-    Call<ApiResponse2> updateLeave(@Body UpdateLeave updateLeave);
 
     @GET("getRequestTypes")
     Call<RequestType> getRequestTypes();
@@ -106,6 +103,28 @@ public interface EmployeeEndpoint {
     @Multipart
     @POST("applyLeaveApplicationnew")
     Call<ApiResponse2> applyLeaveWithoutFile(
+            @Part("leave_type_id")  RequestBody leave_type_id,
+            @Part("description")  RequestBody description,
+            @Part("from_date")  RequestBody from_date,
+            @Part("to_date")  RequestBody to_date
+    );
+
+
+    @Multipart
+    @POST("updateEmployeeLeaveRequest")
+    Call<ApiResponse2> updateLeaveWithFile(
+            @Part("id")  RequestBody id,
+            @Part("leave_type_id")  RequestBody leave_type_id,
+            @Part("description")  RequestBody description,
+            @Part("from_date")  RequestBody from_date,
+            @Part("to_date")  RequestBody to_date,
+            @Part  MultipartBody.Part NationalIDFile
+    );
+
+    @Multipart
+    @POST("updateEmployeeLeaveRequest")
+    Call<ApiResponse2> updateLeaveWithoutFile(
+            @Part("id")  RequestBody id,
             @Part("leave_type_id")  RequestBody leave_type_id,
             @Part("description")  RequestBody description,
             @Part("from_date")  RequestBody from_date,
