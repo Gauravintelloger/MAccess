@@ -16,6 +16,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivityPersonalInfoBinding
 import technology.dubaileading.maccessemployee.rest.entity.UpdateProfile
+import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +34,7 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
         viewModel.profileData.observe(this){
             if (it?.profileData?.name != null){
                 binding?.name?.setText(it?.profileData?.name.toString())
+                AppShared(this@PersonalInfoActivity).saveName(it.profileData.name)
             }
 
             if (it?.profileData?.dateOfBirth != null){

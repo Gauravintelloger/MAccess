@@ -106,7 +106,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding,HomeFragmentViewModel>(),o
 
         var user = AppShared(activity as Context).getUser()
         var image = AppShared(activity as Context).getImage()
-        binding?.username?.text = user.data?.name
+        var name = AppShared(activity as Context).getName()
+
+        binding?.username?.text = name
+
+
 
         if (image != null){
             binding?.userImage?.load(image){

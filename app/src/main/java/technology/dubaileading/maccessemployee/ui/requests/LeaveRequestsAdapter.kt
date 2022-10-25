@@ -44,17 +44,17 @@ class LeaveRequestsAdapter(val context: Context,val onClickListener: leaveClickL
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.pending_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
             holder.delete.visibility = View.VISIBLE
-            holder.edit.visibility = View.VISIBLE
+            //holder.edit.visibility = View.VISIBLE
         } else if (leaveRequests[position].status.equals("approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
             holder.delete.visibility = View.GONE
-            holder.edit.visibility = View.GONE
+            //holder.edit.visibility = View.GONE
         } else if (leaveRequests[position].status.equals("rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
             holder.delete.visibility = View.GONE
-            holder.edit.visibility = View.GONE
+            //holder.edit.visibility = View.GONE
         }
 
         holder.delete.setOnClickListener {

@@ -85,6 +85,18 @@ class AppShared(context : Context) {
 
     /*---------*/
 
+    fun saveName(date: String?) {
+        val edit: SharedPreferences.Editor = shared.edit()
+        edit.putString("userName", date)
+        edit.apply()
+    }
+
+    fun getName(): String? {
+        return shared.getString("userName", "")
+    }
+
+    /*---------*/
+
     fun isBreakOut(): Boolean {
         return shared.getBoolean("breakOut", false)
     }

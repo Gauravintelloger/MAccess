@@ -82,6 +82,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
 
             AppShared(this@LoginActivity).saveUser(it)
             AppShared(this@LoginActivity).saveImage(it.data?.photo)
+            AppShared(this@LoginActivity).saveName(it.data?.name)
 
             viewModel.notificationToken(this@LoginActivity,tokenRequest)
 

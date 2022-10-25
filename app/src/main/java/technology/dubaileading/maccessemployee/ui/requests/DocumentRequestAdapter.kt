@@ -34,21 +34,24 @@ class DocumentRequestAdapter(val context: Context, private val documentClickList
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
             holder.download.visibility = View.GONE
             holder.delete.visibility = View.VISIBLE
-            holder.edit.visibility = View.VISIBLE
+            //holder.edit.visibility = View.VISIBLE
         } else if (otherRequestsData[position].statusId.equals("Approved")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
-            holder.download.visibility = View.VISIBLE
+            if (otherRequestsData[position].doc_url_from_admin != null){
+                holder.download.visibility = View.VISIBLE
+            }
             holder.delete.visibility = View.GONE
-            holder.edit.visibility = View.GONE
+            //holder.edit.visibility = View.GONE
         } else if (otherRequestsData[position].statusId.equals("Rejected")){
             holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
             holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
             holder.delete.visibility = View.GONE
-            holder.edit.visibility = View.GONE
-            if (otherRequestsData[position].doc_url_from_admin != null){
+            holder.download.visibility = View.GONE
+            //holder.edit.visibility = View.GONE
+            /*if (otherRequestsData[position].doc_url_from_admin != null){
                 holder.download.visibility = View.GONE
-            }
+            }*/
         }
 
         holder.delete.setOnClickListener {
@@ -66,7 +69,7 @@ class DocumentRequestAdapter(val context: Context, private val documentClickList
     }
 
     override fun getItemCount(): Int {
-        return otherRequestsData.size;
+        return otherRequestsData.size
     }
 
     fun setData(otherRequestsItem: ArrayList<OtherRequestsItem>) {

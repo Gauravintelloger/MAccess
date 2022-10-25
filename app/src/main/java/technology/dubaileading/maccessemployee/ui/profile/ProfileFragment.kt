@@ -84,6 +84,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>()
                 }
             }
             AppShared(requireContext()).saveImage(it.profileData?.photo)
+            AppShared(requireContext()).saveName(it.profileData?.name)
             binding?.nameText?.text = it.profileData?.name.toString()
             binding?.positionTv?.text = it.profileData?.designation?.title.toString()
 
