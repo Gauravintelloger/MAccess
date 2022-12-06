@@ -76,7 +76,7 @@ class ChangePasswordActivity: BaseActivity<ActivityChangePasswordBinding, Change
         return ViewModelProvider(this).get(ChangePasswordViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityChangePasswordBinding {
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityChangePasswordBinding {
         return ActivityChangePasswordBinding.inflate(layoutInflater!!)
     }
 

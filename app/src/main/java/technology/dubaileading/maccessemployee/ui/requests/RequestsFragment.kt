@@ -24,6 +24,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.utility.SessionManager
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.PermissionUtils
@@ -101,25 +102,36 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
 
         var docType = ArrayList<String>()
-        for (i in docTypeList.indices) {
-            docType.add(docTypeList[i].type.toString())
-        }
-        val arrayAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, docType)
-        spinnerDocType.adapter = arrayAdapter
-        doc_type_id = docTypeList[0].id
+        if (docTypeList.isNotEmpty()) {
+            for (i in docTypeList.indices) {
+                docType.add(docTypeList[i].type.toString())
+            }
+            val arrayAdapter =
+                ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    docType
+                )
+            spinnerDocType.adapter = arrayAdapter
+            doc_type_id = docTypeList[0].id
 
-        spinnerDocType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                val docType = docTypeList[i].type
-                doc_type_id = docTypeList[i].id
-                if (docType.equals("Others")) {
+            spinnerDocType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    adapterView: AdapterView<*>,
+                    view: View,
+                    i: Int,
+                    l: Long
+                ) {
+                    val docType = docTypeList[i].type
+                    doc_type_id = docTypeList[i].id
+                    if (docType.equals("Others")) {
+
+                    }
+                }
+
+                override fun onNothingSelected(adapterView: AdapterView<*>?) {
 
                 }
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-
             }
         }
 
@@ -147,8 +159,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
             datePicker.show()
         }
 
-        var user = AppShared(activity as Context).getUser()
-        email.setText(user.data?.username)
+        SessionManager.init(requireContext())
+        SessionManager.user?.let { email.setText(it.username) }
+
+
 
         attachCardView.setOnClickListener {
             callFileAccessIntent()
@@ -248,15 +262,34 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         leaveAttachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
         val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
         var typeList = ArrayList<String>()
-        if (leaveTypeList != null){
+        var leave_type_id: Int? = 0
+
+        if (leaveTypeList.isNotEmpty()){
             leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
+            leave_type_id = leaveTypeList[0].id
 
             for (i in leaveTypeList.indices) {
                 typeList.add(leaveTypeList[i].title.toString())
             }
 
+            val arrayAdapter =
+                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
+            leaveType.adapter = arrayAdapter
+
+            leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
+                    val short_code = leaveTypeList[i].shortCode
+                    val no_of_leaves = leaveTypeList[i].noOfLeaves
+                    val balance_leaves = leaveTypeList[i].balanceLeaves
+                    leave_type_id = leaveTypeList[i].id
+                    leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
+                }
+
+                override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+            }
+
         }
-        var leave_type_id = leaveTypeList[0]?.id
+
 
         val arrayAdapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
@@ -392,9 +425,6 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            activity?.onBackPressed()
-        }
 
         binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Leave"))
         binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Document"))

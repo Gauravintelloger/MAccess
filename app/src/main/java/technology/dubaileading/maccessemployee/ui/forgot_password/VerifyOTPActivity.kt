@@ -228,7 +228,7 @@ class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotP
         return ViewModelProvider(this).get(ForgotPasswordViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityVerifyOtpactivityBinding {
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityVerifyOtpactivityBinding {
         return ActivityVerifyOtpactivityBinding.inflate(layoutInflater!!)
     }
 

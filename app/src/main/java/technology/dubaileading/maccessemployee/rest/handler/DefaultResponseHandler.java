@@ -43,13 +43,13 @@ public class DefaultResponseHandler<T> {
                     return true;
                 }
                 else {
-                    if (failureCallback == null) {
+                    if (failureCallback == null) { 
 //                        new NoNetworkDialog(context).show();
 //                        Toast.makeText(context, "Request failed with " + response.code() + " failure code", Toast.LENGTH_SHORT).show();
                         Toast.makeText(context, "Please check your internet connection", Toast.LENGTH_SHORT).show();
                     } else {
                         failureCallback.onFailure(new ErrorResponse(
-                                0,new ToastMessage("","")));
+                                0,new ToastMessage("","Invalid")));
                     }
                 }
                 return true;

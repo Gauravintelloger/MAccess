@@ -1,35 +1,50 @@
 package technology.dubaileading.maccessemployee.ui.attendance
 
-import android.content.Context
+import android.text.TextUtils
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import technology.dubaileading.maccessemployee.base.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest
-import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
+import technology.dubaileading.maccessemployee.utility.DataState
+import technology.dubaileading.maccessemployee.utility.Event
+import javax.inject.Inject
 
-class AttendanceViewModel : BaseViewModel(),AttendanceCallback {
-    val attendanceRepo = AttendanceRepo(this)
-    var attendanceList = MutableLiveData<AttendenceReport>()
-    var attendanceFailure = MutableLiveData<ErrorResponse>()
-    var error = MutableLiveData<AttendenceReport>()
+@HiltViewModel
+class AttendanceViewModel @Inject constructor(private val repository: AttendanceRepository) :
+    ViewModel() {
+    private val _posts = MutableLiveData<DataState<AttendenceReport>>()
+    val posts: LiveData<DataState<AttendenceReport>> = _posts
 
-    fun getReport(context : Context,reportRequest: ReportRequest){
-        attendanceRepo.getReport(context,reportRequest)
-    }
+    private val _statusMessage = MutableLiveData<Event<String>>()
+    val statusMessage: LiveData<Event<String>> = _statusMessage
 
-    override fun attendanceResponse(attendenceReport: AttendenceReport?) {
-        if (attendenceReport?.status == "ok") {
-            attendanceList.value = attendenceReport!!
+    fun attendanceReports(request: ReportRequest) {
+        when {
+            TextUtils.isEmpty(request.from_date) -> {
+                _statusMessage.value = Event("From date is not selected")
+            }
+            TextUtils.isEmpty(request.from_date) -> {
+                _statusMessage.value = Event("To date is not selected")
+            }
+            else -> {
+                viewModelScope.launch {
+                    repository.attendanceReports(request = request)
+                        .onEach { dataState ->
+                            dataState.let {
+                                _posts.value = it
+                            }
+                        }.launchIn(viewModelScope)
+                }
+            }
         }
-        else {
-            error.value = attendenceReport!!
-        }
+
 
     }
-
-    override fun attendanceFailure(error: ErrorResponse) {
-        attendanceFailure.value = error
-    }
-
 
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home"/>
+
+    <fragment
+        android:id="@+id/servicesFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.services.ServicesFragment"
+        android:label="ServicesFragment"
+        tools:layout="@layout/fragment_services"/>
+
+    <fragment
+        android:id="@+id/requestsFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.requests.RequestsFragment"
+        android:label="RequestsFragment"
+        tools:layout="@layout/fragment_services"/>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment"
+        android:label="NotificationsFragment"
+        tools:layout="@layout/fragment_notifications"/>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile"/>
+
+    <fragment
+        android:id="@+id/checkInFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.check_in.CheckInFragment"
+        android:label="CheckInFragment"
+        tools:layout="@layout/fragment_check_in">
+        <action
+            android:id="@+id/checkInToCheckOut"
+            app:destination="@id/checkOutFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/checkOutFragment"
+        android:name="technology.dubaileading.maccessemployee.ui.check_out.CheckOutFragment"
+        android:label="CheckOutFragment"
+        tools:layout="@layout/fragment_check_out"/>
+
+</navigation>

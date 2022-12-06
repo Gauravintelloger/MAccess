@@ -8,9 +8,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
-abstract class BaseFragment<BINDING : ViewBinding?, VM : BaseViewModel?> : Fragment() {
-    protected var viewModel: VM? = null
-    protected var binding: BINDING? = null
+abstract class BaseFragment<BINDING : ViewBinding, VM : BaseViewModel> : Fragment() {
+    lateinit var viewModel: VM
+    lateinit var binding: BINDING
     protected abstract fun createViewModel(): VM
     protected abstract fun createViewBinding(layoutInflater: LayoutInflater?): BINDING
 
@@ -24,9 +24,7 @@ abstract class BaseFragment<BINDING : ViewBinding?, VM : BaseViewModel?> : Fragm
         binding = createViewBinding(LayoutInflater.from(activity))
         viewModel = createViewModel()
 
-
-//        binding = binding.inflate(inflater,container,false);
-        return binding?.root;
+        return binding.root
     }
 
 

@@ -1,27 +1,23 @@
 package technology.dubaileading.maccessemployee.ui.services
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.LayoutInflater
-import technology.dubaileading.maccessemployee.base.BaseFragment
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import technology.dubaileading.maccessemployee.databinding.FragmentBankingBinding
 
 
-class BankingFragment : BaseFragment<FragmentBankingBinding, BankingViewModel>() {
+class BankingFragment : Fragment() {
+    private lateinit var viewBinding: FragmentBankingBinding
 
-
-    override fun createViewModel(): BankingViewModel {
-        return ViewModelProvider(this).get(BankingViewModel::class.java)
-    }
-
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentBankingBinding {
-        return FragmentBankingBinding.inflate(layoutInflater!!);
-    }
-
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentBankingBinding.inflate(inflater, container, false)
+        return viewBinding.root
     }
 
 }

@@ -1,11 +1,13 @@
 package technology.dubaileading.maccessemployee.ui.personal_info
 
 import android.content.Context
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.Profile
 import technology.dubaileading.maccessemployee.rest.entity.UpdateProfile
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
+import technology.dubaileading.maccessemployee.utility.showToast
 
 class PersonalInfoRepo(var callback: PersonalRepoCallback) {
 
@@ -22,6 +24,9 @@ class PersonalInfoRepo(var callback: PersonalRepoCallback) {
                     callback.profileResponse(profile)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.profileFailure(it)
             }.build()
         request.executeAsync()
@@ -40,6 +45,9 @@ class PersonalInfoRepo(var callback: PersonalRepoCallback) {
                     callback.updateProfileResponse(profile)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.updateProfileFailure(it)
             }.build()
         request.executeAsync()

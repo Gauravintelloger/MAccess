@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.DataItem
 
-class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adapter<AttendanceReportAdapter.AttendanceViewHolder>() {
+class AttendanceReportAdapter( private val context: Context, var dataList: List<DataItem?>?) : RecyclerView.Adapter<AttendanceReportAdapter.AttendanceViewHolder>() {
 
-    private var dataList = ArrayList<DataItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttendanceViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -25,34 +24,33 @@ class AttendanceReportAdapter( private val context: Context) : RecyclerView.Adap
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AttendanceViewHolder, position: Int) {
-
-        holder.dateTime.text = dataList[position].dateTimeUnix
-        if (dataList[position]!!.remarks != null){
-            holder.remark.text = dataList[position]!!.remarks.toString()
+        val bean = dataList?.get(position)
+        holder.dateTime.text = bean?.dateTimeUnix
+        if (bean?.remarks != null){
+            holder.remark.text = bean.remarks.toString()
         }
-        holder.comp.text = dataList[position].sources.toString()
+        holder.comp.text = bean?.sources.toString()
 
-        if (dataList[position].mode!! == "in"){
+        if (bean?.mode!! == "in"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_in))
             holder.status.text = "Break-In"
-        } else if (dataList[position].mode!! == "out"){
+        } else if (bean.mode == "out"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_out))
             holder.status.text = "Break-Out"
-        }  else if (dataList[position].mode!! == "check-in"){
+        }  else if (bean.mode == "check-in"){
             holder.status.text = "Check-In"
-        }else if (dataList[position].mode!! == "check-out"){
+        }else if (bean.mode == "check-out"){
             holder.status.text = "Check-Out"
         }
 
     }
 
     override fun getItemCount(): Int {
-        return dataList.size
+        return dataList?.size!!
     }
 
-    fun addList(items: ArrayList<DataItem>){
-        dataList.clear()
-        dataList.addAll(items)
+    fun addList(items: List<DataItem?>?){
+        this.dataList = items
         notifyDataSetChanged()
     }
 

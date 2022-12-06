@@ -8,7 +8,7 @@ data class LoginResponse(
 	val statuscode: String? = null,
 
 	@field:SerializedName("data")
-	val data: Data? = null,
+	val data: UserDetails? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null,
@@ -20,7 +20,7 @@ data class LoginResponse(
 	val token: String? = null
 )
 
-data class Data(
+data class UserDetails(
 
 	@field:SerializedName("name")
 	val name: String? = null,

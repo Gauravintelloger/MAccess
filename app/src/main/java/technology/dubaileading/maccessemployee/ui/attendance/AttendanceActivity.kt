@@ -1,171 +1,186 @@
 package technology.dubaileading.maccessemployee.ui.attendance
 
-import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.DatePicker
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityTimelogBinding
-import technology.dubaileading.maccessemployee.rest.entity.DataItem
+import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.utility.DataState
+import technology.dubaileading.maccessemployee.utility.hide
+import technology.dubaileading.maccessemployee.utility.show
+import technology.dubaileading.maccessemployee.utility.showToast
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
-class AttendanceActivity : BaseActivity<ActivityTimelogBinding,AttendanceViewModel>(),
-    OnDateSetListener {
+@AndroidEntryPoint
+class AttendanceActivity : AppCompatActivity() {
 
+    private val viewModel: AttendanceViewModel by viewModels()
+    private lateinit var viewBinding: ActivityTimelogBinding
     private lateinit var attendanceReportAdapter: AttendanceReportAdapter
-    private var IS_FROM_DATE = false
-    private var fromDate : String = ""
-    private var toDate : String = ""
-    var cal = Calendar.getInstance()
-
-    override fun createViewModel(): AttendanceViewModel {
-        return ViewModelProvider(this).get(AttendanceViewModel::class.java)
-    }
-
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityTimelogBinding {
-        return ActivityTimelogBinding.inflate(layoutInflater)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_timelog)
+        setAttendanceReportAdapter()
+        setFilterDefaultData()
+        setUpListeners()
+        getAttendanceReportFromRemote()
 
-        attendanceReportAdapter = AttendanceReportAdapter(this@AttendanceActivity)
-        binding?.reportsRv?.itemAnimator = DefaultItemAnimator()
-        binding?.reportsRv?.layoutManager = LinearLayoutManager(this@AttendanceActivity)
-        binding?.reportsRv?.adapter = attendanceReportAdapter
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                startActivity(Intent(this@AttendanceActivity, HomeActivity::class.java))
+                finish()
+            }
+        })
+
+        viewModel.statusMessage.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showToast(it)
+            }
+        }
+    }
+
+    private fun setAttendanceReportAdapter() {
+        attendanceReportAdapter = AttendanceReportAdapter(this@AttendanceActivity, listOf())
+        viewBinding.recyclerView.itemAnimator = DefaultItemAnimator()
+        viewBinding.recyclerView.layoutManager = LinearLayoutManager(this@AttendanceActivity)
+        viewBinding.recyclerView.adapter = attendanceReportAdapter
+
+    }
 
 
-        val myFormat = "yyyy-MM-dd" // mention the format you need
+    private fun setFilterDefaultData() {
+        val myFormat = "yyyy-MM-dd"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
-        var date = Date()
+        val date = Date()
+        viewBinding.fromDate.text = sdf.format(date)
+        viewBinding.toDate.text = sdf.format(date)
+    }
 
-        fromDate = sdf.format(date)
-        toDate = sdf.format(date)
+    private fun getAttendanceReportFromRemote() {
+        viewModel.attendanceReports(
+            ReportRequest(
+                viewBinding.fromDate.text.toString(),
+                viewBinding.toDate.text.toString()
+            )
+        )
+        viewModel.posts.observe(this, attendanceReportsObserver)
+    }
 
-        binding.fromDate.text = sdf.format(date)
-        binding.toDate.text = sdf.format(date)
+    private var attendanceReportsObserver: Observer<DataState<AttendenceReport>> =
+        androidx.lifecycle.Observer {
+            when (it) {
+                is DataState.Loading -> {
+                    viewBinding.errorLayout.root.hide()
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.show()
+                }
+                is DataState.Success -> {
+                    viewBinding.progressBar.hide()
+                    validateAttendanceReportData(it.item)
+                }
+                is DataState.Error -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    viewBinding.apply {
+                        viewBinding.errorLayout.errorText.text = "No Data Found"
+                        viewBinding.errorLayout.root.show()
+                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                    }
+                    showToast(it.error.toString())
+                }
+            }
+        }
 
-        var reportRequest = ReportRequest(fromDate,toDate)
-        viewModel.getReport(this@AttendanceActivity,reportRequest)
+    private fun validateAttendanceReportData(response: AttendenceReport) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            if (response.attendanceData?.data != null && response.attendanceData.data.isNotEmpty()) {
+                viewBinding.errorLayout.root.hide()
+                viewBinding.recyclerView.show()
+                attendanceReportAdapter.addList(response.attendanceData.data)
+            } else {
+                attendanceReportAdapter.addList(Collections.emptyList())
 
-        viewModel.attendanceList.observe(this){
-            if (it.attendanceData?.data != null){
-                attendanceReportAdapter.addList(it.attendanceData?.data as ArrayList<DataItem>)
+                viewBinding.errorLayout.errorText.text = "No Data Found"
+                viewBinding.errorLayout.root.show()
+                viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
             }
 
+
+        } else if (response.status == Constants.API_RESPONSE_CODE.NOT_OK && response.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
+            CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                R.string.tokenExpiredDesc
+            ),
+                object : CustomDialog.OnClickListener {
+                    override fun okButtonClicked() {
+                        logoutUser()
+                    }
+                })
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
+
+    }
+
+    private fun setUpListeners() {
+        viewBinding.materialToolbar.setNavigationOnClickListener {
+            startActivity(Intent(this@AttendanceActivity, HomeActivity::class.java))
+            finish()
         }
 
 
-
-
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            onBackPressed()
-        }
-
-
-        binding.fromDate.setOnClickListener{
+        viewBinding.fromDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(supportFragmentManager, "DatePicker")
 
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
                 val myFormat = "yyyy-MM-dd" // mention the format you need
                 val sdf = SimpleDateFormat(myFormat, Locale.US)
-                binding?.fromDate?.text = sdf.format(datePicker.selection?.first)
-                binding?.toDate?.text = sdf.format(datePicker.selection?.second)
-                fromDate = sdf.format(datePicker.selection?.first)
-                toDate = sdf.format(datePicker.selection?.second)
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
-
+                viewBinding.fromDate.text = sdf.format(datePicker.selection?.first)
+                viewBinding.toDate.text = sdf.format(datePicker.selection?.second)
             }
 
         }
-
-
-
-        binding.toDate.setOnClickListener {
+        viewBinding.toDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(supportFragmentManager, "DatePicker")
-
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
-                val myFormat = "yyyy-MM-dd" // mention the format you need
+                val myFormat = "yyyy-MM-dd"
                 val sdf = SimpleDateFormat(myFormat, Locale.US)
-                binding?.fromDate?.text = sdf.format(datePicker.selection?.first)
-                binding?.toDate?.text = sdf.format(datePicker.selection?.second)
-                fromDate = sdf.format(datePicker.selection?.first)
-                toDate =sdf.format(datePicker.selection?.second)
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
+                viewBinding.fromDate.text = sdf.format(datePicker.selection?.first)
+                viewBinding.toDate.text = sdf.format(datePicker.selection?.second)
 
             }
         }
 
-        binding.search.setOnClickListener {
-            if(fromDate.isEmpty()){
-                Toast.makeText(this@AttendanceActivity,"From date is not selected", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            if(toDate.isEmpty()){
-                Toast.makeText(this@AttendanceActivity,"To date is not selected", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
+        viewBinding.search.setOnClickListener {
 
-            var reportRequest = ReportRequest(fromDate,toDate)
-
-            viewModel.getReport(this@AttendanceActivity,reportRequest)
+            getAttendanceReportFromRemote()
 
         }
 
-
-
     }
 
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        startActivity(Intent(this@AttendanceActivity, HomeActivity::class.java))
-        finish()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-    }
-
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-
+    fun logoutUser() {
+        startActivity(Intent(applicationContext, LoginActivity::class.java))
+        finishAffinity()
+        showToast("Logged out Successfully")
     }
 
 }

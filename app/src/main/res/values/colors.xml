@@ -43,7 +43,11 @@
     <color name="text_color_grey">#5C616F</color>
     <color name="grey">#373737</color>
     <color name="app_color_primary_light">#148DC2</color>
-
+    <color name="darKText">#040C22</color>
+    <color name="subTitleDark">#363D4E</color>
+    <color name="hintLabel">#5C616F</color>
+    <color name="hintColor">#5E040C22</color>
+    <color name="colorSecondary">#01A0C6</color>
 
 
 

@@ -1,58 +1,48 @@
 package technology.dubaileading.maccessemployee.ui.profile
 
 
-import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import technology.dubaileading.maccessemployee.base.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave
 import technology.dubaileading.maccessemployee.rest.entity.Profile
-import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
+import technology.dubaileading.maccessemployee.utility.DataState
+import javax.inject.Inject
 
-class ProfileViewModel : BaseViewModel(),ProfileCallback {
-    var profileRepo = ProfileRepo(this)
+@HiltViewModel
+class ProfileViewModel @Inject constructor(private val profileRepository: ProfileRepository) : ViewModel() {
 
-    var profileData = MutableLiveData<Profile>()
-    var profileError = MutableLiveData<Profile>()
+    private val _profile = MutableLiveData<DataState<Profile>>()
+    val profile: LiveData<DataState<Profile>> = _profile
 
-    var leaveData = MutableLiveData<GetLeave>()
-    var leaveError = MutableLiveData<GetLeave>()
+    private val _leaves = MutableLiveData<DataState<GetLeave>>()
+    val leaves: LiveData<DataState<GetLeave>> = _leaves
 
-    var failure = MutableLiveData<ErrorResponse>()
-
-
-
-
-    fun getProfile(context : Context){
-        profileRepo.getProfile(context)
-    }
-
-    fun getLeaves(context : Context){
-        profileRepo.getLeaves(context)
-    }
-
-    override fun profileResponse(profile: Profile?) {
-        if (profile?.status == "ok") {
-            profileData.value = profile!!
-        } else {
-            profileError.value = profile!!
+    fun profile() {
+        viewModelScope.launch {
+            profileRepository.getProfile()
+                .onEach { dataState ->
+                    dataState.let {
+                        _profile.value = it
+                    }
+                }.launchIn(viewModelScope)
         }
     }
 
-    override fun profileFailure(error: ErrorResponse) {
-        failure.value = error
-    }
-
-    override fun getLeaveResponse(getLeave: GetLeave?) {
-        if (getLeave?.status == "ok") {
-            leaveData.value = getLeave!!
-        } else {
-            leaveError.value = getLeave!!
+    fun leaves() {
+        viewModelScope.launch {
+            profileRepository.getLeaves()
+                .onEach { dataState ->
+                    dataState.let {
+                        _leaves.value = it
+                    }
+                }.launchIn(viewModelScope)
         }
-
-    }
-
-    override fun getLeaveFailure(error: ErrorResponse) {
-        failure.value = error
     }
 
 }

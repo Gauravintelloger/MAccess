@@ -1,127 +1,144 @@
 package technology.dubaileading.maccessemployee.ui.login
 
-import android.app.AlertDialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityLoginBinding
+import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
+import technology.dubaileading.maccessemployee.rest.entity.LoginResponse
 import technology.dubaileading.maccessemployee.rest.entity.TokenRequest
 import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordActivity
-import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
+import technology.dubaileading.maccessemployee.ui.splash.SplashOrganisationActivity
+import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 import technology.dubaileading.maccessemployee.utils.Utils
 
 
-class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(){
-    private lateinit var token : String
-    private lateinit var tokenRequest : TokenRequest
+@AndroidEntryPoint
+class LoginActivity : AppCompatActivity() {
+    private val viewModel: LoginViewModel by viewModels()
+    private lateinit var viewBinding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("Splash", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
+        SessionManager.init(this)
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
-            // Get new FCM registration token
-            token = task.result
-            AppShared(this@LoginActivity).saveFirebaseToken(token)
-            tokenRequest = TokenRequest(token,"android")
-            // Log and toast
-            Log.d("Splash", token)
-            //Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-        })
-
-
-
-
-
-        binding.submitBt.setOnClickListener{
-            var username = binding.usename.text.toString()
-            var password = Utils.md5(binding.password.text.toString().trim())
-            var deviceToken = Utils.getUniqueID(this@LoginActivity)
-
-
-            var loginRequest = LoginRequest(
-                device_token = deviceToken,
-                password = password,
-                username = username
+        viewBinding.submitMaterialButton.setOnClickListener {
+            val loginRequest = LoginRequest(
+                device_token = getUniqueID(this@LoginActivity),
+                password = Utils.md5(viewBinding.passwordTextInputEditText.text.toString().trim()),
+                username = viewBinding.userNameTextInputEditText.text.toString()
             )
 
-            var isValidated = viewModel.validate(loginRequest)
-            if(isValidated){
-                viewModel.loginUser(this@LoginActivity, loginRequest)
-            }
+            viewModel.userLogin(loginRequest)
+            viewModel.userDetails.observe(this, loginObserver)
 
         }
 
-        binding.forgotPass.setOnClickListener {
+
+        viewModel.statusMessage.observe(this@LoginActivity) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it.contains("Username", true)) {
+                    viewBinding.userNameTextInputLayout.error = it
+                    if (viewBinding.passwordTextInputLayout.isErrorEnabled) {
+                        viewBinding.passwordTextInputLayout.isErrorEnabled = false
+                    }
+                } else if (it.contains("Password", true)) {
+                    viewBinding.passwordTextInputLayout.error = it
+                    if (viewBinding.userNameTextInputLayout.isErrorEnabled) {
+                        viewBinding.userNameTextInputLayout.isErrorEnabled = false
+                    }
+
+                } else {
+                    viewBinding.userNameTextInputLayout.isErrorEnabled = false
+                    viewBinding.passwordTextInputLayout.isErrorEnabled = false
+
+                }
+
+            }
+        }
+
+        viewBinding.forgotPasswordTextView.setOnClickListener {
             startActivity(Intent(this@LoginActivity, ForgotPasswordActivity::class.java))
         }
 
+    }
 
-
-
-        //observing the validUser livedata from ViewModel
-        viewModel.validUser.observe(this){
-            AppShared(this@LoginActivity).saveToken(it.token.toString())
-
-            AppShared(this@LoginActivity).saveUser(it)
-            AppShared(this@LoginActivity).saveImage(it.data?.photo)
-            AppShared(this@LoginActivity).saveName(it.data?.name)
-
-            viewModel.notificationToken(this@LoginActivity,tokenRequest)
-
-
-        }
-
-        viewModel.notificationTokenSuccess.observe(this){
-            startActivity(Intent(this@LoginActivity, SplashActivity::class.java))
-            finish()
-        }
-
-        //observing the invalidUser liveData from ViewModel
-        viewModel.invalidUser.observe(this){
-            AlertDialog.Builder(this@LoginActivity)
-                .setTitle("Alert")
-                .setMessage(it?.message)
-                .setPositiveButton(
-                "Ok"
-                ) { _, _ ->
+    private var loginObserver: Observer<DataState<LoginResponse>> =
+        androidx.lifecycle.Observer<DataState<LoginResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
                 }
-            .show()
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateLoginResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+            }
+        }
+
+    private var saveFcmTokenObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateSaveFcmTokenResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+            }
+        }
+
+    private fun validateLoginResponse(response: LoginResponse) {
+
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            SessionManager.user = response.data
+            SessionManager.token = response.token
+            AppShared(this).saveToken(response.token!!)
+
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    return@OnCompleteListener
+                }
+                viewModel.saveFcmToken(TokenRequest(task.result, "android"))
+                viewModel.saveToken.observe(this, saveFcmTokenObserver)
+
+            })
+
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
         }
 
     }
 
-    override fun createViewModel(): LoginViewModel {
-        return ViewModelProvider(this).get(LoginViewModel::class.java)
-    }
+    private fun validateSaveFcmTokenResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            SessionManager.isLoggedIn = true
+            startActivity(Intent(this@LoginActivity, SplashOrganisationActivity::class.java))
+            finish()
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityLoginBinding {
-        return ActivityLoginBinding.inflate(layoutInflater)
     }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.login_bg)
-        window.navigationBarColor = ContextCompat.getColor(this,  R.color.login_bg)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.login_bg)
-    }
-
 }

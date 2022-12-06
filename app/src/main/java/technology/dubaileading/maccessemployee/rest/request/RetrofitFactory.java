@@ -19,6 +19,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import technology.dubaileading.maccessemployee.BaseApplication;
 import technology.dubaileading.maccessemployee.BuildConfig;
+import technology.dubaileading.maccessemployee.utility.SessionManager;
 import technology.dubaileading.maccessemployee.utils.AppShared;
 
 /**
@@ -75,7 +76,7 @@ public class RetrofitFactory {
     }
 
     private OkHttpClient newOkHttpClient() {
-        try{
+        try {
 
             return new OkHttpClient().newBuilder()
                     .addInterceptor(new Interceptor() {
@@ -91,7 +92,7 @@ public class RetrofitFactory {
 
                             Request.Builder requestBuilder = original.newBuilder().url(url);
 
-                            String token = new AppShared(BaseApplication.getInstance()).getToken();
+                            String token = new AppShared(BaseApplication.Companion.getInstance()).getToken();
                             if (token != null) {
                                 requestBuilder.addHeader("Authorization", "Bearer "+token);
                             }
@@ -115,8 +116,8 @@ public class RetrofitFactory {
                             return response;
                         }
                     }).build();
-        }catch (Exception e){
-            Log.e("error",e.toString());
+        } catch (Exception e) {
+            Log.e("error", e.toString());
         }
 
         return null;

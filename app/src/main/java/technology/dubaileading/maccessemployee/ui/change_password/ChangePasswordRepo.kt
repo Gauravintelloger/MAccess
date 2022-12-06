@@ -1,11 +1,13 @@
 package technology.dubaileading.maccessemployee.ui.change_password
 
 import android.content.Context
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.ChangePassword
 import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
+import technology.dubaileading.maccessemployee.utility.showToast
 
 class ChangePasswordRepo(var callback: ChangePasswordCallback) {
 
@@ -23,6 +25,9 @@ class ChangePasswordRepo(var callback: ChangePasswordCallback) {
                     callback.changePasswordResponse(changePassword)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.changePasswordFailure(it)
             }.build()
         request.executeAsync()

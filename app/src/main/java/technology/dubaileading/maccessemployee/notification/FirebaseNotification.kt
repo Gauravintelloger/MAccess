@@ -13,7 +13,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.ui.HomeActivity
-import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utility.SessionManager
 
 
 class FirebaseNotification : FirebaseMessagingService() {
@@ -22,9 +22,9 @@ class FirebaseNotification : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         super.onMessageReceived(message)
+        SessionManager.init(this)
 
-        var isNotification = AppShared(this).isNotification()
-        if (isNotification){
+        if (SessionManager.isNotification == true){
             notifyUser(
                 message.data["title"].toString(),
                 message.data["message"].toString()

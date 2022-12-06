@@ -1,6 +1,7 @@
 package technology.dubaileading.maccessemployee.ui.forgot_password
 
 import android.content.Context
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword
@@ -8,6 +9,7 @@ import technology.dubaileading.maccessemployee.rest.entity.ResetPassword
 import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
+import technology.dubaileading.maccessemployee.utility.showToast
 
 class ForgotPasswordRepo(val forgotPasswordCallback: ForgotPasswordCallback) {
 
@@ -24,6 +26,9 @@ class ForgotPasswordRepo(val forgotPasswordCallback: ForgotPasswordCallback) {
                     forgotPasswordCallback.forgotPasswordResponse(entity!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 forgotPasswordCallback.forgotPasswordFailure(it)
             }.build()
         request.executeAsync()
@@ -42,6 +47,9 @@ class ForgotPasswordRepo(val forgotPasswordCallback: ForgotPasswordCallback) {
                     forgotPasswordCallback.resendOTPResponse(entity!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 forgotPasswordCallback.resendOTPFailure(it)
             }.build()
         request.executeAsync()
@@ -60,6 +68,9 @@ class ForgotPasswordRepo(val forgotPasswordCallback: ForgotPasswordCallback) {
                     forgotPasswordCallback.verifyOTPResponse(entity!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 forgotPasswordCallback.verifyOTPFailure(it)
             }.build()
         request.executeAsync()
@@ -78,6 +89,9 @@ class ForgotPasswordRepo(val forgotPasswordCallback: ForgotPasswordCallback) {
                     forgotPasswordCallback.forgotPasswordResponse(entity!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 forgotPasswordCallback.forgotPasswordFailure(it)
             }.build()
         request.executeAsync()

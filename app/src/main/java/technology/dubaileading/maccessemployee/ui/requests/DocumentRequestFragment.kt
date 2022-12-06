@@ -25,6 +25,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseFragment
 import technology.dubaileading.maccessemployee.databinding.FragmentDocumentRequestBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.utility.SessionManager
 import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.Constants
@@ -188,8 +189,13 @@ class DocumentRequestFragment  : BaseFragment<FragmentDocumentRequestBinding, Re
             datePicker.show()
         }
 
-        var user = AppShared(activity as Context).getUser()
-        email.setText(user.data?.username)
+        requireActivity().let {
+            SessionManager.init(it)
+        }
+
+        SessionManager.user.let {
+            email.setText(it?.username)
+        }
 
         attachCardView.setOnClickListener {
             callFileAccessIntent()

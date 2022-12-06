@@ -1,55 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.HomeActivity"
-    android:background="@color/white">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <include
-        layout="@layout/layout_home_fragments"
-        android:layout_marginBottom="56dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        app:layout_anchor="@id/bnv_layout"
-        android:background="@drawable/elevation_gradient"/>
+        android:layout_height="match_parent"
+        tools:context=".ui.HomeActivity"
+        android:background="@color/white">
 
-    <LinearLayout
-        android:id="@+id/bnv_layout"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal">
 
-        <include
-            layout="@layout/bottom_bar"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerView"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            android:layout_above="@+id/bottomNavigationLinearLayout"
+            app:navGraph="@navigation/home_navigation" />
 
-    </LinearLayout>
-    <ImageView
-        android:layout_width="160dp"
-        android:layout_height="95dp"
-        app:layout_anchor="@id/bnv_layout"
-        android:background="@drawable/curve"
-        app:layout_anchorGravity="center_horizontal"
-        android:layout_marginBottom="35dp"
-        android:elevation="0dp"/>
+        <LinearLayout
+            android:id="@+id/bottomNavigationLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/img_ORDR"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:background="@drawable/hom_fab"
-        android:clickable="true"
-        android:elevation="1dp"
-        android:src="@drawable/ic_logo"
-        app:layout_anchor="@id/bnv_layout"
-        app:layout_anchorGravity="center_horizontal"
-        tools:ignore="SpeakableTextPresentCheck" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <include
+                android:id="@+id/bottomNavigationViewInclude"
+                layout="@layout/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/homeImageView"
+            android:layout_width="@dimen/_115sdp"
+            android:layout_height="@dimen/_70sdp"
+            app:layout_anchor="@id/bottomNavigationLinearLayout"
+            android:background="@drawable/curve"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="35dp"
+            android:elevation="0dp"/>
+
+        <FrameLayout
+            android:id="@+id/homeImageButtonFrameLayout"
+            android:background="@drawable/hom_fab"
+            android:layout_marginBottom="@dimen/_25sdp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp">
+            <ImageButton
+                android:id="@+id/homeImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_logo"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </FrameLayout>
+    </RelativeLayout>
+</layout>

@@ -1,162 +1,180 @@
 package technology.dubaileading.maccessemployee.ui
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.ImageView
-import androidx.annotation.RequiresApi
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.badge.BadgeDrawable
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationBarView
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityHomeBinding
-import technology.dubaileading.maccessemployee.ui.home_fragment.HomeFragment
+import technology.dubaileading.maccessemployee.rest.entity.NotificationCount
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.ui.notifications.NotificationsFragment
-import technology.dubaileading.maccessemployee.ui.profile.ProfileFragment
-import technology.dubaileading.maccessemployee.ui.requests.RequestsFragment
-import technology.dubaileading.maccessemployee.ui.services.ServicesFragment
-import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utility.*
 
+@AndroidEntryPoint
+class HomeActivity : AppCompatActivity() {
 
-class HomeActivity : BaseActivity<ActivityHomeBinding,HomeViewModel>() {
+    private lateinit var count: BadgeDrawable
+    private lateinit var navController: NavController
+    private val viewModel: HomeViewModel by viewModels()
+    private lateinit var viewBinding: ActivityHomeBinding
 
-    lateinit var navView : BottomNavigationView
-    lateinit var im : ImageView
-    private lateinit var count : BadgeDrawable
-
-    private val broadcastReceiver : BroadcastReceiver = object : BroadcastReceiver() {
+    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            viewModel.getNotificationsCount(this@HomeActivity)
+            loadNotificationCountFromRemote()
         }
-
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        backGroundColor()
         super.onCreate(savedInstanceState)
-        loadFragment(HomeFragment())
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
         val intentFilter = IntentFilter("IntentFilterAction")
         LocalBroadcastManager.getInstance(this@HomeActivity)
             .registerReceiver(broadcastReceiver, intentFilter)
 
-        navView = findViewById(R.id.bnv_home)
-        navView.selectedItemId = R.id.bnm_home
+        val host: NavHostFragment = supportFragmentManager
+            .findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = host.navController
+        viewBinding.bottomNavigationViewInclude.bottomNavigationView.selectedItemId = R.id.home
 
-        binding.imgORDR.setOnClickListener{
-            navView.selectedItemId = R.id.bnm_home
+        setCountColor()
+        setUpListeners()
+        loadNotificationCountFromRemote()
+
+    }
+
+    private fun setUpListeners() {
+        viewBinding.bottomNavigationViewInclude.bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.services -> {
+                    findNavController(R.id.fragmentContainerView).navigate(
+                        R.id.servicesFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+                }
+                R.id.requests -> {
+                    findNavController(R.id.fragmentContainerView).navigate(
+                        R.id.requestsFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+                }
+                R.id.home -> {
+                    findNavController(R.id.fragmentContainerView).navigate(
+                        R.id.homeFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+                }
+                R.id.notifications -> {
+                    findNavController(R.id.fragmentContainerView).navigate(
+                        R.id.notificationsFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+                }
+                R.id.profile -> {
+                    findNavController(R.id.fragmentContainerView).navigate(
+                        R.id.profileFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+
+                }
+            }
+            return@setOnItemSelectedListener true
+
         }
 
-        count = navView.getOrCreateBadge(R.id.bnm_notification)
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            if (destination.label == "CheckInFragment" || destination.label == "CheckOutFragment") {
+                viewBinding.bottomNavigationLinearLayout.hide()
+                viewBinding.homeImageView.hide()
+                viewBinding.homeImageButtonFrameLayout.hide()
+            } else {
+                viewBinding.bottomNavigationLinearLayout.show()
+                viewBinding.homeImageView.show()
+                viewBinding.homeImageButtonFrameLayout.show()
+                if (destination.label == "HomeFragment") {
+                    viewBinding.homeImageButtonFrameLayout.background =
+                        ContextCompat.getDrawable(this, R.drawable.hom_fab)
+                    viewBinding.bottomNavigationViewInclude.bottomNavigationView.menu.getItem(2)?.isChecked =
+                        true
+                } else {
+                    if (destination.label == "ServicesFragment") {
+                        viewBinding.bottomNavigationViewInclude.bottomNavigationView.menu.getItem(0)?.isChecked =
+                            true
+                    } else if (destination.label == "RequestsFragment") {
+                        viewBinding.bottomNavigationViewInclude.bottomNavigationView.menu.getItem(1)?.isChecked =
+                            true
+                    } else if (destination.label == "NotificationsFragment") {
+                        viewBinding.bottomNavigationViewInclude.bottomNavigationView.menu.getItem(3)?.isChecked =
+                            true
+                    } else if (destination.label == "ProfileFragment") {
+                        viewBinding.bottomNavigationViewInclude.bottomNavigationView.menu.getItem(4)?.isChecked =
+                            true
+                    }
+                    viewBinding.homeImageButtonFrameLayout.background =
+                        ContextCompat.getDrawable(this, R.drawable.hom_fab_disable)
+                }
+            }
+        }
+
+        viewBinding.homeImageButton.setOnClickListener {
+            viewBinding.bottomNavigationViewInclude.bottomNavigationView.selectedItemId = R.id.home
+        }
+
+    }
+
+    private fun setCountColor() {
+        count =
+            viewBinding.bottomNavigationViewInclude.bottomNavigationView.getOrCreateBadge(R.id.notifications)
         count.backgroundColor = Color.RED
         count.badgeTextColor = Color.WHITE
+    }
 
-        viewModel.getNotificationsCount(this)
+    private fun loadNotificationCountFromRemote() {
+        viewModel.notificationCount()
+        viewModel.notificationCount.observe(this, notificationCountObserver)
+    }
 
-        viewModel.notificationCountSuccess.observe(this){
+    private var notificationCountObserver: Observer<DataState<NotificationCount>> =
+        androidx.lifecycle.Observer {
+            when (it) {
+                is DataState.Loading -> {
+                }
+                is DataState.Success -> {
+                    validateNotificationCount(it.item)
+                }
+                is DataState.Error -> {
+                }
+            }
+        }
 
-            if (it.data !=0){
-                count.number = it.data!!
+    private fun validateNotificationCount(body: NotificationCount) {
+        if (body.status == Constants.API_RESPONSE_CODE.OK) {
+            if (body.data != 0) {
+                count.number = body.data!!
                 count.isVisible = true
-            } else{
+            } else {
                 count.isVisible = false
             }
         }
-
-        viewModel.error.observe(this){
-            count.isVisible = false
-            if (it.status.equals("notok") && it.message.equals("TOKEN_EXPIRED")){
-                AppShared(this@HomeActivity).clearAll()
-                startActivity(Intent(this@HomeActivity, LoginActivity::class.java))
-                finishAffinity()
-            }
-
-        }
-
-
-        navView.setOnItemSelectedListener(NavigationBarView.OnItemSelectedListener { item ->
-            when (item.title){
-                "Services" -> {
-                    binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(ServicesFragment())
-                    binding
-                }
-                "Requests" -> {
-                    binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(RequestsFragment())
-                }
-                "Home" -> {
-                    binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab)
-                    loadFragment(HomeFragment())
-                }
-                "Notifications" -> {
-                    binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(NotificationsFragment())
-                    count.isVisible = false
-                }
-                "Profile" -> {
-                    binding.imgORDR.background = this.getDrawable(R.drawable.hom_fab_disable)
-                    loadFragment(ProfileFragment())
-                }
-            }
-
-            item.itemId
-            true
-        })
-
-    }
-
-    override fun createViewModel(): HomeViewModel {
-        return ViewModelProvider(this).get(HomeViewModel::class.java)
-    }
-
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityHomeBinding {
-        return ActivityHomeBinding.inflate(layoutInflater)
-    }
-
-    private fun loadFragment(fragment: Fragment?): Boolean {
-        //switching fragment
-        if (fragment != null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.fragment_container,
-                    fragment
-                )
-                //.addToBackStack(fragment.tag)
-                .commit()
-            return true
-        }
-        return false
-    }
-
-    override fun onBackPressed() {
-//        super.onBackPressed()
-
-        var id = navView.selectedItemId
-        if(id == R.id.bnm_home){
-            super.onBackPressed()
-            return
-        }
-
-        loadFragment(HomeFragment())
-        navView.selectedItemId = R.id.bnm_home
-
     }
 
     override fun onDestroy() {
@@ -164,14 +182,10 @@ class HomeActivity : BaseActivity<ActivityHomeBinding,HomeViewModel>() {
         LocalBroadcastManager.getInstance(this@HomeActivity).unregisterReceiver(broadcastReceiver)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+    fun logoutUser() {
+        startActivity(Intent(applicationContext, LoginActivity::class.java))
+        finish()
+        showToast("Logged out Successfully")
     }
-
 
 }

@@ -34,7 +34,6 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
         viewModel.profileData.observe(this){
             if (it?.profileData?.name != null){
                 binding?.name?.setText(it?.profileData?.name.toString())
-                AppShared(this@PersonalInfoActivity).saveName(it.profileData.name)
             }
 
             if (it?.profileData?.dateOfBirth != null){
@@ -126,7 +125,7 @@ class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalI
         return ViewModelProvider(this).get(PersonalInfoViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityPersonalInfoBinding {
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityPersonalInfoBinding {
         return ActivityPersonalInfoBinding.inflate(layoutInflater!!)
     }
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

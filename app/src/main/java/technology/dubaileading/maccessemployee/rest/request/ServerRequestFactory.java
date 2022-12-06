@@ -18,7 +18,6 @@ public class ServerRequestFactory {
         return this.retrofit.create(clz);
     }
 
-
     public <T> HttpServerRequestBuilder newHttpRequest(Context context) {
         return new HttpServerRequestBuilder<>(context);
     }

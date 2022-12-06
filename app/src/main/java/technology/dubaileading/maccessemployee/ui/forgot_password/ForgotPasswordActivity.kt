@@ -59,7 +59,7 @@ class ForgotPasswordActivity : BaseActivity<ActivityForgotPasswordBinding, Forgo
         return ViewModelProvider(this).get(ForgotPasswordViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityForgotPasswordBinding {
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityForgotPasswordBinding {
         return ActivityForgotPasswordBinding.inflate(layoutInflater!!)
     }
 

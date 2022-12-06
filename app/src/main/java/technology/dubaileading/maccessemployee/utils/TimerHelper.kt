@@ -15,8 +15,6 @@ class TimerHelper {
 
         val currentHourDifference: String = findDifference(savedTime, nowTime)
 
-//        val hours: String = AppShared(getApplicationContext()).getHours()
-
         val h1 = currentHourDifference.split(":").toTypedArray()
         val h2 = savedHours.split(":").toTypedArray()
 

@@ -1,177 +1,202 @@
 package technology.dubaileading.maccessemployee.ui.profile
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
-import coil.transform.RoundedCornersTransformation
-import technology.dubaileading.maccessemployee.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
+import technology.dubaileading.maccessemployee.R
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.FragmentProfileBinding
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave
 import technology.dubaileading.maccessemployee.rest.entity.LeaveDataItem
+import technology.dubaileading.maccessemployee.rest.entity.Profile
+import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessemployee.ui.change_password.ChangePasswordActivity
-import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
 import technology.dubaileading.maccessemployee.ui.settings.SettingsActivity
-import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.utility.*
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 
-class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>() {
+@AndroidEntryPoint
+class ProfileFragment : Fragment() {
 
-    val totalLeaves: Float = 100f
-    val alLeaves: Float = 20F
-    val slLeaves: Float = 10f
-    val clLeaves: Float = 20f
-    val availableLeaves: Float = 50f
-    private lateinit var leave : GetLeave
     private lateinit var leaveAdapter: LeaveAdapter
+    private lateinit var viewBinding: FragmentProfileBinding
+    private val viewModel by viewModels<ProfileViewModel>()
 
-    override fun createViewModel(): ProfileViewModel {
-        return ViewModelProvider(this).get(ProfileViewModel::class.java)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentProfileBinding {
-        return FragmentProfileBinding.inflate(layoutInflater!!);
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        var user = AppShared(requireContext()).getUser()
-
-
-
-
-        /*if (user.data?.photo != null){
-            binding?.profilePicView?.load(user.data?.photo){
-                transformations(CircleCropTransformation())
+    private var profileObserver: Observer<DataState<Profile>> =
+        androidx.lifecycle.Observer<DataState<Profile>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateProfileResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
             }
-        }else{
-            binding?.profilePicView?.load(user.data?.organisationLogo){
-                transformations(CircleCropTransformation())
+        }
+
+    private var leavesObserver: Observer<DataState<GetLeave>> =
+        androidx.lifecycle.Observer<DataState<GetLeave>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateLeaveResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
             }
-        }*/
+        }
+
+    private fun validateProfileResponse(body: Profile) {
+        if (activity != null && isAdded) {
+            if (body.status == Constants.API_RESPONSE_CODE.OK) {
+                if (body.profileData?.photo != null) {
+                    viewBinding.profilePicView.load(body.profileData.photo) {
+                        transformations(CircleCropTransformation())
+                    }
+                } else {
+                    viewBinding.profilePicView.load(SessionManager.user?.organisationLogo) {
+                        transformations(CircleCropTransformation())
+                    }
+                }
+                viewBinding.nameText.text = body.profileData?.name.toString()
+                viewBinding.positionTv.text = body.profileData?.designation?.title.toString()
+
+
+            } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
+                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                    R.string.tokenExpiredDesc
+                ),
+                    object : CustomDialog.OnClickListener {
+                        override fun okButtonClicked() {
+                            (activity as? HomeActivity?)?.logoutUser()
+                        }
+                    })
+            } else {
+                CustomDialog(requireContext()).showInformationDialog(body.message)
+            }
+
+        }
+    }
+
+    private fun validateLeaveResponse(body: GetLeave) {
+        if (activity != null && isAdded) {
+            if (body.status == Constants.API_RESPONSE_CODE.OK) {
+                viewBinding.availableLeave.text = body.data?.sumAvailableLeave.toString()
+                viewBinding.totalLeave.text = "/" + body.data?.sumTotalLeave.toString()
+                viewBinding.leaveRequested.text = body.data?.leaveRequested.toString()
+                leaveAdapter.addList(body.data?.leaveData as ArrayList<LeaveDataItem>)
+
+            } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
+                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                    R.string.tokenExpiredDesc
+                ),
+                    object : CustomDialog.OnClickListener {
+                        override fun okButtonClicked() {
+                            (activity as? HomeActivity?)?.logoutUser()
+                        }
+                    })
+            } else {
+                CustomDialog(requireContext()).showInformationDialog(body.message)
+            }
+
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentProfileBinding.inflate(inflater, container, false)
+        SessionManager.init(requireContext())
+        initLeaverecyclerAdapter()
+        getProfileFromRemote()
+        getLeavesFromRemote()
+        setUpListeners()
+        return viewBinding.root
+    }
+
+    private fun initLeaverecyclerAdapter() {
         leaveAdapter = LeaveAdapter(requireContext())
-        binding?.leaveRv?.itemAnimator = DefaultItemAnimator()
-        binding?.leaveRv?.layoutManager = LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false)
-        binding?.leaveRv?.adapter = leaveAdapter
+        viewBinding.leaveRv.itemAnimator = DefaultItemAnimator()
+        viewBinding.leaveRv.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        viewBinding.leaveRv.adapter = leaveAdapter
+    }
 
-        viewModel?.getProfile(requireContext())
-        viewModel?.getLeaves(requireContext())
+    private fun getProfileFromRemote() {
+        viewModel.profile()
+        viewModel.profile.observe(viewLifecycleOwner, profileObserver)
+    }
 
-        viewModel?.profileData?.observe(viewLifecycleOwner){
-            if (it.profileData?.photo != null){
-                binding?.profilePicView?.load(it.profileData.photo){
-                    transformations(CircleCropTransformation())
-                }
-            }else{
-                binding?.profilePicView?.load(user.data?.organisationLogo){
-                    transformations(CircleCropTransformation())
-                }
-            }
-            AppShared(requireContext()).saveImage(it.profileData?.photo)
-            AppShared(requireContext()).saveName(it.profileData?.name)
-            binding?.nameText?.text = it.profileData?.name.toString()
-            binding?.positionTv?.text = it.profileData?.designation?.title.toString()
+    private fun getLeavesFromRemote() {
+        viewModel.leaves()
+        viewModel.leaves.observe(viewLifecycleOwner, leavesObserver)
+    }
 
-        }
-
-        viewModel?.leaveData?.observe(viewLifecycleOwner){
-            leave = it
-            binding?.availableLeave?.text = it.data?.sumAvailableLeave.toString()
-            binding?.totalLeave?.text = "/"+it.data?.sumTotalLeave.toString()
-            binding?.leaveRequested?.text = it.data?.leaveRequested.toString()
-            leaveAdapter.addList(it.data?.leaveData as ArrayList<LeaveDataItem>)
-
-        }
-
-       /* val linearAlViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,alLeaves)
-        linearAlViewParams.weight = alLeaves
-        binding?.al?.layoutParams = linearAlViewParams
-
-        val linearClViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,clLeaves)
-        //linearAlViewParams.weight = clLeaves
-        binding?.cl?.layoutParams = linearClViewParams
-
-        val linearSlViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,slLeaves)
-        //linearAlViewParams.weight = slLeaves
-        binding?.sl?.layoutParams = linearSlViewParams
-
-
-
-        val linearAvaillViewParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,availableLeaves)
-        //linearAlViewParams.weight = availableLeaves
-        binding?.restLeave?.layoutParams = linearAvaillViewParams
-
-        binding?.progressView?.weightSum = totalLeaves
-        binding?.progressView?.removeAllViews()
-        binding?.progressView?.addView(binding?.al)
-        binding?.progressView?.addView(binding?.cl)
-        binding?.progressView?.addView(binding?.sl)
-
-        binding?.progressView?.addView(binding?.restLeave)*/
-
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            activity?.onBackPressed()
-        }
-
-        binding?.personalInfo?.setOnClickListener {
+    private fun setUpListeners() {
+        viewBinding.personalInfo.setOnClickListener {
             startActivity(Intent(activity, PersonalInfoActivity::class.java))
         }
 
-        binding?.changePass?.setOnClickListener {
+        viewBinding.changePass.setOnClickListener {
             startActivity(Intent(activity, ChangePasswordActivity::class.java))
         }
 
-        binding?.attendanceLog?.setOnClickListener {
+        viewBinding.attendanceLog.setOnClickListener {
             startActivity(Intent(activity, AttendanceActivity::class.java))
         }
 
-        binding?.settings?.setOnClickListener {
+        viewBinding.settings.setOnClickListener {
             startActivity(Intent(activity, SettingsActivity::class.java))
         }
 
-        binding?.logOut?.setOnClickListener {
-            var isTimerRunning =  AppShared(requireContext()).isTimerRunning()
-            var alertDialog = AlertDialog.Builder(activity as Context)
-            alertDialog.setTitle("Logout?")
-            if (isTimerRunning){
-                alertDialog.setMessage("Timer is Running,Timer will get cleared Do you want to logout from mAccess?")
-            }else{
-                alertDialog.setMessage("Do you want to logout from mAccess?")
+        viewBinding.logOut.setOnClickListener {
+            val message: String = if (SessionManager.isTimerRunning == true) {
+                "Timer is Running,Timer will get cleared Do you want to logout from mAccess?"
+            } else {
+                "Do you want to logout from mAccess?"
             }
+            CustomDialog(requireActivity()).showDecisionButtonDialog(
+                message,
+                "Yes",
+                "No",
+                true,
+                object : CustomDialog.onUserActionCLickListener {
+                    override fun negativeButtonClicked() {
 
-            alertDialog.setPositiveButton("Yes") { _, _ ->
-                run {
-                    AppShared(activity as Context).clearAll()
-                    startActivity(Intent(activity, LoginActivity::class.java))
-                    (activity as Activity).finishAffinity()
-                }
-            }
-            alertDialog.setNegativeButton("No") { dialog, which ->
-                dialog.dismiss()
+                    }
 
-            }
+                    override fun positiveButtonClicked() {
+                        (activity as? HomeActivity?)?.logoutUser()
+                    }
 
-            alertDialog.show()
+                })
         }
 
     }
-
 
 
 }

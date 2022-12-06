@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -125,7 +126,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:background="@drawable/home_bg" />
+            android:background="@drawable/home_background" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,11 +136,11 @@
             android:layout_marginRight="22dp"
             android:orientation="horizontal">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/userImage"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/dlt_single_logo" />
+                android:src="@mipmap/ic_launcher" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -282,14 +283,35 @@
                 android:background="#D0D7DD"
                 android:visibility="gone" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:visibility="visible"
-                android:id="@+id/rv"
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:paddingBottom="8dp"
-                android:layout_marginTop="5dp" />
+                android:layout_height="match_parent">
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/error_layout"
+                    layout="@layout/error_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -379,3 +401,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

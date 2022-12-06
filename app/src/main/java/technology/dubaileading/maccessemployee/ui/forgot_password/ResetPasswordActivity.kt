@@ -27,12 +27,12 @@ class ResetPasswordActivity : BaseActivity<ActivityResetPasswordBinding, ForgotP
 
 
         binding.submit.setOnClickListener {
-            if(binding?.newPass?.text?.trim()!!?.isEmpty()){
+            if(binding?.newPass?.text?.trim()?.isEmpty()!!){
                 Toast.makeText(this@ResetPasswordActivity,"Enter New Password", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            if(binding?.rePass?.text?.trim()!!?.isEmpty()){
+            if(binding?.rePass?.text?.trim()!!?.isEmpty()!!){
                 Toast.makeText(this@ResetPasswordActivity,"Re-Enter New Password", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -71,7 +71,7 @@ class ResetPasswordActivity : BaseActivity<ActivityResetPasswordBinding, ForgotP
         return ViewModelProvider(this).get(ForgotPasswordViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivityResetPasswordBinding {
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityResetPasswordBinding {
         return ActivityResetPasswordBinding.inflate(layoutInflater!!)
     }
 

@@ -9,20 +9,20 @@ class AppShared(context : Context) {
 
     var shared : SharedPreferences = context.getSharedPreferences("app_shared",Context.MODE_PRIVATE)
 
-    /*----------*/
-    fun saveUser(user : LoginResponse){
-        val edit = shared.edit()
-        edit.putString("user",Gson().toJson(user))
-        edit.apply()
-    }
-
-    fun getUser() : LoginResponse{
-        var userS = shared.getString("user","");
-        return Gson().fromJson(userS,LoginResponse::class.java)
-    }
-    /*----------*/
-
-    /*----------*/
+//    /*----------*/
+//    fun saveUser(user : LoginResponse){
+//        val edit = shared.edit()
+//        edit.putString("user",Gson().toJson(user))
+//        edit.apply()
+//    }
+//
+//    fun getUser() : LoginResponse{
+//        var userS = shared.getString("user","");
+//        return Gson().fromJson(userS,LoginResponse::class.java)
+//    }
+//    /*----------*/
+//
+//    /*----------*/
     fun saveToken(token : String){
         val edit = shared.edit()
         edit.putString("token",token)
@@ -49,15 +49,15 @@ class AppShared(context : Context) {
     /*----------*/
 
 
-    fun savePlace(place: String?) {
-        val edit: SharedPreferences.Editor = shared.edit()
-        edit.putString("place", place)
-        edit.apply()
-    }
-
-    fun getPlace(): String? {
-        return shared.getString("place", "")
-    }
+//    fun savePlace(place: String?) {
+//        val edit: SharedPreferences.Editor = shared.edit()
+//        edit.putString("place", place)
+//        edit.apply()
+//    }
+//
+//    fun getPlace(): String? {
+//        return shared.getString("place", "")
+//    }
 
     /*----------*/
 
@@ -73,27 +73,27 @@ class AppShared(context : Context) {
 
     /*---------*/
 
-    fun saveImage(date: String?) {
-        val edit: SharedPreferences.Editor = shared.edit()
-        edit.putString("profileImage", date)
-        edit.apply()
-    }
-
-    fun getImage(): String? {
-        return shared.getString("profileImage", "")
-    }
+//    fun saveImage(date: String?) {
+//        val edit: SharedPreferences.Editor = shared.edit()
+//        edit.putString("profileImage", date)
+//        edit.apply()
+//    }
+//
+//    fun getImage(): String? {
+//        return shared.getString("profileImage", "")
+//    }
 
     /*---------*/
 
-    fun saveName(date: String?) {
-        val edit: SharedPreferences.Editor = shared.edit()
-        edit.putString("userName", date)
-        edit.apply()
-    }
-
-    fun getName(): String? {
-        return shared.getString("userName", "")
-    }
+//    fun saveName(date: String?) {
+//        val edit: SharedPreferences.Editor = shared.edit()
+//        edit.putString("userName", date)
+//        edit.apply()
+//    }
+//
+//    fun getName(): String? {
+//        return shared.getString("userName", "")
+//    }
 
     /*---------*/
 

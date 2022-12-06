@@ -142,7 +142,7 @@ class RequestsViewModel() : BaseViewModel(),RequestCallback {
 
 
     override fun documentRequestSuccess(apiResponse: ApiResponse) {
-        if (apiResponse?.status == "ok") {
+        if (apiResponse.status == "ok") {
             documentRequestSuccess.value = apiResponse!!
             var getRequests = GetRequests(20, 1)
             requestRepo.getEmployeeRequests(context,getRequests)

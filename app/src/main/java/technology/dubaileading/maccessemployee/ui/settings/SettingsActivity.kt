@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.base.BaseActivity
 import technology.dubaileading.maccessemployee.databinding.ActivitySettingsBinding
+import technology.dubaileading.maccessemployee.utility.SessionManager
 import technology.dubaileading.maccessemployee.utils.AppShared
 import java.text.DateFormat
 import java.text.ParseException
@@ -24,6 +25,8 @@ import java.util.concurrent.TimeUnit
 class SettingsActivity : BaseActivity<ActivitySettingsBinding, SettingsViewModel>(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SessionManager.init(this)
+
         backGroundColor()
         binding?.materialToolbar?.setNavigationOnClickListener {
             onBackPressed()
@@ -33,16 +36,10 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding, SettingsViewModel
         binding?.appVersion?.text = "App Version : $versionName"
 
         binding?.notifications?.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked){
-                AppShared(this).setNotification(true)
-            } else {
-                AppShared(this).setNotification(false)
-            }
+            SessionManager.isNotification = isChecked
         }
 
-        val isEnable = AppShared(this).isNotification()
-
-        binding?.notifications?.isChecked = isEnable
+        binding?.notifications?.isChecked = SessionManager.isNotification == true
 
 
 
@@ -57,8 +54,8 @@ class SettingsActivity : BaseActivity<ActivitySettingsBinding, SettingsViewModel
         return ViewModelProvider(this).get(SettingsViewModel::class.java)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): ActivitySettingsBinding {
-        return ActivitySettingsBinding.inflate(layoutInflater!!)
+    override fun createViewBinding(layoutInflater: LayoutInflater): ActivitySettingsBinding {
+        return ActivitySettingsBinding.inflate(layoutInflater)
     }
 
 

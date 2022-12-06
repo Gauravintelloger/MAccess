@@ -7,10 +7,12 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.*
 import technology.dubaileading.maccessemployee.rest.request.ServerRequestFactory
 import technology.dubaileading.maccessemployee.rest.request.SuccessCallback
+import technology.dubaileading.maccessemployee.utility.showToast
 import java.io.File
 
 
@@ -29,6 +31,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.leaveTypesResponse(leaveTypes!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.leaveTypesFailure(it)
             }.build()
         request.executeAsync()
@@ -47,6 +52,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.requestTypesSuccess(requestType!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.requestTypesFailure(it)
             }.build()
         request.executeAsync()
@@ -68,7 +76,7 @@ class RequestRepo(var callback: RequestCallback) {
             ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
 
         val requestFactory = ServerRequestFactory()
-        var call : Call<ApiResponse2>? = null
+        var call : Call<ApiResponse2?>? = null
         if (filePath != null) {
             val fileToUpload = File(filePath)
 
@@ -95,6 +103,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.applyLeaveSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.applyLeaveFailure(it)
             }.build()
         request.executeAsync()
@@ -121,7 +132,7 @@ class RequestRepo(var callback: RequestCallback) {
             ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
 
         val requestFactory = ServerRequestFactory()
-        var call : Call<ApiResponse2>? = null
+        var call : Call<ApiResponse2?>? = null
         if (filePath != null) {
             val fileToUpload = File(filePath)
 
@@ -149,6 +160,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.updateLeaveSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.updateLeaveFailure(it)
             }.build()
         request.executeAsync()
@@ -171,7 +185,7 @@ class RequestRepo(var callback: RequestCallback) {
         val email: RequestBody = documentRequest.email
             ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
         val requestFactory = ServerRequestFactory()
-        var call : Call<ApiResponse>? = null
+        var call : Call<ApiResponse?>? = null
         if (filePath != null) {
             val fileToUpload = File(filePath)
 
@@ -207,6 +221,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.documentRequestSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.documentRequestFailure(it)
             }.build()
         request.executeAsync()
@@ -230,7 +247,7 @@ class RequestRepo(var callback: RequestCallback) {
         val id: RequestBody = updateDocumentRequest.id.toString()
             ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())!!
         val requestFactory = ServerRequestFactory()
-        var call : Call<ApiResponse>? = null
+        var call : Call<ApiResponse?>? = null
         if (filePath != null) {
             val fileToUpload = File(filePath)
 
@@ -266,6 +283,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.updateDocumentRequestSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.updateDocumentRequestFailure(it)
             }.build()
         request.executeAsync()
@@ -284,6 +304,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.getRequestSuccess(employeeRequests!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.getRequestFailure(it)
             }.build()
         request.executeAsync()
@@ -303,6 +326,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.deleteDocRequestSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.deleteDocRequestFailure(it)
             }.build()
         request.executeAsync()
@@ -321,6 +347,9 @@ class RequestRepo(var callback: RequestCallback) {
                     callback.deleteLeaveRequestSuccess(apiResponse!!)
                 }
             }) {
+                context.showToast(
+                    context.getString(R.string.apiEngineDown)
+                )
                 callback.deleteLeaveRequestFailure(it)
             }.build()
         request.executeAsync()

@@ -378,14 +378,14 @@ public class Utils {
 
     public static String getCurrentDate(){
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         String formattedDate = df.format(c);
         return formattedDate;
     }
 
     public static String getCurrentTime(){
         Date c = Calendar.getInstance().getTime();
-        SimpleDateFormat tf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat tf = new SimpleDateFormat("HH:mm:ss", Locale.US);
         String formattedTime = tf.format(c);
         return formattedTime;
     }

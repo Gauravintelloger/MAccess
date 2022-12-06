@@ -33,5 +33,16 @@
     <string name="not_now">Not Now</string>
 
     <string name="default_notification_channel_id">101</string>
+    <string name="apiEngineDown">API Engine Down</string>
+    <string name="tokenExpiredDesc">Your token has been expired. Please login again to continue</string>
+    <string name="by_using_our_mobile_app_you_agree_to_our_terms_of_use_and_privacy_policy">By using our mobile app, you agree to our Terms of Use and Privacy Policy</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="submit">Submit</string>
+    <string name="simply_enter_the_existing_username_and_the_corresponding_password">Simply enter the existing username and the corresponding password.</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="pressOnceAgainToExit">Press once again to exit</string>
+    <string name="notAvailable">Not Available</string>
+
 
 </resources>

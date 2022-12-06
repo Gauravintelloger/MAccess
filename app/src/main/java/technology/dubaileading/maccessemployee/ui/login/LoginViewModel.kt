@@ -1,77 +1,67 @@
 package technology.dubaileading.maccessemployee.ui.login
 
-import android.content.Context
+import android.text.TextUtils
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import technology.dubaileading.maccessemployee.base.BaseViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.rest.entity.LoginRequest
 import technology.dubaileading.maccessemployee.rest.entity.LoginResponse
 import technology.dubaileading.maccessemployee.rest.entity.TokenRequest
-import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
-import technology.dubaileading.maccessuser.ui.login.LoginRepoCallback
+import technology.dubaileading.maccessemployee.utility.DataState
+import technology.dubaileading.maccessemployee.utility.Event
+import javax.inject.Inject
 
 
-class LoginViewModel : BaseViewModel(), LoginRepoCallback {
+@HiltViewModel
+class LoginViewModel @Inject constructor(private val loginRepository: LoginRepository) :
+    ViewModel() {
 
-    var invalidUser = MutableLiveData<LoginResponse>()
-    var validUser = MutableLiveData<LoginResponse>()
-    var loginFailure = MutableLiveData<ErrorResponse>()
+    private val _statusMessage = MutableLiveData<Event<String>>()
+    val statusMessage: LiveData<Event<String>> = _statusMessage
 
-    var notificationTokenSuccess = MutableLiveData<ApiResponse>()
-    var notificationTokenError = MutableLiveData<ApiResponse>()
-    var notificationTokenFailure = MutableLiveData<ErrorResponse>()
+    private val _userDetails = MutableLiveData<DataState<LoginResponse>>()
+    val userDetails: LiveData<DataState<LoginResponse>> = _userDetails
 
-    private var loginRepo = LoginRepo(this)
+    private val _saveToken = MutableLiveData<DataState<ApiResponse>>()
+    val saveToken: LiveData<DataState<ApiResponse>> = _saveToken
 
-    //login api is called
-    fun loginUser(context : Context, loginRequest: LoginRequest){
-        loginRepo.login(context, loginRequest)
-    }
-
-
-    fun notificationToken(context : Context,tokenRequest: TokenRequest){
-        loginRepo.notificationToken(context, tokenRequest)
-    }
-
-    //validating the input data
-    fun validate(loginRequest : LoginRequest) : Boolean{
-        if(loginRequest.username.isEmpty()){
-            return false
-        }
-        if(loginRequest.password.isEmpty()){
-            return false
-        }
-
-        return true
-    }
-
-    //login response from the server
-    override fun loginResponse(user : LoginResponse?) {
-        if (user?.status == "ok") {
-            validUser.value = user!!
-        }
-        else {
-            invalidUser.value = user!!
+    fun userLogin(request: LoginRequest) {
+        when {
+            TextUtils.isEmpty(request.username) -> {
+                _statusMessage.value = Event("Enter Valid Username")
+            }
+            TextUtils.isEmpty(request.password) -> {
+                _statusMessage.value = Event("Enter Valid Password")
+            }
+            TextUtils.isEmpty(request.device_token) -> {
+                _statusMessage.value = Event("Invalid Android ID")
+            }
+            else -> {
+                _statusMessage.value = Event("")
+                viewModelScope.launch {
+                    loginRepository.login(request = request).onEach { dataState ->
+                        _userDetails.value = dataState
+                    }
+                        .launchIn(viewModelScope)
+                }
+            }
         }
     }
 
-    override fun loginFailure(error: ErrorResponse) {
-        loginFailure.value = error
-    }
 
-    override fun notificationTokenSuccess(apiResponse: ApiResponse?) {
-        if (apiResponse?.status == "ok") {
-            notificationTokenSuccess.value = apiResponse!!
+    fun saveFcmToken(request: TokenRequest) {
+        viewModelScope.launch {
+            loginRepository.saveFcmToken(request = request).onEach { dataState ->
+                _saveToken.value = dataState
+            }
+                .launchIn(viewModelScope)
         }
-        else {
-            notificationTokenError.value = apiResponse!!
-        }
-
-    }
-
-    override fun notificationTokenFailure(error: ErrorResponse) {
-        notificationTokenFailure.value = error
-
     }
 
 }

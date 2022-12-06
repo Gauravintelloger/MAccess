@@ -10,11 +10,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.NotificationData
+import technology.dubaileading.maccessemployee.rest.entity.PostData
 
 
-class NotificationAdapter(var context: Context) : RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
-
-    private var dataList = ArrayList<NotificationData>()
+class NotificationAdapter(var context: Context, var dataList: List<NotificationData?>?) : RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationAdapter.NotificationViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -24,19 +23,20 @@ class NotificationAdapter(var context: Context) : RecyclerView.Adapter<Notificat
     }
 
     override fun onBindViewHolder(holder: NotificationAdapter.NotificationViewHolder, position: Int) {
-        holder.notification.text = dataList[position].title
-        holder.message.text = dataList[position].message
-        holder.time.text = dataList[position].dateOfNotificationWithTime
-        if (dataList[position].remarks != null){
-            holder.remarks.text = dataList[position].remarks
+        val bean: NotificationData = dataList?.get(position)!!
+        holder.notification.text = bean.title
+        holder.message.text = bean.message
+        holder.time.text = bean.dateOfNotificationWithTime
+        if (bean.remarks != null){
+            holder.remarks.text = bean.remarks
             holder.remarks.visibility = View.VISIBLE
         }else{
             holder.remarks.visibility = View.GONE
         }
 
-        if (dataList[position].type.equals("Document Request")){
+        if (bean.type.equals("Document Request")){
             holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.document_notification))
-        } else if (dataList[position].type.equals("Leave Application")){
+        } else if (bean.type.equals("Leave Application")){
             holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.leave_notification))
         } else {
             holder.image.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_insurance_1))
@@ -46,12 +46,11 @@ class NotificationAdapter(var context: Context) : RecyclerView.Adapter<Notificat
     }
 
     override fun getItemCount(): Int {
-        return dataList.size
+        return dataList?.size!!
     }
 
-    fun addList(notificationData : ArrayList<NotificationData>){
-        dataList.clear()
-        dataList.addAll(notificationData)
+    fun addList(notificationData : List<NotificationData?>?){
+        this.dataList = notificationData
         notifyDataSetChanged()
     }
 

@@ -1,98 +1,124 @@
 package technology.dubaileading.maccessemployee.ui.splash_gif
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.view.LayoutInflater
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.databinding.DataBindingUtil
+import com.google.android.gms.tasks.Task
+import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import dagger.hilt.android.AndroidEntryPoint
 import pl.droidsonroids.gif.GifDrawable
-
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashGifBinding
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.ui.splash.SplashActivity
+import technology.dubaileading.maccessemployee.ui.splash.SplashOrganisationActivity
+import technology.dubaileading.maccessemployee.utility.setStatusBarTranslucent
 import technology.dubaileading.maccessemployee.utils.AppShared
-import technology.dubaileading.maccessemployee.utils.Utils
 
 
-private const val UPDATE_REQUEST_CODE = 123
-
-class SplashGifActivity : BaseActivity<ActivitySplashGifBinding, SplashGifViewModel>() {
-    private lateinit var appUpdateManager : AppUpdateManager
-
+@AndroidEntryPoint
+class SplashGifActivity : AppCompatActivity() {
+    private var appUpdateManager: AppUpdateManager? = null
+    private var binding: ActivitySplashGifBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appUpdateManager = AppUpdateManagerFactory.create(this)
-
-        Log.e("android ID", Utils.getUniqueID(applicationContext))
-        appUpdateManager.appUpdateInfo.addOnSuccessListener {
-            if (it.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && it.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-                appUpdateManager.startUpdateFlowForResult(it, AppUpdateType.IMMEDIATE, this, UPDATE_REQUEST_CODE)
-            }else if (it.updateAvailability() == UpdateAvailability.UPDATE_NOT_AVAILABLE){
-                navtoHome()
-            } else{
-                navtoHome()
-            }
-        }.addOnFailureListener {
-            navtoHome()
-            Log.e("ImmediateUpdateActivity", "Failed to check for update: $it")
-        }
-
-
+        setStatusBarTranslucent(true)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_splash_gif)
+        appUpdateManager =
+            AppUpdateManagerFactory.create(this)
+        checkUpdate()
 
         val gifFromAssets = GifDrawable(assets, "splash_gif.gif")
-        binding.splashGif.setImageDrawable(gifFromAssets)
-
+        binding?.splashLogoImageView?.setImageDrawable(gifFromAssets)
 
     }
 
-    @SuppressLint("SuspiciousIndentation")
-    private fun navtoHome() {
-        Handler(Looper.getMainLooper()).postDelayed({
-        val token = AppShared(this@SplashGifActivity).getToken()
-            if (token.equals(null) || token!!.isEmpty()){
-                startActivity(Intent(applicationContext, LoginActivity::class.java))
-                finish()
+    private fun checkUpdate() {
+        val appUpdateInfoTask: Task<AppUpdateInfo> = appUpdateManager!!.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+            ) {
+                startUpdateFlow(appUpdateInfo)
+            } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                startUpdateFlow(appUpdateInfo)
+            } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_NOT_AVAILABLE) {
+                navToHome()
             } else {
-                startActivity(Intent(applicationContext, SplashActivity::class.java))
-                finish()
+                navToHome()
             }
+        }.addOnFailureListener {
+            navToHome()
+        }
+    }
 
-       },2000)
+    private fun startUpdateFlow(appUpdateInfo: AppUpdateInfo) {
+        try {
+            appUpdateManager?.startUpdateFlowForResult(
+                appUpdateInfo,
+                AppUpdateType.IMMEDIATE,
+                this,
+                IMMEDIATE_APP_UPDATE_REQ_CODE
+            )
+        } catch (e: SendIntentException) {
+            e.printStackTrace()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == UPDATE_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
-            navtoHome()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        appUpdateManager.appUpdateInfo.addOnSuccessListener {
-            if (it.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
-                appUpdateManager.startUpdateFlowForResult(it, AppUpdateType.IMMEDIATE, this, UPDATE_REQUEST_CODE)
+        if (requestCode == IMMEDIATE_APP_UPDATE_REQ_CODE) {
+            if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(
+                    applicationContext,
+                    "Update required", Toast.LENGTH_LONG
+                ).show()
+                finish()
+            } else if (resultCode == RESULT_OK) {
+                Toast.makeText(
+                    applicationContext,
+                    "Successfully Updated!", Toast.LENGTH_LONG
+                ).show()
+                navToHome()
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Update Failed!", Toast.LENGTH_LONG
+                ).show()
+                checkUpdate()
             }
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
+    private fun navToHome() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val token = AppShared(this@SplashGifActivity).getToken()
+            if (token.equals(null) || token!!.isEmpty()) {
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(applicationContext, SplashOrganisationActivity::class.java))
+                finish()
+            }
 
-
-    override fun createViewModel(): SplashGifViewModel {
-        return ViewModelProvider(this).get(SplashGifViewModel::class.java)
+        }, 2000)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivitySplashGifBinding {
-        return ActivitySplashGifBinding.inflate(layoutInflater)
+    companion object {
+        private const val IMMEDIATE_APP_UPDATE_REQ_CODE = 124
     }
+
 }
