@@ -18,10 +18,7 @@ import technology.dubaileading.maccessemployee.rest.entity.AttendenceReport
 import technology.dubaileading.maccessemployee.rest.entity.ReportRequest
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.utility.DataState
-import technology.dubaileading.maccessemployee.utility.hide
-import technology.dubaileading.maccessemployee.utility.show
-import technology.dubaileading.maccessemployee.utility.showToast
+import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.CustomDialog
 import java.text.SimpleDateFormat
 import java.util.*
@@ -104,8 +101,26 @@ class AttendanceActivity : AppCompatActivity() {
                     }
                     showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    viewBinding.apply {
+                        viewBinding.errorLayout.errorText.text = "No Data Found"
+                        viewBinding.errorLayout.root.show()
+                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                    }
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                logoutUser()
+                            }
+                        })
+                }
             }
         }
+
 
     private fun validateAttendanceReportData(response: AttendenceReport) {
         if (response.status == Constants.API_RESPONSE_CODE.OK) {
@@ -122,15 +137,6 @@ class AttendanceActivity : AppCompatActivity() {
             }
 
 
-        } else if (response.status == Constants.API_RESPONSE_CODE.NOT_OK && response.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-            CustomDialog(this).showNonCancellableMessageDialog(message = getString(
-                R.string.tokenExpiredDesc
-            ),
-                object : CustomDialog.OnClickListener {
-                    override fun okButtonClicked() {
-                        logoutUser()
-                    }
-                })
         } else {
             CustomDialog(this).showInformationDialog(response.message)
         }

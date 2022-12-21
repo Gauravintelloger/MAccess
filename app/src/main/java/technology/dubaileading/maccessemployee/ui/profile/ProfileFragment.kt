@@ -10,8 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import coil.load
-import coil.transform.CircleCropTransformation
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.config.Constants
@@ -48,6 +47,17 @@ class ProfileFragment : Fragment() {
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
@@ -65,6 +75,8 @@ class ProfileFragment : Fragment() {
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                }
             }
         }
 
@@ -72,32 +84,26 @@ class ProfileFragment : Fragment() {
         if (activity != null && isAdded) {
             if (body.status == Constants.API_RESPONSE_CODE.OK) {
                 if (body.profileData?.photo != null) {
-                    viewBinding.profilePicView.load(body.profileData.photo) {
-                        transformations(CircleCropTransformation())
-                    }
+                    loadLogo(body.profileData.photo)
                 } else {
-                    viewBinding.profilePicView.load(SessionManager.user?.organisationLogo) {
-                        transformations(CircleCropTransformation())
-                    }
+                    loadLogo(SessionManager.user?.organisationLogo)
                 }
                 viewBinding.nameText.text = body.profileData?.name.toString()
                 viewBinding.positionTv.text = body.profileData?.designation?.title.toString()
 
 
-            } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ),
-                    object : CustomDialog.OnClickListener {
-                        override fun okButtonClicked() {
-                            (activity as? HomeActivity?)?.logoutUser()
-                        }
-                    })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(body.message)
+                CustomDialog(requireActivity()).showInformationDialog(body.message)
             }
 
         }
+    }
+
+    private fun loadLogo(imageUrl: String?) {
+        Glide.with(requireContext()).load(imageUrl)
+            .placeholder(R.mipmap.ic_launcher)
+            .error(R.mipmap.ic_launcher)
+            .into(viewBinding.profilePicView)
     }
 
     private fun validateLeaveResponse(body: GetLeave) {
@@ -108,17 +114,8 @@ class ProfileFragment : Fragment() {
                 viewBinding.leaveRequested.text = body.data?.leaveRequested.toString()
                 leaveAdapter.addList(body.data?.leaveData as ArrayList<LeaveDataItem>)
 
-            } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ),
-                    object : CustomDialog.OnClickListener {
-                        override fun okButtonClicked() {
-                            (activity as? HomeActivity?)?.logoutUser()
-                        }
-                    })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(body.message)
+                CustomDialog(requireActivity()).showInformationDialog(body.message)
             }
 
         }
@@ -131,14 +128,23 @@ class ProfileFragment : Fragment() {
     ): View {
         viewBinding = FragmentProfileBinding.inflate(inflater, container, false)
         SessionManager.init(requireContext())
-        initLeaverecyclerAdapter()
+        initLeaveRecyclerAdapter()
         getProfileFromRemote()
         getLeavesFromRemote()
         setUpListeners()
         return viewBinding.root
     }
 
-    private fun initLeaverecyclerAdapter() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (SessionManager.user?.photo != null) {
+            loadLogo(SessionManager.user?.photo)
+        } else {
+            loadLogo(SessionManager.user?.organisationLogo)
+        }
+    }
+
+    private fun initLeaveRecyclerAdapter() {
         leaveAdapter = LeaveAdapter(requireContext())
         viewBinding.leaveRv.itemAnimator = DefaultItemAnimator()
         viewBinding.leaveRv.layoutManager =
@@ -175,7 +181,7 @@ class ProfileFragment : Fragment() {
 
         viewBinding.logOut.setOnClickListener {
             val message: String = if (SessionManager.isTimerRunning == true) {
-                "Timer is Running,Timer will get cleared Do you want to logout from mAccess?"
+                "Timer will get cleared. Do you want to logout from mAccess?"
             } else {
                 "Do you want to logout from mAccess?"
             }

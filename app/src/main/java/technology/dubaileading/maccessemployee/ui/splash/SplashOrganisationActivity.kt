@@ -13,6 +13,7 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.databinding.ActivitySplashBinding
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.utility.SessionManager
+import technology.dubaileading.maccessemployee.utility.setStatusBarTranslucent
 
 @AndroidEntryPoint
 class SplashOrganisationActivity : AppCompatActivity() {
@@ -20,6 +21,7 @@ class SplashOrganisationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStatusBarTranslucent(true)
         SessionManager.init(this)
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
     }

@@ -1,188 +1,116 @@
 package technology.dubaileading.maccessemployee.ui.requests
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
+import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatSpinner
-import androidx.cardview.widget.CardView
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.braver.tool.picker.BraverDocPathUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.datepicker.MaterialDatePicker
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseFragment
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.FragmentLeaveRequestBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.AppUtils
-
-import technology.dubaileading.maccessemployee.utils.Constants
-import technology.dubaileading.maccessemployee.utils.PermissionUtils
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
-class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsViewModel>(),leaveClickListener {
+@AndroidEntryPoint
+class LeaveRequestFragment: Fragment(), LeaveClickListener {
     private lateinit var leaveRequestsAdapter: LeaveRequestsAdapter
-    private var leaveRequests = ArrayList<LeaveRequestsItem>()
-    private var leaveTypeList = java.util.ArrayList<LeaveTypeData>()
-    private var fromDate: String = ""
-    private var toDate: String = ""
     private val dateFormat = "dd-MM-yyyy"
     private var attachmentFileTextView: TextView? = null
+    private lateinit var leaveBottomSheetDialog: BottomSheetDialog
+    private val viewModel by viewModels<RequestsViewModel>()
+    private lateinit var viewBinding: FragmentLeaveRequestBinding
 
-    private lateinit var updateLeaveDialog : BottomSheetDialog
-
-    override fun createViewModel(): RequestsViewModel {
-        return ViewModelProvider(this).get(RequestsViewModel::class.java)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        viewBinding = FragmentLeaveRequestBinding.inflate(inflater, container, false)
+        initialiseRecyclerAdapter()
+        loadAllLeaveRequestsFromRemote()
+        setUpObservers()
+        return viewBinding.root
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentLeaveRequestBinding {
-        return FragmentLeaveRequestBinding.inflate(layoutInflater!!)
+    private fun initialiseRecyclerAdapter() {
+        leaveRequestsAdapter = LeaveRequestsAdapter(requireContext(), this, Collections.emptyList())
+        viewBinding.recyclerView.adapter = leaveRequestsAdapter
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        leaveRequestsAdapter = LeaveRequestsAdapter(requireContext(),this)
-        leaveRequests = arguments?.getParcelableArrayList<LeaveRequestsItem>(Constants.LEAVE_REQUEST)!!
-        leaveRequestsAdapter.setData(leaveRequests)
+     fun loadAllLeaveRequestsFromRemote(){
+        viewModel.employeeRequests(GetRequests(20, 1))
+        viewModel.employeeRequests.observe(viewLifecycleOwner, employeeRequestsObserver)
     }
 
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        binding?.leaveRv?.itemAnimator = DefaultItemAnimator()
-        binding?.leaveRv?.layoutManager = LinearLayoutManager(activity)
-        binding?.leaveRv?.adapter = leaveRequestsAdapter
-
-        viewModel?.getLeaveTypes(requireContext())
-
-        viewModel?.leaveTypesData?.observe(viewLifecycleOwner) {
-            leaveTypeList = it.data as java.util.ArrayList<LeaveTypeData>
-        }
-
-        viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            updateLeaveDialog.dismiss()
-            var getRequests = GetRequests(20, 1)
-            viewModel?.getEmployeeRequests(requireContext(), getRequests)
-
-        }
-
-        viewModel?.applyLeaveError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
-
-        viewModel?.deleteLeaveRequestSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            var getRequests = GetRequests(20, 1)
-            viewModel?.getEmployeeRequests(requireContext(), getRequests)
-        }
-
-        viewModel?.deleteLeaveRequestError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
-
-        viewModel?.getRequestSuccess?.observe(viewLifecycleOwner) {
-            leaveRequests = it.data?.leaveRequests as ArrayList<LeaveRequestsItem>
-            leaveRequestsAdapter.setData(leaveRequests)
-        }
-
-        viewModel?.selectedFileLiveData?.observe(viewLifecycleOwner) {
-            if (attachmentFileTextView != null){
+    private fun setUpObservers(){
+        viewModel.selectedFileLiveData?.observe(viewLifecycleOwner) {
+            if (attachmentFileTextView != null) {
                 val fileName = AppUtils.getFileNameFromPath(it)
                 attachmentFileTextView?.text = fileName
             }
         }
 
-
+        viewModel.statusMessage.observe(viewLifecycleOwner) { it ->
+            it.getContentIfNotHandled()?.let {
+                requireContext().showToast(it)
+            }
+        }
     }
 
     override fun updateLeaveRequest(leaveRequestsItem: LeaveRequestsItem) {
-        showUpdateDailog(leaveRequestsItem)
+        showUpdateDialog(leaveRequestsItem)
     }
 
-    private fun showUpdateDailog(leaveRequestsItem: LeaveRequestsItem) {
-        val btnsheet = layoutInflater.inflate(R.layout.leave_request, null)
-        updateLeaveDialog = BottomSheetDialog(requireContext())
+    private fun showUpdateDialog(leaveRequestsItem: LeaveRequestsItem) {
+        val view = layoutInflater.inflate(R.layout.leave_request, null)
+        leaveBottomSheetDialog = BottomSheetDialog(requireContext())
 
-        val leaveType = btnsheet.findViewById<AppCompatSpinner>(R.id.leaveType)
-        val desc = btnsheet.findViewById<EditText>(R.id.desc)
-        val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
-        val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
-        val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
-        val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
-        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
-        attachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
-        val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
-        var typeList = java.util.ArrayList<String>()
+        val leaveTypesSpinner = view.findViewById<DynamicWidthSpinner>(R.id.leaveTypesSpinner)
+        val descriptionTextView = view.findViewById<EditText>(R.id.descriptionTextView)
+        val startDateTextView = view.findViewById<TextView>(R.id.startDateTextView)
+        val endDateTextView = view.findViewById<TextView>(R.id.endDateTextView)
+        val leaveBalanceTextView = view.findViewById<TextView>(R.id.leaveBalanceTextView)
+        val attachCardView = view.findViewById<MaterialCardView>(R.id.attachCardView)
+        val remove = view.findViewById<ImageView>(R.id.remove)
+        attachmentFileTextView = view.findViewById(R.id.attachmentFileTextView)
+        val submitMaterialButton = view.findViewById<MaterialButton>(R.id.submitMaterialButton)
 
-        desc.setText(leaveRequestsItem.description)
-        startDate.setText(leaveRequestsItem.fromDate)
-        endDate.setText(leaveRequestsItem.toDate)
-
-        remove.setOnClickListener {
-            viewModel?.clearAttachment()
-        }
-
-
-
-        if (leaveTypeList != null){
-            leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
-
-            for (i in leaveTypeList.indices) {
-                typeList.add(leaveTypeList[i].title.toString())
-            }
-
-        }
-        var leave_type_id = leaveRequestsItem.leaveType?.id
-
-        val arrayAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
-        leaveType.adapter = arrayAdapter
-
-        for (i in 0 until leaveType.count) {
-            if (leaveType.getItemAtPosition(i).equals(leaveRequestsItem.leaveType?.title)) {
-                leaveType.setSelection(i)
-                break
-            }
-        }
-
-        leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                val short_code = leaveTypeList[i].shortCode
-                val no_of_leaves = leaveTypeList[i].noOfLeaves
-                val balance_leaves = leaveTypeList[i].balanceLeaves
-                leave_type_id = leaveTypeList[i].id
-                leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
-        }
-
-
-        startDate.setOnClickListener {
-            it.hideKeyboard()
+        descriptionTextView.setText(leaveRequestsItem.description)
+        startDateTextView.text = leaveRequestsItem.fromDate
+        endDateTextView.text = leaveRequestsItem.toDate
+        startDateTextView.setOnClickListener {
+            startDateTextView.hideKeyboard()
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
 
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
                 val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                fromDate = sdf.format(datePicker.selection?.first)
-                startDate.setText(fromDate)
-                toDate =  sdf.format(datePicker.selection?.second)
-                endDate.setText(toDate)
+                startDateTextView.text = sdf.format(datePicker.selection?.first)
+                endDateTextView.text = sdf.format(datePicker.selection?.second)
 
                 val startDate: Long? = datePicker.selection?.first
                 val endDate: Long? = datePicker.selection?.second
@@ -192,31 +120,18 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
 
                 val days = daysDiff + 1;
 
-                submitBt.text = "Submit($days day)"
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
-
+                submitMaterialButton.text = "Submit($days day)"
             }
         }
 
-        endDate.setOnClickListener {
-            it.hideKeyboard()
+        endDateTextView.setOnClickListener {
+            endDateTextView?.hideKeyboard()
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
-
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
                 val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                fromDate = sdf.format(datePicker.selection?.first)
-                startDate.setText(fromDate)
-                toDate =  sdf.format(datePicker.selection?.second)
-                endDate.setText(toDate)
-
+                startDateTextView.text = sdf.format(datePicker.selection?.first)
+                endDateTextView.text = sdf.format(datePicker.selection?.second)
 
                 val startDate: Long? = datePicker.selection?.first
                 val endDate: Long? = datePicker.selection?.second
@@ -226,65 +141,283 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
 
                 val days = daysDiff + 1;
 
-                submitBt.text = "Submit($days day)"
-
-
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
-
+                submitMaterialButton.text = "Submit($days day)"
             }
         }
 
         attachCardView.setOnClickListener {
-            callFileAccessIntent()
+            checkPermissionAndOpenPicker()
         }
 
-
-        submitBt.setOnClickListener {
-            if (leave_type_id!!.equals(null)) {
-                Toast.makeText(requireContext(), "Select Leave Type", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            val description = desc?.text?.toString()?.trim()
-            if (description!!.isEmpty()) {
-                Toast.makeText(requireContext(), "Add Description", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (fromDate.isEmpty()) {
-                Toast.makeText(requireContext(), "Start date is not selected", Toast.LENGTH_LONG)
-                    .show()
-                return@setOnClickListener
-            }
-            if (toDate.isEmpty()) {
-                Toast.makeText(requireContext(), "End date is not selected", Toast.LENGTH_LONG)
-                    .show()
-                return@setOnClickListener
-            }
-
-            var updateLeave = UpdateLeave(leaveRequestsItem.id,leave_type_id, description, fromDate, toDate)
-
-            viewModel?.updateLeave(requireContext(), updateLeave)
-
-
+        remove.setOnClickListener {
+            viewModel.clearAttachment()
         }
 
-        updateLeaveDialog.setContentView(btnsheet)
-        updateLeaveDialog.show()
+        submitMaterialButton.setOnClickListener {
+            viewModel.updateLeave(
+                UpdateLeave(
+                    leaveRequestsItem.id,
+                    viewModel.selectedLeaveType?.value?.id,
+                    descriptionTextView.text.toString(),
+                    startDateTextView.text.toString(),
+                    endDateTextView.text.toString()
+                )
+            )
+            viewModel.updateLeave.observe(viewLifecycleOwner, updateLeaveObserver)
+        }
+
+        loadAllLeaveTypes(leaveTypesSpinner, leaveBalanceTextView, leaveRequestsItem)
+
+        leaveBottomSheetDialog.setContentView(view)
+        leaveBottomSheetDialog.show()
 
     }
 
 
-    private fun callFileAccessIntent() {
-        if (PermissionUtils.isFileAccessPermissionGranted(requireContext())) {
-            openAttachments()
+    private fun checkPermissionAndOpenPicker() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermission()
         } else {
-            PermissionUtils.showFileAccessPermissionRequestDialog(requireContext())
+            openAttachments()
+        }
+    }
+
+    private fun checkPermission() {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                showPermissionNeededAlert()
+            } else {
+                openAttachments()
+            }
+    }
+
+    private fun showPermissionNeededAlert() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.needPermissions))
+        builder.setMessage(getString(R.string.somePermissionsAreRequiredToDoTheTask))
+        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                permissionResult.launch(
+                    arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                )
+        }
+        builder.setNeutralButton(getString(R.string.cancel), null)
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private var permissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                println("it value = ${it.value}")
+                if (it.value) {
+                    openAttachments()
+                }
+            }
+        }
+
+    private fun loadAllLeaveTypes(
+        leaveTypesSpinner: DynamicWidthSpinner,
+        leaveBalanceTextView: TextView,
+        leaveRequestsItem: LeaveRequestsItem
+    ) {
+        viewModel.getLeaveTypes()
+        viewModel.leaveTypes.observe(
+            viewLifecycleOwner
+        ) {
+            when (it) {
+                is DataState.Loading -> {
+                }
+                is DataState.Success -> {
+                    validateLeaveTypesData(it.item, leaveTypesSpinner, leaveBalanceTextView, leaveRequestsItem)
+                }
+                is DataState.Error -> {
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun validateLeaveTypesData(
+        response: LeaveTypes,
+        leaveTypesSpinner: DynamicWidthSpinner,
+        leaveBalanceTextView: TextView,
+        leaveRequestsItem: LeaveRequestsItem
+    ) {
+        if (activity != null && isAdded) {
+            if (response.status == technology.dubaileading.maccessemployee.config.Constants.API_RESPONSE_CODE.OK) {
+                if (response.data != null && response.data.isNotEmpty()) {
+                    leaveBalanceTextView.text =
+                        response.data[0]?.shortCode + "Left:" + response.data[0]?.balanceLeaves + " of " + response.data[0]?.noOfLeaves
+
+                    val spinnerAdapter =
+                        LeaveTypesSpinnerAdapter(requireContext(), response.data)
+                    leaveTypesSpinner.apply {
+                        adapter = spinnerAdapter
+                        onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    p0: AdapterView<*>?,
+                                    p1: View?,
+                                    p2: Int,
+                                    p3: Long
+                                ) {
+                                    if (p2 != 0) {
+                                        viewModel.selectedLeaveType?.value =
+                                            spinnerAdapter.result[p2 - 1]
+                                    } else {
+                                        viewModel.selectedLeaveType?.value = null
+
+                                    }
+                                }
+
+                                override fun onNothingSelected(p0: AdapterView<*>?) {
+                                }
+                            }
+                    }
+
+                    for (bean in spinnerAdapter.result) {
+                        if (bean?.id == leaveRequestsItem.id) {
+                            val selectedPosition: Int =
+                                spinnerAdapter.getPosition(bean)
+                            leaveTypesSpinner.setSelection(selectedPosition + 1)
+                        }
+                    }
+
+
+                } else {
+                    val equipmentsSpinnerAdapter =
+                        LeaveTypesSpinnerAdapter(requireContext(), Collections.emptyList())
+                    leaveTypesSpinner.apply {
+                        adapter = equipmentsSpinnerAdapter
+                    }
+                }
+
+            } else {
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
+            }
+
+        }
+    }
+
+    private var updateLeaveObserver: Observer<DataState<ApiResponse2>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse2>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateUpdateLeaveResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+    private fun validateUpdateLeaveResponse(response: ApiResponse2) {
+        if (response.status == technology.dubaileading.maccessemployee.config.Constants.API_RESPONSE_CODE.OK) {
+            requireContext().showToast(response.message)
+            if (leaveBottomSheetDialog.isShowing) {
+                leaveBottomSheetDialog.dismiss()
+            }
+            viewModel.employeeRequests(GetRequests(20, 1))
+            viewModel.employeeRequests.observe(viewLifecycleOwner, employeeRequestsObserver)
+        } else {
+            CustomDialog(requireActivity()).showInformationDialog(response.message)
+        }
+
+    }
+
+    private var employeeRequestsObserver: Observer<DataState<EmployeeRequests>> =
+        androidx.lifecycle.Observer {
+            when (it) {
+                is DataState.Loading -> {
+                    viewBinding.errorLayout.root.hide()
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.show()
+                }
+                is DataState.Success -> {
+                    viewBinding.progressBar.hide()
+                    validateEmployeeRequestsData(it.item)
+                }
+                is DataState.Error -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    viewBinding.apply {
+                        viewBinding.errorLayout.errorText.text = "No Data Found"
+                        viewBinding.errorLayout.root.show()
+                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                    }
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    viewBinding.apply {
+                        viewBinding.errorLayout.errorText.text = "No Data Found"
+                        viewBinding.errorLayout.root.show()
+                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                    }
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+    private fun validateEmployeeRequestsData(response: EmployeeRequests) {
+        if (activity != null && isAdded) {
+            if (response.status == technology.dubaileading.maccessemployee.config.Constants.API_RESPONSE_CODE.OK) {
+                if (response.data?.leaveRequests != null && response.data.leaveRequests.isNotEmpty()) {
+                    viewBinding.errorLayout.root.hide()
+                    viewBinding.recyclerView.show()
+                    leaveRequestsAdapter.setData(response.data.leaveRequests)
+                } else {
+                    leaveRequestsAdapter.setData(Collections.emptyList())
+
+                    viewBinding.errorLayout.errorText.text = "No Data Found"
+                    viewBinding.errorLayout.root.show()
+                    viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                }
+
+            } else {
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
+            }
+
         }
     }
 
@@ -300,11 +433,10 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
         }
     }
 
-    var activityResultLauncherForDocs =
+    private var activityResultLauncherForDocs =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
-                    //String tempFileAbsolutePath = "";
                     val selectedDocUri = result.data!!.data
                     if (selectedDocUri.toString().contains("video") || selectedDocUri.toString()
                             .contains("mp4") || selectedDocUri.toString()
@@ -329,31 +461,67 @@ class LeaveRequestFragment : BaseFragment<FragmentLeaveRequestBinding, RequestsV
         }
 
     private fun setSourcePathView(path: String) {
-        viewModel?.selectedFileLiveData?.value = path
+        viewModel.selectedFileLiveData?.value = path
 
     }
 
-    override fun onClick(id: Int) {
-        android.app.AlertDialog.Builder(activity)
-            .setTitle("Alert")
-            .setMessage("Do you want to delete the request?")
-            .setPositiveButton(
-                "Yes"
-            ) { dialog, _ ->
-                var deleteReq = DeleteReq(id)
-                viewModel?.deleteLeaveRequest(requireContext(),deleteReq)
-                dialog.dismiss()
-            }
-            .setNegativeButton("No"){ dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+    override fun onDeleteClicked(id: Int) {
+        CustomDialog(requireActivity()).showDecisionButtonDialog(
+            "Do you want to delete the request?",
+            "Yes",
+            "No",
+            true,
+            object : CustomDialog.onUserActionCLickListener {
+                override fun negativeButtonClicked() {
 
+                }
+
+                override fun positiveButtonClicked() {
+                    viewModel.deleteLeaveRequest(DeleteReq(id))
+                    viewModel.deleteLeave.observe(viewLifecycleOwner, deleteLeaveRequestObserver)
+
+                }
+
+            })
     }
 
-    private fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
+    private var deleteLeaveRequestObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateDeleteRequestResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+
+                            }
+                        })
+                }
+            }
+        }
+
+    private fun validateDeleteRequestResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            requireContext().showToast(response.message)
+            loadAllLeaveRequestsFromRemote()
+        } else {
+            CustomDialog(requireActivity()).showInformationDialog(response.message)
+        }
+
     }
 
 

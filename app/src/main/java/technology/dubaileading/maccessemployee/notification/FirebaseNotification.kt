@@ -31,11 +31,9 @@ class FirebaseNotification : FirebaseMessagingService() {
             )
         }
 
-        if (message.data != null){
-            val intent = Intent("IntentFilterAction")
-            intent.putExtra("MyDataKey",  message.data["title"].toString())
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-        }
+        val intent = Intent("IntentFilterAction")
+        intent.putExtra("MyDataKey",  message.data["title"].toString())
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
 
     }
 
@@ -43,10 +41,27 @@ class FirebaseNotification : FirebaseMessagingService() {
     private fun notifyUser(title: String, messageBody: String) {
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT
-        )
+//        val pendingIntent = PendingIntent.getActivity(
+//            this, 0, intent,
+//            PendingIntent.FLAG_ONE_SHOT
+//        )
+        var pendingIntent: PendingIntent? = null
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             pendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
+        else {
+            pendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
         val channelId = getString(R.string.default_notification_channel_id)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder: NotificationCompat.Builder =

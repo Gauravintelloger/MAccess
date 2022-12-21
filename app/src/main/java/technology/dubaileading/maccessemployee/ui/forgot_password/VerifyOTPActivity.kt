@@ -1,252 +1,167 @@
 package technology.dubaileading.maccessemployee.ui.forgot_password
 
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextUtils
-import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.component_otp_view.view.*
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
-import technology.dubaileading.maccessemployee.databinding.ActivityVerifyOtpactivityBinding
+import technology.dubaileading.maccessemployee.callbacks.OtpVerifyCallBack
+import technology.dubaileading.maccessemployee.config.ApplicationConstants.PIN_TYPE_CONFIRM
+import technology.dubaileading.maccessemployee.config.Constants
+import technology.dubaileading.maccessemployee.databinding.ActivityVerifyOtpBinding
+import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword
 import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.utility.*
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 
 
-class VerifyOTPActivity : BaseActivity<ActivityVerifyOtpactivityBinding, ForgotPasswordViewModel>(){
-    private lateinit var otp1 : String
-    private lateinit var otp2 : String
-    private lateinit var otp3 : String
-    private lateinit var otp4 : String
-    private lateinit var otp5 : String
-    private lateinit var otp6 : String
-
+@AndroidEntryPoint
+class VerifyOTPActivity : AppCompatActivity(), OtpVerifyCallBack {
+    private val viewModel: ForgotPasswordViewModel by viewModels()
+    private lateinit var viewBinding: ActivityVerifyOtpBinding
+    private var otp: String? = null
+    lateinit var email: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
-        var email = intent.getStringExtra("email")
-        binding.otpEdit1.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        setStatusBarTranslucent(false)
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_verify_otp)
+        viewBinding.viewModel = viewModel
+        email = intent.getStringExtra("email")!!
 
-            }
+        val otpVerifyCallBack: OtpVerifyCallBack = this
+        viewBinding.pinView.setContext(otpVerifyCallBack, PIN_TYPE_CONFIRM)
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    binding.otpEdit2.requestFocus()
-                }
-            }
-
-        })
-
-        binding.otpEdit2.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    binding.otpEdit3.requestFocus()
-                }
-            }
-
-        })
-
-        binding.otpEdit3.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    binding.otpEdit4.requestFocus()
-                }
-            }
-
-        })
-
-        binding.otpEdit4.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    binding.otpEdit5.requestFocus()
-                }
-            }
-
-        })
-
-        binding.otpEdit5.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    binding.otpEdit6.requestFocus()
-                }
-            }
-
-        })
-
-        binding.otpEdit6.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s?.length == 1) {
-                    hideKeyboard()
-                }
-            }
-
-        })
-
-
-
-
-        binding.submit.setOnClickListener {
-            otp1 =  binding.otpEdit1.text.toString().trim()
-            otp2 =  binding.otpEdit2.text.toString().trim()
-            otp3 =  binding.otpEdit3.text.toString().trim()
-            otp4 =  binding.otpEdit4.text.toString().trim()
-            otp5 =  binding.otpEdit5.text.toString().trim()
-            otp6 =  binding.otpEdit6.text.toString().trim()
-            if (isOtpValid()){
-                var otp = otp1+otp2+otp3+otp4+otp5+otp6
-                var verifyOTP = VerifyOTP(email,otp)
-                viewModel.verifyOTP(this@VerifyOTPActivity,verifyOTP)
-
-            }
-
+        viewBinding.submitMaterialButton.setOnClickListener {
+            viewModel.validateOtp(VerifyOTP(email, otp))
+            viewModel.validateOtp.observe(this, validateOtpObserver)
         }
 
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            onBackPressed()
+        viewBinding.backImageView.setOnClickListener {
+            finish()
         }
 
 
-        viewModel.verifyOTPSuccess.observe(this){
-            Toast.makeText(this@VerifyOTPActivity, it.message, Toast.LENGTH_LONG).show()
-            var intent = Intent(this@VerifyOTPActivity, ResetPasswordActivity::class.java)
-            intent.putExtra("email",email)
-            startActivity(intent)
-        }
-        viewModel.verifyOTPError.observe(this){
-            Toast.makeText(this@VerifyOTPActivity, it.message, Toast.LENGTH_LONG).show()
+        viewBinding.resendOtpTextView.setOnClickListener {
+            viewBinding.pinView.resetFields()
+            viewModel.resendOtp(ForgotPassword(email))
+            viewModel.resendOtp.observe(this, resendOtpObserver)
+
         }
 
-
-
-        binding.resend.setOnClickListener {
-            if (email!!.isEmpty()){
-                Toast.makeText(this@VerifyOTPActivity, "Please Re-Try", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+        viewModel.statusMessage.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showToast(it)
             }
-            var forgotPassword = ForgotPassword(email)
-            viewModel.resendOTP(this@VerifyOTPActivity,forgotPassword)
         }
 
-        viewModel.resendOTPSuccess.observe(this){
-            Toast.makeText(this@VerifyOTPActivity, it.message, Toast.LENGTH_LONG).show()
-        }
-        viewModel.resendOTPError.observe(this){
-            Toast.makeText(this@VerifyOTPActivity, it.message, Toast.LENGTH_LONG).show()
-        }
-
-
-
+        viewBinding.pinView.pinHiddenEditText.showKeyboard()
 
     }
 
-    private fun isOtpValid(): Boolean {
-        if (binding.otpEdit1.text != null && TextUtils.isEmpty(binding.otpEdit1.text)) {
-            binding.otpEdit1.requestFocus()
-            return false
-        }
-        if (binding.otpEdit2.text != null && TextUtils.isEmpty(binding.otpEdit2.text)) {
-            binding.otpEdit2.requestFocus()
-            return false
-        }
-        if (binding.otpEdit3.text != null && TextUtils.isEmpty(binding.otpEdit3.text)) {
-            binding.otpEdit3.requestFocus()
-            return false
-        }
-        if (binding.otpEdit4.text != null && TextUtils.isEmpty(binding.otpEdit4.text)) {
-            binding.otpEdit4.requestFocus()
-            return false
-        }
 
-        if (binding.otpEdit5.text != null && TextUtils.isEmpty(binding.otpEdit5.text)) {
-            binding.otpEdit5.requestFocus()
-            return false
-        }
+    override fun createPinCallback(otp: String?) {
 
-        if (binding.otpEdit6.text != null && TextUtils.isEmpty(binding.otpEdit6.text)) {
-            binding.otpEdit6.requestFocus()
-            return false
-        }
-        return true
     }
 
-
-    override fun createViewModel(): ForgotPasswordViewModel {
-        return ViewModelProvider(this).get(ForgotPasswordViewModel::class.java)
+    override fun confirmPinCallback(otp: String?) {
+        viewBinding.submitMaterialButton.enable()
+        this@VerifyOTPActivity.otp = otp
+        viewModel.validateOtp(VerifyOTP(email, otp))
+        viewModel.validateOtp.observe(this@VerifyOTPActivity, validateOtpObserver)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityVerifyOtpactivityBinding {
-        return ActivityVerifyOtpactivityBinding.inflate(layoutInflater!!)
+    override fun onAllDigitNotCompleted() {
+        viewBinding.submitMaterialButton.disable()
     }
 
-    private fun hideKeyboard() {
-        if (currentFocus != null) {
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+    private var validateOtpObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateOtpResponse(it.item)
+                }
+                is DataState.Error -> {
+                    viewBinding.pinView.resetFields()
+                    dismissProgress()
+                    showToast(it.error.toString())
+
+                    startActivity(Intent(this, ResetPasswordActivity::class.java).apply {
+                        putExtra("email", email)
+                    })
+                    finish()
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ), object : CustomDialog.OnClickListener {
+                        override fun okButtonClicked() {
+                            finishAffinity()
+                            startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        }
+                    })
+                }
+            }
         }
+
+    private fun validateOtpResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            showToast(response.message)
+            startActivity(Intent(this, ResetPasswordActivity::class.java).apply {
+                putExtra("email", email)
+            })
+            finish()
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
+
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-    }
+    private var resendOtpObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateResendOtpResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ), object : CustomDialog.OnClickListener {
+                        override fun okButtonClicked() {
+                            finishAffinity()
+                            startActivity(Intent(applicationContext, LoginActivity::class.java))
+                        }
+                    })
+                }
+            }
+        }
 
+    private fun validateResendOtpResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            showToast(response.message)
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
+
+    }
 }

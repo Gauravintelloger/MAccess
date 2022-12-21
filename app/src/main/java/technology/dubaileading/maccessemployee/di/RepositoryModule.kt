@@ -7,10 +7,12 @@ import dagger.hilt.components.SingletonComponent
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceRepository
 import technology.dubaileading.maccessemployee.ui.check_in.ActionRepository
+import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordRepository
 import technology.dubaileading.maccessemployee.ui.home.HomeRepository
 import technology.dubaileading.maccessemployee.ui.login.LoginRepository
 import technology.dubaileading.maccessemployee.ui.notifications.NotificationsRepository
 import technology.dubaileading.maccessemployee.ui.profile.ProfileRepository
+import technology.dubaileading.maccessemployee.ui.requests.RequestsRepository
 import technology.dubaileading.maccessemployee.utility.NetworkHelper
 import javax.inject.Singleton
 
@@ -53,5 +55,17 @@ object RepositoryModule {
     fun providesProfileRepository(
         retrofit: EmployeeEndpoint, networkHelper: NetworkHelper
     ): ProfileRepository = ProfileRepository(retrofit, networkHelper)
+
+    @Provides
+    @Singleton
+    fun providesForgotPasswordRepository(
+        retrofit: EmployeeEndpoint, networkHelper: NetworkHelper
+    ): ForgotPasswordRepository = ForgotPasswordRepository(retrofit, networkHelper)
+
+    @Provides
+    @Singleton
+    fun providesRequestsRepository(
+        retrofit: EmployeeEndpoint, networkHelper: NetworkHelper
+    ): RequestsRepository = RequestsRepository(retrofit, networkHelper)
 
 }

@@ -1,86 +1,146 @@
 package technology.dubaileading.maccessemployee.ui.forgot_password
 
-import android.content.Context
+import android.text.TextUtils
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import technology.dubaileading.maccessemployee.base.BaseViewModel
-import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
-import technology.dubaileading.maccessemployee.rest.entity.ForgotPassword
-import technology.dubaileading.maccessemployee.rest.entity.ResetPassword
-import technology.dubaileading.maccessemployee.rest.entity.VerifyOTP
-import technology.dubaileading.maccessemployee.rest.request.ErrorResponse
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.utility.DataState
+import technology.dubaileading.maccessemployee.utility.Event
+import technology.dubaileading.maccessemployee.utils.Utils
+import javax.inject.Inject
 
-class ForgotPasswordViewModel: BaseViewModel(),ForgotPasswordCallback{
-    var forgotPasswordRepo = ForgotPasswordRepo(this)
+@HiltViewModel
+class ForgotPasswordViewModel @Inject constructor(private val forgotPasswordRepository: ForgotPasswordRepository) :
+    ViewModel() {
+    var userName: MutableLiveData<String> = MutableLiveData()
 
-    var forgotPasswordSuccess = MutableLiveData<ApiResponse>()
-    var forgotPasswordError = MutableLiveData<ApiResponse>()
-    var forgotPasswordFailure = MutableLiveData<ErrorResponse>()
+    var oldPassword: MutableLiveData<String> = MutableLiveData()
+    var password: MutableLiveData<String> = MutableLiveData()
+    var confirmPassword: MutableLiveData<String> = MutableLiveData()
 
-    var verifyOTPSuccess = MutableLiveData<ApiResponse>()
-    var verifyOTPError = MutableLiveData<ApiResponse>()
-    var verifyOTPFailure = MutableLiveData<ErrorResponse>()
+    private val _statusMessage = MutableLiveData<Event<String>>()
+    val statusMessage: LiveData<Event<String>> = _statusMessage
 
-    var resendOTPSuccess = MutableLiveData<ApiResponse>()
-    var resendOTPError = MutableLiveData<ApiResponse>()
-    var resendOTPFailure = MutableLiveData<ErrorResponse>()
+    private val _forgotPassword = MutableLiveData<DataState<ApiResponse>>()
+    val forgotPassword: LiveData<DataState<ApiResponse>> = _forgotPassword
 
+    private val _validateOtp = MutableLiveData<DataState<ApiResponse>>()
+    val validateOtp: LiveData<DataState<ApiResponse>> = _validateOtp
 
+    private val _resendOtp = MutableLiveData<DataState<ApiResponse>>()
+    val resendOtp: LiveData<DataState<ApiResponse>> = _resendOtp
 
-    fun forgotPassword(context : Context, forgotPassword: ForgotPassword){
-        forgotPasswordRepo.forgotPassword(context,forgotPassword)
-    }
+    private val _resetPassword = MutableLiveData<DataState<ApiResponse>>()
+    val resetPassword: LiveData<DataState<ApiResponse>> = _resetPassword
 
-    fun resendOTP(context : Context, forgotPassword: ForgotPassword){
-        forgotPasswordRepo.resendOTP(context,forgotPassword)
-    }
-
-    fun verifyOTP(context : Context,verifyOTP: VerifyOTP){
-        forgotPasswordRepo.verifyOTP(context,verifyOTP)
-    }
-
-    fun resetPassword(context : Context,resetPassword: ResetPassword){
-        forgotPasswordRepo.resetPassword(context,resetPassword)
-    }
+    private val _changePassword = MutableLiveData<DataState<ChangePassword>>()
+    val changePassword: LiveData<DataState<ChangePassword>> = _changePassword
 
 
-
-    override fun forgotPasswordResponse(apiResponse: ApiResponse) {
-        if (apiResponse?.status == "ok") {
-            forgotPasswordSuccess.value = apiResponse!!
-        }
-        else {
-            forgotPasswordError.value = apiResponse!!
-        }
-
-    }
-
-    override fun forgotPasswordFailure(error: ErrorResponse) {
-        forgotPasswordFailure.value = error
-    }
-
-    override fun verifyOTPResponse(apiResponse: ApiResponse) {
-        if (apiResponse?.status == "ok") {
-            verifyOTPSuccess.value = apiResponse!!
-        }
-        else {
-            verifyOTPError.value = apiResponse!!
+    fun forgotPassword() {
+        val request = ForgotPassword(userName.value)
+        when {
+            TextUtils.isEmpty(request.email) -> {
+                _statusMessage.value = Event("Enter Valid Username")
+            }
+            else -> {
+                viewModelScope.launch {
+                    forgotPasswordRepository.forgotPassword(request = request).onEach { dataState ->
+                        _forgotPassword.value = dataState
+                    }
+                        .launchIn(viewModelScope)
+                }
+            }
         }
     }
 
-    override fun verifyOTPFailure(error: ErrorResponse) {
-        verifyOTPFailure.value = error
+    fun validateOtp(request: VerifyOTP) {
+        when {
+            TextUtils.isEmpty(request.email) -> {
+                _statusMessage.value = Event("Invalid Username")
+            }
+            TextUtils.isEmpty(request.otp) -> {
+                _statusMessage.value = Event("Invalid otp")
+            }
+            else -> {
+                viewModelScope.launch {
+                    forgotPasswordRepository.validateOtp(request = request).onEach { dataState ->
+                        _validateOtp.value = dataState
+                    }
+                        .launchIn(viewModelScope)
+                }
+            }
+        }
     }
 
-    override fun resendOTPResponse(apiResponse: ApiResponse) {
-        if (apiResponse?.status == "ok") {
-            resendOTPSuccess.value = apiResponse!!
-        }
-        else {
-            resendOTPError.value = apiResponse!!
+    fun resendOtp(request: ForgotPassword) {
+        when {
+            TextUtils.isEmpty(request.email) -> {
+                _statusMessage.value = Event("Invalid Username")
+            }
+            else -> {
+                viewModelScope.launch {
+                    forgotPasswordRepository.resendOtp(request = request).onEach { dataState ->
+                        _resendOtp.value = dataState
+                    }
+                        .launchIn(viewModelScope)
+                }
+            }
         }
     }
 
-    override fun resendOTPFailure(error: ErrorResponse) {
-        resendOTPFailure.value = error
+    fun resetPassword(email: String) {
+        if (TextUtils.isEmpty(email)){
+            _statusMessage.value = Event("Invalid Username")
+        }else if (TextUtils.isEmpty(password.value)){
+            _statusMessage.value = Event("Enter New Password")
+        }
+        else if (TextUtils.isEmpty(confirmPassword.value)){
+            _statusMessage.value = Event("Re-Enter New Password")
+        }
+        else if (password.value != confirmPassword.value){
+            _statusMessage.value = Event("New Password and Re-Enter Password is not match")
+        }else{
+            viewModelScope.launch {
+                val request = ResetPassword(email, Utils.md5(password.value), Utils.md5(confirmPassword.value))
+                println("reset password input = ${Gson().toJson(request)}")
+                forgotPasswordRepository.resetPassword(request = request).onEach { dataState ->
+                    _resetPassword.value = dataState
+                }
+                    .launchIn(viewModelScope)
+            }
+        }
+
     }
+
+    fun changePassword() {
+        if (TextUtils.isEmpty(oldPassword.value)){
+            _statusMessage.value = Event("Enter Old Password")
+        }else if (TextUtils.isEmpty(password.value)){
+            _statusMessage.value = Event("Enter New Password")
+        } else if (TextUtils.isEmpty(confirmPassword.value)){
+            _statusMessage.value = Event("Re-Enter New Password")
+        }
+        else if (password.value != confirmPassword.value){
+            _statusMessage.value = Event("New Password and Re-Enter Password is not match")
+        }else{
+            viewModelScope.launch {
+                val request = PasswordRequest(Utils.md5(oldPassword.value), Utils.md5(password.value), Utils.md5(confirmPassword.value))
+                println("change password request = ${Gson().toJson(request)}")
+                forgotPasswordRepository.changePassword(request = request).onEach { dataState ->
+                    _changePassword.value = dataState
+                }
+                    .launchIn(viewModelScope)
+            }
+        }
+
+    }
+
 }

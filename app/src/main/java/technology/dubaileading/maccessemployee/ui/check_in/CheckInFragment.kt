@@ -140,10 +140,12 @@ class CheckInFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        SessionManager.init(requireContext())
+        requireActivity().setStatusBarTranslucent(true)
+
+        SessionManager.init(requireActivity())
 
         viewBinding = FragmentCheckInBinding.inflate(inflater, container, false)
-        viewBinding.googleMap.onCreate(savedInstanceState);
+        viewBinding.googleMap.onCreate(savedInstanceState)
 
         gpsStatusReceiver = GpsStatusReceiver(this)
         setListenerOnViews()
@@ -226,7 +228,7 @@ class CheckInFragment :
                 } else if (currentTime == null) {
                     requireActivity().showToast("Invalid Time")
                 } else {
-                    val versionName = getAppVersion(requireContext())
+                    val versionName = getAppVersion(requireActivity())
                     val checkInRequest = CheckInRequest(
                         mode = 1,
                         date = currentDate,
@@ -278,16 +280,12 @@ class CheckInFragment :
 
 
     private fun initLocationHelper() {
-
         locationHelper = LocationHelper(activity)
         locationHelper?.setRequiredGpsPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
         locationHelper?.init()
         locationHelper?.setLocationCallback(locationCallback)
         locationHelper!!.checkForGpsSettings(this)
-
-
     }
-
 
     fun addMarkerOnMap(latitude: Double, longitude: Double) {
         userPosMap?.clear()
@@ -303,7 +301,7 @@ class CheckInFragment :
 
     override fun onResume() {
         super.onResume()
-        viewBinding.googleMap?.onResume()
+        viewBinding.googleMap.onResume()
 
         requireActivity().registerReceiver(
             gpsStatusReceiver,
@@ -365,7 +363,7 @@ class CheckInFragment :
         viewBinding.progressBar.visibility = View.GONE
         viewBinding.shiftBt.visibility = View.VISIBLE
 
-        val gifFromAssets = GifDrawable(requireContext().assets, "start_shift.gif")
+        val gifFromAssets = GifDrawable(requireActivity().assets, "start_shift.gif")
         viewBinding.gif.setImageDrawable(gifFromAssets)
     }
 
@@ -378,7 +376,6 @@ class CheckInFragment :
             requestPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             if (isRuntimePermissionGranted()) {
                 viewBinding.googleMap.getMapAsync(this)
-
             }
             initLocationHelper()
         }
@@ -401,6 +398,7 @@ class CheckInFragment :
         } catch (e: SendIntentException) {
             e.printStackTrace()
         }
+        CustomDialog(requireActivity()).showInformationDialog("GPS settings Un available")
     }
 
     override fun requiredGpsSettingAreAvailable() {
@@ -409,8 +407,9 @@ class CheckInFragment :
         Log.d("points,", "GPS is turned on")
     }
 
+
     override fun gpsSettingsNotAvailable() {
-        requireContext().showToast("GPS settings Not Available")
+        CustomDialog(requireActivity()).showInformationDialog("GPS settings Not available")
     }
 
     private fun getAppVersion(context: Context): String {
@@ -429,15 +428,26 @@ class CheckInFragment :
         androidx.lifecycle.Observer<DataState<CheckInResponse>> {
             when (it) {
                 is DataState.Loading -> {
-                    requireContext().showProgress()
+                    requireActivity().showProgress()
                 }
                 is DataState.Success -> {
-                    requireContext().dismissProgress()
+                    requireActivity().dismissProgress()
                     validateResponse(it.item)
                 }
                 is DataState.Error -> {
-                    requireContext().dismissProgress()
-                    requireContext().showToast(it.error.toString())
+                    requireActivity().dismissProgress()
+                    requireActivity().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    requireActivity().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
                 }
             }
         }
@@ -456,17 +466,8 @@ class CheckInFragment :
                 findNavController().navigate(direction)
 
 
-            } else if (body.status == NOT_OK && body.statuscode == TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ),
-                    object : CustomDialog.OnClickListener {
-                        override fun okButtonClicked() {
-                            (activity as? HomeActivity?)?.logoutUser()
-                        }
-                    })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(body.message)
+                CustomDialog(requireActivity()).showInformationDialog(body.message)
             }
 
         }

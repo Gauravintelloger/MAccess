@@ -58,6 +58,7 @@ object RetrofitModule {
             SessionManager.init(BaseApplication.instance)
             if (SessionManager.token != null) {
                 requestBuilder.addHeader("Authorization", "Bearer " + SessionManager.token)
+                println("SessionManager token = ${SessionManager.token}")
             }
 
             val request = requestBuilder.build()

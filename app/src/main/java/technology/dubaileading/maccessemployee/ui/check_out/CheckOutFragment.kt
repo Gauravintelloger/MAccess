@@ -27,12 +27,15 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pl.droidsonroids.gif.GifDrawable
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.config.Constants
@@ -151,7 +154,7 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
 
         performTimerLogic()
 
-        viewBinding.materialToolbar.setNavigationOnClickListener {
+        viewBinding.backImageView.setOnClickListener {
             findNavController().popBackStack()
         }
 
@@ -166,16 +169,24 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
     }
 
     private fun performTimerLogic() {
+        println("SessionManager isBreakOut = ${SessionManager.isBreakOut}")
         if (SessionManager.isBreakOut == true) {
             breakOutStatusChange(true)
             breakInStatusChange(false)
 
-            viewBinding.timer.text = SessionManager.hours
+            SessionManager.hours.let {
+                var hour = it
+                if (it.isNullOrEmpty()) {
+                    hour = "00:00:00"
+                }
+                viewBinding.timer.text = hour
+
+            }
         } else {
             breakInStatusChange(true)
             breakOutStatusChange(false)
-            runTimer()
         }
+        runTimer()
 
         statusUpdate()
 
@@ -556,35 +567,36 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
 
     private fun runTimer() {
         timer = Timer()
-        timer.scheduleAtFixedRate(object : TimerTask() {
+        val timerTask = object : TimerTask() {
             override fun run() {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (SessionManager.isBreakOut == true || SessionManager.timing.isNullOrEmpty()) {
+                        timer.cancel()
+                    } else {
+                        SessionManager.hours.let {
+                            var hours = it
+                            if (it.isNullOrEmpty()) {
+                                hours = "00:00:00"
+                            }
+                            val timerTime =
+                                TimerHelper().findTime(SessionManager.timing!!, hours!!)
+                            val h1 = timerTime.split(":").toTypedArray()
+                            val hour1 = h1[0].toInt()
+                            if (hour1 >= 18) {
+                                timer.cancel()
+                                isShiftOver = true
+                                navToHome()
 
-                if (SessionManager.timing.isNullOrEmpty()) {
-                    timer.cancel()
-                } else {
+                            }
 
-                    SessionManager.hours.let {
-                        var hours = it
-                        if (it.isNullOrEmpty()) {
-                            hours = "00:00:00"
+
+                            viewBinding.timer.text = timerTime
                         }
-                        val timerTime = TimerHelper().findTime(SessionManager.timing!!, hours!!)
-                        val h1 = timerTime.split(":").toTypedArray()
-                        val hour1 = h1[0].toInt()
-                        if (hour1 >= 18) {
-                            timer.cancel()
-                            isShiftOver = true
-                            navToHome()
-
-                        }
-
-
-                        viewBinding.timer.text = timerTime
                     }
-
                 }
             }
-        }, 0, 1000)
+        }
+        timer.scheduleAtFixedRate(timerTask, 0, 1000)
     }
 
     private fun navToHome() {
@@ -617,7 +629,7 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                 )
 
                 viewModel.breakIn(breakInRequest)
-                viewModel.breakIn.observe(viewLifecycleOwner, breakInObserver)
+                viewModel.breakIn.observe(this, breakInObserver)
 
             }
         }
@@ -642,7 +654,7 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                 )
 
                 viewModel.breakOut(breakOutRequest)
-                viewModel.breakOut.observe(viewLifecycleOwner, breakOutObserver)
+                viewModel.breakOut.observe(this, breakOutObserver)
             }
         }
     }
@@ -668,7 +680,7 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                 )
 
                 viewModel.checkOut(checkOutRequest)
-                viewModel.checkOut.observe(viewLifecycleOwner, checkOutObserver)
+                viewModel.checkOut.observe(this, checkOutObserver)
 
             }
         }
@@ -701,6 +713,17 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
@@ -716,17 +739,8 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
 
             performTimerLogic()
 
-        } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-            CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                R.string.tokenExpiredDesc
-            ),
-                object : CustomDialog.OnClickListener {
-                    override fun okButtonClicked() {
-                        (activity as? HomeActivity?)?.logoutUser()
-                    }
-                })
         } else {
-            CustomDialog(requireContext()).showInformationDialog(body.message)
+            CustomDialog(requireActivity()).showInformationDialog(body.message)
         }
     }
 
@@ -744,12 +758,22 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
     private fun validateBreakOutResponse(body: BreakOutResponse) {
         if (body.status == Constants.API_RESPONSE_CODE.OK) {
-            timer.cancel()
             val sdf = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
             val tt = sdf.format(Date())
             SessionManager.timing = tt
@@ -759,17 +783,8 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
             SessionManager.isBreakStarted = true
 
             performTimerLogic()
-        } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-            CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                R.string.tokenExpiredDesc
-            ),
-                object : CustomDialog.OnClickListener {
-                    override fun okButtonClicked() {
-                        (activity as? HomeActivity?)?.logoutUser()
-                    }
-                })
-        } else {
-            CustomDialog(requireContext()).showInformationDialog(body.message)
+        }else {
+            CustomDialog(requireActivity()).showInformationDialog(body.message)
         }
     }
 
@@ -787,12 +802,23 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
     private fun validateCheckOutResponse(body: CheckOutResponse) {
         if (body.status == Constants.API_RESPONSE_CODE.OK) {
-            timer.cancel()
+            performTimerLogic()
             SessionManager.timing = ""
             SessionManager.hours = ""
             SessionManager.isBreakOut = false
@@ -800,17 +826,8 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
             SessionManager.isTimerRunning = false
 
             findNavController().popBackStack()
-        } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-            CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                R.string.tokenExpiredDesc
-            ),
-                object : CustomDialog.OnClickListener {
-                    override fun okButtonClicked() {
-                        (activity as? HomeActivity?)?.logoutUser()
-                    }
-                })
         } else {
-            CustomDialog(requireContext()).showInformationDialog(body.message)
+            CustomDialog(requireActivity()).showInformationDialog(body.message)
         }
     }
 

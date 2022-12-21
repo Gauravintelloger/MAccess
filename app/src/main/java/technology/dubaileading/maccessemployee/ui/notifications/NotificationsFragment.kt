@@ -71,6 +71,23 @@ class NotificationsFragment : Fragment() {
                     }
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    viewBinding.apply {
+                        viewBinding.errorLayout.errorText.text = "No Data Found"
+                        viewBinding.errorLayout.root.show()
+                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
+                    }
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
@@ -81,6 +98,7 @@ class NotificationsFragment : Fragment() {
                     viewBinding.errorLayout.root.hide()
                     viewBinding.recyclerView.show()
                     notificationAdapter.addList(response.notificationData)
+                    (activity as? HomeActivity)?.loadNotificationCountFromRemote()
                 } else {
                     notificationAdapter.addList(Collections.emptyList())
 
@@ -90,16 +108,8 @@ class NotificationsFragment : Fragment() {
                 }
 
 
-            } else if (response.status == Constants.API_RESPONSE_CODE.NOT_OK && response.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ), object : CustomDialog.OnClickListener {
-                    override fun okButtonClicked() {
-                        (activity as? HomeActivity?)?.logoutUser()
-                    }
-                })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(response.message)
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
             }
 
         }

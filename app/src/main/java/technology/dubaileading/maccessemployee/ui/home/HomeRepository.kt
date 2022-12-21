@@ -5,6 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.Credentials
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.di.ErrorHandler
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.*
@@ -20,10 +21,19 @@ class HomeRepository @Inject constructor(
         try {
             if (networkHelper.isNetworkConnected()) {
                 val response = retrofit.posts()
+                println("response code() = ${response.code()}")
+
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
-                } else emit(DataState.Error(response.message()))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+
             } else {
                 emit(DataState.Error("No Internet Connection"))
             }
@@ -41,7 +51,13 @@ class HomeRepository @Inject constructor(
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
-                } else emit(DataState.Error(response.message()))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
             } else {
                 emit(DataState.Error("No Internet Connection"))
             }
@@ -59,7 +75,13 @@ class HomeRepository @Inject constructor(
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
-                } else emit(DataState.Error(response.message()))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
             } else {
                 emit(DataState.Error("No Internet Connection"))
             }

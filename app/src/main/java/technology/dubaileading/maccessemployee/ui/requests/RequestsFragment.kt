@@ -1,204 +1,234 @@
 package technology.dubaileading.maccessemployee.ui.requests
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
+import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatSpinner
-import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.braver.tool.picker.BraverDocPathUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_requests.*
+import kotlinx.android.synthetic.main.leave_request.*
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseFragment
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
-import technology.dubaileading.maccessemployee.utility.SessionManager
-import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.AppUtils
-import technology.dubaileading.maccessemployee.utils.PermissionUtils
-import java.text.ParseException
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
-class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel>() {
-    private var cal = Calendar.getInstance()
-    private var leaveTypeList = ArrayList<LeaveTypeData>()
-    private var docTypeList = ArrayList<RequestTypeItem>()
-    private var fromDate: String = ""
-    private var toDate: String = ""
-    private var reqDate: String = ""
-    private var IS_FROM_DATE = false
-    private var REQUEST_CODE_PICK_DOC = 101
-    private var doc_type_id: Int? = null
+@AndroidEntryPoint
+class RequestsFragment : Fragment() {
+    private var calendar = Calendar.getInstance()
     private var attachmentFileTextView: TextView? = null
     private var leaveAttachmentFileTextView: TextView? = null
-    private lateinit var newDocDialog : BottomSheetDialog
-    private lateinit var newLeaveDialog : BottomSheetDialog
+    private lateinit var documentRequestBottomSheetDialog: BottomSheetDialog
+    private lateinit var leaveBottomSheetDialog: BottomSheetDialog
     private val dateFormat = "dd-MM-yyyy"
+    private val viewModel by viewModels<RequestsViewModel>()
+    private lateinit var viewBinding: FragmentRequestsBinding
+    lateinit var requestFragmentAdapter: RequestFragmentAdapter
 
 
-    override fun createViewModel(): RequestsViewModel {
-        return ViewModelProvider(this).get(RequestsViewModel::class.java)
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        requireActivity().setStatusBarTranslucent(true)
+        viewBinding = FragmentRequestsBinding.inflate(inflater, container, false)
+        setupListeners()
+        setUpObservers()
+        return viewBinding.root
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentRequestsBinding {
-        return FragmentRequestsBinding.inflate(layoutInflater!!)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding?.newRequest?.setOnClickListener {
+    private fun setupListeners() {
+        viewBinding.newRequestTextView.setOnClickListener {
             newRequest()
         }
+    }
 
+    private fun setUpObservers() {
+        viewModel.statusMessage.observe(viewLifecycleOwner) { it ->
+            it.getContentIfNotHandled()?.let {
+                requireContext().showToast(it)
+            }
+        }
     }
 
     private fun newRequest() {
-        val btnsheet = layoutInflater.inflate(R.layout.new_request_layout, null)
-        var newRequestDialog = BottomSheetDialog(requireContext())
-        val requestLeave = btnsheet.findViewById<LinearLayout>(R.id.request_leave)
-        val requestDoc = btnsheet.findViewById<LinearLayout>(R.id.request_doc)
+        val view = layoutInflater.inflate(R.layout.new_request_layout, null)
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val requestLeaveLinearLayout: LinearLayout =
+            view.findViewById(R.id.requestLeaveLinearLayout)
+        val requestDocumentsLinearLayout: LinearLayout =
+            view.findViewById(R.id.requestDocumentsLinearLayout)
 
-        requestLeave.setOnClickListener {
-            newRequestDialog.dismiss()
+        requestLeaveLinearLayout.setOnClickListener {
+            bottomSheetDialog.dismiss()
             newLeaveRequest()
         }
 
-        requestDoc.setOnClickListener {
-            newRequestDialog.dismiss()
+        requestDocumentsLinearLayout.setOnClickListener {
+            bottomSheetDialog.dismiss()
             newDocRequest()
         }
-        newRequestDialog.setContentView(btnsheet)
-        newRequestDialog.show()
+        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.show()
     }
 
     private fun newDocRequest() {
-        val btnsheet = layoutInflater.inflate(R.layout.document_request, null)
-        newDocDialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.document_request, null)
+        documentRequestBottomSheetDialog = BottomSheetDialog(requireContext())
 
-        val spinnerDocType = btnsheet.findViewById<AppCompatSpinner>(R.id.spinnerDocType)
-        val dateCard = btnsheet.findViewById<CardView>(R.id.dateCard)
-        val date = btnsheet.findViewById<EditText>(R.id.date)
-        val email = btnsheet.findViewById<EditText>(R.id.email)
-        val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
-        val desc = btnsheet.findViewById<EditText>(R.id.desc)
-        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
-        attachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
-
-        val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
-
-        var docType = ArrayList<String>()
-        if (docTypeList.isNotEmpty()) {
-            for (i in docTypeList.indices) {
-                docType.add(docTypeList[i].type.toString())
-            }
-            val arrayAdapter =
-                ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    docType
-                )
-            spinnerDocType.adapter = arrayAdapter
-            doc_type_id = docTypeList[0].id
-
-            spinnerDocType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    adapterView: AdapterView<*>,
-                    view: View,
-                    i: Int,
-                    l: Long
-                ) {
-                    val docType = docTypeList[i].type
-                    doc_type_id = docTypeList[i].id
-                    if (docType.equals("Others")) {
-
-                    }
-                }
-
-                override fun onNothingSelected(adapterView: AdapterView<*>?) {
-
-                }
-            }
-        }
+        val documentTypesSpinner = view.findViewById<DynamicWidthSpinner>(R.id.documentTypesSpinner)
+        val descriptionTextView = view.findViewById<EditText>(R.id.descriptionTextView)
+        val dateTextView = view.findViewById<TextView>(R.id.dateTextView)
+        val emailAddressTextView = view.findViewById<EditText>(R.id.emailAddressTextView)
+        val attachCardView = view.findViewById<MaterialCardView>(R.id.attachCardView)
+        val remove = view.findViewById<ImageView>(R.id.remove)
+        attachmentFileTextView = view.findViewById(R.id.attachmentFileTextView)
+        val submitMaterialButton = view.findViewById<MaterialButton>(R.id.submitMaterialButton)
 
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-
-                val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                reqDate = sdf.format(cal.time)
-                date.setText(reqDate)
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, monthOfYear)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                dateTextView.text = SimpleDateFormat(dateFormat, Locale.US).format(calendar.time)
             }
-        var datePicker = DatePickerDialog(
+        val datePicker = DatePickerDialog(
             requireActivity(),
             dateSetListener,
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         )
-        datePicker.datePicker.minDate = cal.timeInMillis
+        datePicker.datePicker.minDate = calendar.timeInMillis
 
-        date.setOnClickListener {
+        dateTextView.setOnClickListener {
             datePicker.show()
         }
 
         SessionManager.init(requireContext())
-        SessionManager.user?.let { email.setText(it.username) }
-
-
+        SessionManager.user?.let { emailAddressTextView.setText(it.username) }
 
         attachCardView.setOnClickListener {
-            callFileAccessIntent()
+            checkPermissionAndOpenPicker()
         }
 
         remove.setOnClickListener {
-            viewModel?.clearAttachment()
+            viewModel.clearAttachment()
         }
 
-
-        submitBt.setOnClickListener {
-            val description = desc?.text?.toString()?.trim()
-            val mail = email?.text?.toString()?.trim()
-            var documentRequest =
-                DocumentRequest("Document Request", description, "", doc_type_id, reqDate, mail)
-            viewModel?.documentRequest(requireContext(), documentRequest)
+        submitMaterialButton.setOnClickListener {
+            viewModel.applyLeave(
+                ApplyLeave(
+                    viewModel.selectedLeaveType?.value?.id,
+                    descriptionTextView.text.toString(),
+                    startDateTextView.text.toString(),
+                    endDateTextView.text.toString()
+                )
+            )
+            viewModel.applyLeave.observe(viewLifecycleOwner, applyLeaveObserver)
         }
 
+        submitMaterialButton.setOnClickListener {
+            val documentRequest =
+                DocumentRequest(
+                    "Document Request",
+                    descriptionTextView?.text?.toString()?.trim(),
+                    "",
+                    viewModel.selectedDocumentRequestType?.value?.id,
+                    dateTextView.text.toString(),
+                    emailAddressTextView?.text?.toString()?.trim()
+                )
+            viewModel.requestDocument(documentRequest)
+            viewModel.requestDocument.observe(viewLifecycleOwner, requestDocumentObserver)
+
+        }
+
+        loadAllDocumentRequestTypes(documentTypesSpinner)
 
 
-        newDocDialog.setContentView(btnsheet)
-        newDocDialog.show()
+        documentRequestBottomSheetDialog.setContentView(view)
+        documentRequestBottomSheetDialog.show()
 
     }
 
-    /**
-     * Declaration callFileAccessIntent()
-     * Handling click event of the picker icons
-     */
-    private fun callFileAccessIntent() {
-        if (PermissionUtils.isFileAccessPermissionGranted(requireContext())) {
-            openAttachments()
+    private fun checkPermissionAndOpenPicker() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermission()
         } else {
-            PermissionUtils.showFileAccessPermissionRequestDialog(requireContext())
+            openAttachments()
         }
     }
+
+    private fun checkPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            showPermissionNeededAlert()
+        } else {
+            openAttachments()
+        }
+    }
+
+    private fun showPermissionNeededAlert() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle(getString(R.string.needPermissions))
+        builder.setMessage(getString(R.string.somePermissionsAreRequiredToDoTheTask))
+        builder.setPositiveButton(getString(R.string.ok)) { dialog, which ->
+            permissionResult.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
+        }
+        builder.setNeutralButton(getString(R.string.cancel), null)
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private var permissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                println("it value = ${it.value}")
+                if (it.value) {
+                    openAttachments()
+                }
+            }
+        }
+
 
 
     /**
@@ -216,11 +246,10 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         }
     }
 
-    var activityResultLauncherForDocs =
+    private var activityResultLauncherForDocs =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
-                    //String tempFileAbsolutePath = "";
                     val selectedDocUri = result.data!!.data
                     if (selectedDocUri.toString().contains("video") || selectedDocUri.toString()
                             .contains("mp4") || selectedDocUri.toString()
@@ -229,7 +258,7 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
 
                         setSourcePathView(selectedDocUri.toString())
                     } else {
-                        var tempFileAbsolutePath = BraverDocPathUtils.Companion.getSourceDocPath(
+                        val tempFileAbsolutePath = BraverDocPathUtils.Companion.getSourceDocPath(
                             requireContext(),
                             selectedDocUri!!
                         )
@@ -245,83 +274,33 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
         }
 
     private fun setSourcePathView(path: String) {
-        viewModel?.selectedFileLiveData?.value = path
-
+        viewModel.selectedFileLiveData?.value = path
     }
+
+    @SuppressLint("SetTextI18n")
     private fun newLeaveRequest() {
-        val btnsheet = layoutInflater.inflate(R.layout.leave_request, null)
-        newLeaveDialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.leave_request, null)
+        leaveBottomSheetDialog = BottomSheetDialog(requireContext())
 
-        val leaveType = btnsheet.findViewById<AppCompatSpinner>(R.id.leaveType)
-        val desc = btnsheet.findViewById<EditText>(R.id.desc)
-        val startDate = btnsheet.findViewById<EditText>(R.id.startDate)
-        val endDate = btnsheet.findViewById<EditText>(R.id.endDate)
-        val leaveBal = btnsheet.findViewById<TextView>(R.id.leaveBal)
-        val attachCardView = btnsheet.findViewById<CardView>(R.id.attachCardView)
-        val remove = btnsheet.findViewById<ImageView>(R.id.remove)
-        leaveAttachmentFileTextView = btnsheet.findViewById<TextView>(R.id.attachmentFileTextView)
-        val submitBt = btnsheet.findViewById<AppCompatButton>(R.id.submitBt)
-        var typeList = ArrayList<String>()
-        var leave_type_id: Int? = 0
+        val leaveTypesSpinner = view.findViewById<DynamicWidthSpinner>(R.id.leaveTypesSpinner)
+        val descriptionTextView = view.findViewById<EditText>(R.id.descriptionTextView)
+        val startDateTextView = view.findViewById<TextView>(R.id.startDateTextView)
+        val endDateTextView = view.findViewById<TextView>(R.id.endDateTextView)
+        val leaveBalanceTextView = view.findViewById<TextView>(R.id.leaveBalanceTextView)
+        val attachCardView = view.findViewById<MaterialCardView>(R.id.attachCardView)
+        val remove = view.findViewById<ImageView>(R.id.remove)
+        leaveAttachmentFileTextView = view.findViewById(R.id.attachmentFileTextView)
+        val submitMaterialButton = view.findViewById<MaterialButton>(R.id.submitMaterialButton)
 
-        if (leaveTypeList.isNotEmpty()){
-            leaveBal.text = leaveTypeList[0].shortCode + "Left:" + leaveTypeList[0].balanceLeaves + " of " + leaveTypeList[0].noOfLeaves
-            leave_type_id = leaveTypeList[0].id
-
-            for (i in leaveTypeList.indices) {
-                typeList.add(leaveTypeList[i].title.toString())
-            }
-
-            val arrayAdapter =
-                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
-            leaveType.adapter = arrayAdapter
-
-            leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                    val short_code = leaveTypeList[i].shortCode
-                    val no_of_leaves = leaveTypeList[i].noOfLeaves
-                    val balance_leaves = leaveTypeList[i].balanceLeaves
-                    leave_type_id = leaveTypeList[i].id
-                    leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
-                }
-
-                override fun onNothingSelected(adapterView: AdapterView<*>?) {}
-            }
-
-        }
-
-
-        val arrayAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, typeList)
-        leaveType.adapter = arrayAdapter
-
-        leaveType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                val short_code = leaveTypeList[i].shortCode
-                val no_of_leaves = leaveTypeList[i].noOfLeaves
-                val balance_leaves = leaveTypeList[i].balanceLeaves
-                leave_type_id = leaveTypeList[i].id
-                leaveBal.text = "$short_code Left:$balance_leaves of $no_of_leaves"
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
-        }
-
-
-
-
-        startDate.setOnClickListener {
-            it.hideKeyboard()
+        startDateTextView.setOnClickListener {
+            startDateTextView.hideKeyboard()
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
 
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
                 val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                fromDate = sdf.format(datePicker.selection?.first)
-                startDate.setText(fromDate)
-                toDate =  sdf.format(datePicker.selection?.second)
-                endDate.setText(toDate)
+                startDateTextView.text = sdf.format(datePicker.selection?.first)
+                endDateTextView.text = sdf.format(datePicker.selection?.second)
 
                 val startDate: Long? = datePicker.selection?.first
                 val endDate: Long? = datePicker.selection?.second
@@ -329,33 +308,20 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
                 val msDiff = endDate!!.minus(startDate!!)
                 val daysDiff: Long = TimeUnit.MILLISECONDS.toDays(msDiff)
 
-                val days = daysDiff + 1;
+                val days = daysDiff + 1
 
-                submitBt.text = "Submit($days day)"
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
-
+                submitMaterialButton.text = "Submit($days day)"
             }
         }
 
-        endDate.setOnClickListener {
-            it.hideKeyboard()
+        endDateTextView.setOnClickListener {
+            endDateTextView?.hideKeyboard()
             val datePicker = MaterialDatePicker.Builder.dateRangePicker().build()
             datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
-
-            // Setting up the event for when ok is clicked
             datePicker.addOnPositiveButtonClickListener {
                 val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                fromDate = sdf.format(datePicker.selection?.first)
-                startDate.setText(fromDate)
-                toDate =  sdf.format(datePicker.selection?.second)
-                endDate.setText(toDate)
-
+                startDateTextView.text = sdf.format(datePicker.selection?.first)
+                endDateTextView.text = sdf.format(datePicker.selection?.second)
 
                 val startDate: Long? = datePicker.selection?.first
                 val endDate: Long? = datePicker.selection?.second
@@ -363,80 +329,301 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
                 val msDiff = endDate!!.minus(startDate!!)
                 val daysDiff: Long = TimeUnit.MILLISECONDS.toDays(msDiff)
 
-                val days = daysDiff + 1;
+                val days = daysDiff + 1
 
-                submitBt.text = "Submit($days day)"
-
-
-            }
-            // Setting up the event for when cancelled is clicked
-            datePicker.addOnNegativeButtonClickListener {
-
-            }
-            // Setting up the event for when back button is pressed
-            datePicker.addOnCancelListener {
-
+                submitMaterialButton.text = "Submit($days day)"
             }
         }
 
         attachCardView.setOnClickListener {
-            callFileAccessIntent()
+            checkPermissionAndOpenPicker()
         }
 
         remove.setOnClickListener {
-            viewModel?.clearAttachment()
+            viewModel.clearAttachment()
         }
 
-        submitBt.setOnClickListener {
-            if (leave_type_id!!.equals(null)) {
-                Toast.makeText(requireContext(), "Select Leave Type", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            val description = desc?.text?.toString()?.trim()
-            if (description!!.isEmpty()) {
-                Toast.makeText(requireContext(), "Add Description", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (fromDate.isEmpty()) {
-                Toast.makeText(requireContext(), "Start date is not selected", Toast.LENGTH_LONG)
-                    .show()
-                return@setOnClickListener
-            }
-            if (toDate.isEmpty()) {
-                Toast.makeText(requireContext(), "End date is not selected", Toast.LENGTH_LONG)
-                    .show()
-                return@setOnClickListener
-            }
-
-            var applyLeave = ApplyLeave(leave_type_id, description, fromDate, toDate)
-
-            viewModel?.applyLeave(requireContext(), applyLeave)
-
-
+        submitMaterialButton.setOnClickListener {
+            viewModel.applyLeave(
+                ApplyLeave(
+                    viewModel.selectedLeaveType?.value?.id,
+                    descriptionTextView.text.toString(),
+                    startDateTextView.text.toString(),
+                    endDateTextView.text.toString()
+                )
+            )
+            viewModel.applyLeave.observe(viewLifecycleOwner, applyLeaveObserver)
         }
 
-        newLeaveDialog.setContentView(btnsheet)
-        newLeaveDialog.show()
+        loadAllLeaveTypes(leaveTypesSpinner, leaveBalanceTextView)
+
+        leaveBottomSheetDialog.setContentView(view)
+        leaveBottomSheetDialog.show()
 
     }
 
+    private var applyLeaveObserver: Observer<DataState<ApiResponse2>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse2>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateApplyLeaveResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+    private var requestDocumentObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    validateDocumentRequestResponse(it.item)
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+    private fun validateApplyLeaveResponse(response: ApiResponse2) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            requireContext().showToast(response.message)
+            if (leaveBottomSheetDialog.isShowing) {
+                leaveBottomSheetDialog.dismiss()
+            }
+            if (viewPager.currentItem == 0){
+                (requestFragmentAdapter.fragmentList[0] as? LeaveRequestFragment)?.loadAllLeaveRequestsFromRemote()
+            }
+
+        } else {
+            CustomDialog(requireActivity()).showInformationDialog(response.message)
+        }
+
+    }
+
+    private fun validateDocumentRequestResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            requireContext().showToast(response.message)
+            if (documentRequestBottomSheetDialog.isShowing) {
+                documentRequestBottomSheetDialog.dismiss()
+            }
+            if (viewPager.currentItem == 1){
+                (requestFragmentAdapter.fragmentList[1] as? DocumentRequestFragment)?.loadAllDocumentRequestsFromRemote()
+            }
+
+        } else {
+            CustomDialog(requireActivity()).showInformationDialog(response.message)
+        }
+
+    }
+
+    private fun loadAllLeaveTypes(
+        leaveTypesSpinner: DynamicWidthSpinner,
+        leaveBalanceTextView: TextView
+    ) {
+        viewModel.getLeaveTypes()
+        viewModel.leaveTypes.observe(
+            viewLifecycleOwner
+        ) {
+            when (it) {
+                is DataState.Loading -> {
+                }
+                is DataState.Success -> {
+                    validateLeaveTypesData(it.item, leaveTypesSpinner, leaveBalanceTextView)
+                }
+                is DataState.Error -> {
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+    }
+
+    private fun loadAllDocumentRequestTypes(
+        spinner: DynamicWidthSpinner
+    ) {
+        viewModel.getRequestTypes()
+        viewModel.documentRequestTypes.observe(
+            viewLifecycleOwner
+        ) {
+            when (it) {
+                is DataState.Loading -> {
+                }
+                is DataState.Success -> {
+                    validateDocumentRequestTypesData(it.item, spinner)
+                }
+                is DataState.Error -> {
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+    }
+
+    private fun validateDocumentRequestTypesData(
+        response: RequestType,
+        spinner: DynamicWidthSpinner
+    ) {
+        if (activity != null && isAdded) {
+            if (response.status == Constants.API_RESPONSE_CODE.OK) {
+                if (response.requestTypeItem != null && response.requestTypeItem.isNotEmpty()) {
+                    val spinnerAdapter =
+                        DocumentRequestTypesSpinnerAdapter(
+                            requireContext(),
+                            response.requestTypeItem
+                        )
+                    spinner.apply {
+                        adapter = spinnerAdapter
+                        onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    p0: AdapterView<*>?,
+                                    p1: View?,
+                                    p2: Int,
+                                    p3: Long
+                                ) {
+                                    if (p2 != 0) {
+                                        viewModel.selectedDocumentRequestType?.value =
+                                            spinnerAdapter.result[p2 - 1]
+                                    } else {
+                                        viewModel.selectedDocumentRequestType?.value = null
+
+                                    }
+                                }
+
+                                override fun onNothingSelected(p0: AdapterView<*>?) {
+                                }
+                            }
+                    }
+
+                } else {
+                    val spinnerAdapter =
+                        LeaveTypesSpinnerAdapter(requireContext(), Collections.emptyList())
+                    spinner.apply {
+                        adapter = spinnerAdapter
+                    }
+                }
+
+            } else {
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
+            }
+
+        }
+    }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    @SuppressLint("SetTextI18n")
+    private fun validateLeaveTypesData(
+        response: LeaveTypes,
+        leaveTypesSpinner: DynamicWidthSpinner,
+        leaveBalanceTextView: TextView
+    ) {
+        if (activity != null && isAdded) {
+            if (response.status == Constants.API_RESPONSE_CODE.OK) {
+                if (response.data != null && response.data.isNotEmpty()) {
+                    val spinnerAdapter =
+                        LeaveTypesSpinnerAdapter(requireContext(), response.data)
+                    leaveTypesSpinner.apply {
+                        adapter = spinnerAdapter
+                        onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    p0: AdapterView<*>?,
+                                    p1: View?,
+                                    p2: Int,
+                                    p3: Long
+                                ) {
+                                    if (p2 != 0) {
+                                        viewModel.selectedLeaveType?.value =
+                                            spinnerAdapter.result[p2 - 1]
+                                       leaveBalanceTextView.text  = "${spinnerAdapter.result[p2 - 1]?.shortCode} Left:${spinnerAdapter.result[p2 - 1]?.balanceLeaves} of ${spinnerAdapter.result[p2 - 1]?.noOfLeaves}"
+                                        leaveBalanceTextView.show()
+                                    } else {
+                                        viewModel.selectedLeaveType?.value = null
+                                        leaveBalanceTextView.hide()
 
-        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Leave"))
-        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Document"))
+                                    }
+                                }
 
+                                override fun onNothingSelected(p0: AdapterView<*>?) {
+                                }
+                            }
+                    }
 
-        val fragmentManager: FragmentManager = activity?.supportFragmentManager!!
+                } else {
+                    val equipmentsSpinnerAdapter =
+                        LeaveTypesSpinnerAdapter(requireContext(), Collections.emptyList())
+                    leaveTypesSpinner.apply {
+                        adapter = equipmentsSpinnerAdapter
+                    }
+                }
 
+            } else {
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
+            }
 
+        }
+    }
 
-        binding?.tabLay?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Leave"))
+        viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Document"))
+
+        viewBinding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                binding?.viewPager?.currentItem = tab!!.position
+                viewBinding.viewPager.currentItem = tab!!.position
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -448,78 +635,50 @@ class RequestsFragment : BaseFragment<FragmentRequestsBinding, RequestsViewModel
             }
         })
 
-        binding?.viewPager?.registerOnPageChangeCallback(object :
+        viewBinding.viewPager.registerOnPageChangeCallback(object :
             ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                binding?.tabLay?.selectTab(binding?.tabLay?.getTabAt(position))
+                viewBinding.tabLayout.selectTab(viewBinding.tabLayout.getTabAt(position))
 
             }
         })
 
+         requestFragmentAdapter = RequestFragmentAdapter(
+            childFragmentManager,
+            lifecycle
+        )
 
+        requestFragmentAdapter.addFragment(LeaveRequestFragment())
+        requestFragmentAdapter.addFragment(DocumentRequestFragment())
+        viewBinding.viewPager.adapter = requestFragmentAdapter
 
-        viewModel?.getLeaveTypes(requireContext())
-
-        viewModel?.getRequestTypes(requireContext())
-
-        var getRequests = GetRequests(20, 1)
-        viewModel?.getEmployeeRequests(requireContext(), getRequests)
-
-        viewModel?.getRequestSuccess?.observe(viewLifecycleOwner) {
-            binding?.viewPager?.adapter = RequestFragmentAdapter(
-                fragmentManager,
-                lifecycle,
-                it.data?.leaveRequests,
-                it.data?.otherRequests
-            )
-        }
-
-        viewModel?.leaveTypesData?.observe(viewLifecycleOwner) {
-            leaveTypeList = it.data as ArrayList<LeaveTypeData>
-        }
-
-        viewModel?.selectedFileLiveData?.observe(viewLifecycleOwner) {
-            if (attachmentFileTextView != null){
+        viewModel.selectedFileLiveData?.observe(viewLifecycleOwner) {
+            if (attachmentFileTextView != null) {
                 val fileName = AppUtils.getFileNameFromPath(it)
                 attachmentFileTextView?.text = fileName
             }
-            if (leaveAttachmentFileTextView != null){
+            if (leaveAttachmentFileTextView != null) {
                 val fileName = AppUtils.getFileNameFromPath(it)
                 leaveAttachmentFileTextView?.text = fileName
             }
         }
-
-        viewModel?.requestTypesSuccess?.observe(viewLifecycleOwner) {
-            docTypeList = it.requestTypeItem as ArrayList<RequestTypeItem>
-        }
-
-        viewModel?.documentRequestSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            newDocDialog.dismiss()
-        }
-
-        viewModel?.documentRequestError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
-
-        viewModel?.applyLeaveSuccess?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-            newLeaveDialog.dismiss()
-
-        }
-
-        viewModel?.applyLeaveError?.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
-        }
-
-
     }
 
-    private fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
-    }
+    class RequestFragmentAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
+        FragmentStateAdapter(fragmentManager, lifecycle) {
+        val fragmentList: ArrayList<Fragment> = ArrayList()
+        override fun createFragment(position: Int): Fragment {
+            return fragmentList[position]
+        }
 
+        fun addFragment(fragment: Fragment) {
+            fragmentList.add(fragment)
+        }
+
+        override fun getItemCount(): Int {
+            return fragmentList.size
+        }
+    }
 
 }

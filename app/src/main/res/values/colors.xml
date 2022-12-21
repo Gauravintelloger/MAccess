@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#01A0C6</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -48,6 +50,12 @@
     <color name="hintLabel">#5C616F</color>
     <color name="hintColor">#5E040C22</color>
     <color name="colorSecondary">#01A0C6</color>
+    <color name="viewBg">#F1F1F1</color>
+    <color name="iconColor">#040C22</color>
+    <color name="liteGrey">#A9A9A9</color>
+    <color name="midGrey">#949494</color>
+    <color name="viewUnderline">#D1D1D1</color>
+    <color name="bodyGrey">#505050</color>
 
 
 

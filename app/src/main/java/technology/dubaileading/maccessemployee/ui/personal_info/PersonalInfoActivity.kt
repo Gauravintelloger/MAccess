@@ -2,138 +2,217 @@ package technology.dubaileading.maccessemployee.ui.personal_info
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityPersonalInfoBinding
+import technology.dubaileading.maccessemployee.rest.entity.Profile
 import technology.dubaileading.maccessemployee.rest.entity.UpdateProfile
-import technology.dubaileading.maccessemployee.utils.AppShared
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.ui.profile.ProfileViewModel
+import technology.dubaileading.maccessemployee.utility.*
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-class PersonalInfoActivity : BaseActivity<ActivityPersonalInfoBinding, PersonalInfoViewModel>(){
-    private var cal = Calendar.getInstance()
-
+@AndroidEntryPoint
+class PersonalInfoActivity : AppCompatActivity() {
+    private val viewModel: ProfileViewModel by viewModels()
+    private lateinit var viewBinding: ActivityPersonalInfoBinding
+    private var calendar = Calendar.getInstance()
     private val dateFormat = "dd-MM-yyyy"
-    private lateinit var dateOfBith : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
-        viewModel.getProfile(this@PersonalInfoActivity)
-        viewModel.profileData.observe(this){
-            if (it?.profileData?.name != null){
-                binding?.name?.setText(it?.profileData?.name.toString())
-            }
+        setStatusBarTranslucent(true)
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_personal_info)
+        setUpListeners()
+        setUpObservers()
+        getProfileFromRemote()
 
-            if (it?.profileData?.dateOfBirth != null){
-                binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())
-            }
+    }
 
-            if (it?.profileData?.personalContactNumber != null){
-                binding?.number?.setText(it?.profileData.personalContactNumber.toString())
-            }
-
-        }
-
-        viewModel.updateProfileSuccess.observe(this){
-            if (it?.profileData?.name != null){
-                binding?.name?.setText(it?.profileData?.name.toString())
-            }
-
-            if (it?.profileData?.dateOfBirth != null){
-                binding?.dob?.setText(it?.profileData?.dateOfBirth.toString())
-            }
-
-            if (it?.profileData?.personalContactNumber != null){
-                binding?.number?.setText(it?.profileData.personalContactNumber.toString())
-            }
-
-        }
-
-
+    private fun setUpListeners() {
         val dateSetListener =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                cal.set(Calendar.YEAR, year)
-                cal.set(Calendar.MONTH, monthOfYear)
-                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                val sdf = SimpleDateFormat(dateFormat, Locale.US)
-                dateOfBith = sdf.format(cal.time)
-                binding?.dob?.setText(dateOfBith)
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, monthOfYear)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                viewBinding.dateOfBirthEditText.setText(SimpleDateFormat(dateFormat, Locale.US).format(calendar.time))
             }
-        var datePicker = DatePickerDialog(
+        val datePicker = DatePickerDialog(
             this@PersonalInfoActivity,
             dateSetListener,
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         )
 
 
-        binding?.dob?.setOnClickListener {
-            it.hideKeyboard()
+        viewBinding.dateOfBirthEditText.setOnClickListener {
+            viewBinding.dateOfBirthEditText.hideKeyboard()
             datePicker.show()
         }
 
-
-        binding?.save?.setOnClickListener {
-            val name = binding?.name?.text?.toString()?.trim()!!
-            val number = binding?.number?.text?.toString()?.trim()!!
-            val date = binding?.dob?.text?.toString()?.trim()!!
-
-            if (name != null && name.isEmpty()) {
-                Toast.makeText(this@PersonalInfoActivity, "Enter Name", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+        viewBinding.backImageView.setOnClickListener {
+            this.currentFocus?.let { view ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
             }
-
-            if (number != null && number.isEmpty()) {
-                Toast.makeText(this@PersonalInfoActivity, "Enter Mobile Number", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (date != null && date.isEmpty()) {
-                Toast.makeText(this@PersonalInfoActivity, "Enter Date of birth", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            var updateProfile = UpdateProfile(name,date,number)
-            viewModel?.updateProfile(this@PersonalInfoActivity,updateProfile)
-
+            finish()
         }
 
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            onBackPressed()
+        viewBinding.saveMaterialButton.setOnClickListener {
+            viewModel.updateProfile(UpdateProfile(viewBinding.nameTextInputEditText.text.toString(), viewBinding.dateOfBirthEditText.text.toString(), viewBinding.contactNumberTextInputEditText.text.toString()))
+            viewModel.updateProfile.observe(this, updateProfileObserver)
+
         }
     }
 
-    fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
+    private fun setUpObservers(){
+        viewModel.statusMessage.observe(this@PersonalInfoActivity) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it.contains("Enter valid name", true)) {
+                    viewBinding.nameTextInputLayout.error = it
+                    if (viewBinding.contactNumberTextInputLayout.isErrorEnabled) {
+                        viewBinding.contactNumberTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.dateOfBirthTextInputLayout.isErrorEnabled) {
+                        viewBinding.dateOfBirthTextInputLayout.isErrorEnabled = false
+                    }
+                } else if (it.contains("Enter valid contact number", true)) {
+                    viewBinding.contactNumberTextInputLayout.error = it
+                    if (viewBinding.nameTextInputLayout.isErrorEnabled) {
+                        viewBinding.nameTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.dateOfBirthTextInputLayout.isErrorEnabled) {
+                        viewBinding.dateOfBirthTextInputLayout.isErrorEnabled = false
+                    }
+
+                } else if (it.contains("Select your date of birth", true)) {
+                    viewBinding.dateOfBirthTextInputLayout.error = it
+                    if (viewBinding.nameTextInputLayout.isErrorEnabled) {
+                        viewBinding.nameTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.contactNumberTextInputLayout.isErrorEnabled) {
+                        viewBinding.contactNumberTextInputLayout.isErrorEnabled = false
+                    }
+
+                } else {
+                    viewBinding.nameTextInputLayout.isErrorEnabled = false
+                    viewBinding.dateOfBirthTextInputLayout.isErrorEnabled = false
+                    viewBinding.contactNumberTextInputLayout.isErrorEnabled = false
+                    showToast(it)
+                }
+
+            }
+        }
+
     }
 
-    override fun createViewModel(): PersonalInfoViewModel {
-        return ViewModelProvider(this).get(PersonalInfoViewModel::class.java)
+    private fun getProfileFromRemote() {
+        viewModel.profile()
+        viewModel.profile.observe(this, profileObserver)
     }
 
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityPersonalInfoBinding {
-        return ActivityPersonalInfoBinding.inflate(layoutInflater!!)
+
+    private var profileObserver: Observer<DataState<Profile>> =
+        androidx.lifecycle.Observer<DataState<Profile>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateProfileResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+    private var updateProfileObserver: Observer<DataState<Profile>> =
+        androidx.lifecycle.Observer<DataState<Profile>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateUpdateProfileResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+
+    private fun validateUpdateProfileResponse(body: Profile) {
+        if (body.status == Constants.API_RESPONSE_CODE.OK) {
+            showToast(body.message)
+            finish()
+        } else {
+            CustomDialog(this).showInformationDialog(body.message)
+        }
     }
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+
+    private fun validateProfileResponse(body: Profile) {
+        if (body.status == Constants.API_RESPONSE_CODE.OK) {
+            if (body.profileData?.name != null) {
+                viewBinding.nameTextInputEditText.setText(body.profileData.name.toString())
+            }
+
+            if (body.profileData?.dateOfBirth != null) {
+                viewBinding.dateOfBirthEditText.setText(body.profileData.dateOfBirth.toString())
+            }
+
+            if (body.profileData?.personalContactNumber != null) {
+                viewBinding.contactNumberTextInputEditText.setText(body.profileData.personalContactNumber.toString())
+            }
+
+        } else {
+            CustomDialog(this).showInformationDialog(body.message)
+        }
     }
+
+    fun logoutUser() {
+        SessionManager.deleteAllUserInfo()
+        startActivity(Intent(applicationContext, LoginActivity::class.java))
+        finish()
+        showToast("Logged out Successfully")
+    }
+
 }

@@ -5,4 +5,5 @@
     <dimen name="smallTextSize">12sp</dimen>
     <dimen name="largeTextSize">16sp</dimen>
     <dimen name="largeText_X_Size">18sp</dimen>
+    <dimen name="otp_box_width">40dp</dimen>
 </resources>

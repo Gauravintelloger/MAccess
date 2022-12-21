@@ -246,6 +246,10 @@ public class LocationHelper {
 
                             callback.gpsSettingsNotAvailable();
                             break;
+
+                        default:
+                            callback.gpsSettingsNotAvailable();
+                            break;
                     }
 
                 });

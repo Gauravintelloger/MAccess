@@ -39,129 +39,126 @@ interface EmployeeEndpoint {
     @GET("employee/employeeProfileView")
     suspend fun getProfile(): Response<Profile?>
 
-    @get:GET("employee/employeeProfileView")
-    val profile: Call<Profile?>?
-
     @POST("employee/EmployeeUpdateProfile")
-    fun updateProfile(@Body updateProfile: UpdateProfile?): Call<Profile?>?
+    suspend fun updateProfile(@Body updateProfile: UpdateProfile?): Response<Profile?>
 
     @GET("employee/getLeaveDetails")
     suspend fun leaves(): Response<GetLeave>
 
     @POST("employee/changeEmployeePassword")
-    fun changePassword(@Body passwordRequest: PasswordRequest?): Call<ChangePassword?>?
+    suspend fun changePassword(@Body passwordRequest: PasswordRequest?): Response<ChangePassword?>
 
-    @get:GET("getLeaveTypesnew")
-    val leaveTypes: Call<LeaveTypes?>?
+    @GET("getLeaveTypesnew")
+    suspend fun leaveTypes(): Response<LeaveTypes?>
 
-    @get:GET("getRequestTypes")
-    val requestTypes: Call<RequestType?>?
+    @GET("getRequestTypes")
+    suspend fun requestTypes(): Response<RequestType?>
 
     @Multipart
     @POST("applyLeaveApplicationnew")
-    fun applyLeaveWithFile(
+    suspend fun applyLeaveWithFile(
         @Part("leave_type_id") leave_type_id: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("from_date") from_date: RequestBody?,
         @Part("to_date") to_date: RequestBody?,
         @Part NationalIDFile: MultipartBody.Part
-    ): Call<ApiResponse2?>?
+    ): Response<ApiResponse2?>
 
     @Multipart
     @POST("applyLeaveApplicationnew")
-    fun applyLeaveWithoutFile(
+    suspend fun applyLeaveWithoutFile(
         @Part("leave_type_id") leave_type_id: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("from_date") from_date: RequestBody?,
         @Part("to_date") to_date: RequestBody?
-    ): Call<ApiResponse2?>?
+    ): Response<ApiResponse2?>
 
     @Multipart
     @POST("updateEmployeeLeaveRequest")
-    fun updateLeaveWithFile(
+    suspend fun updateLeaveWithFile(
         @Part("id") id: RequestBody?,
         @Part("leave_type_id") leave_type_id: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("from_date") from_date: RequestBody?,
         @Part("to_date") to_date: RequestBody?,
         @Part NationalIDFile: MultipartBody.Part
-    ): Call<ApiResponse2?>?
+    ): Response<ApiResponse2?>
 
     @Multipart
     @POST("updateEmployeeLeaveRequest")
-    fun updateLeaveWithoutFile(
+    suspend fun updateLeaveWithoutFile(
         @Part("id") id: RequestBody?,
         @Part("leave_type_id") leave_type_id: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("from_date") from_date: RequestBody?,
         @Part("to_date") to_date: RequestBody?
-    ): Call<ApiResponse2?>?
+    ): Response<ApiResponse2?>
 
     @Multipart
     @POST("makeEmployeeRequestnew")
-    fun requestDocumentWithFile(
+    suspend fun requestDocumentWithFile(
         @Part("subject") subject: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("request_type") request_type: RequestBody?,
         @Part("required_by") required_by: RequestBody?,
         @Part("email") email: RequestBody?,
         @Part NationalIDFile: MultipartBody.Part,
-    ): Call<ApiResponse?>?
+    ): Response<ApiResponse?>
 
     @Multipart
     @POST("makeEmployeeRequestnew")
-    fun requestDocumentWithoutFile(
+    suspend fun requestDocumentWithoutFile(
         @Part("subject") subject: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("request_type") request_type: RequestBody?,
         @Part("required_by") required_by: RequestBody?,
         @Part("email") email: RequestBody?
-    ): Call<ApiResponse?>?
+    ): Response<ApiResponse?>
 
     @Multipart
     @POST("updateEmployeeDocRequest")
-    fun updateEmployeeDocRequestWithFile(
+    suspend fun updateEmployeeDocRequestWithFile(
         @Part("subject") subject: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("request_type") request_type: RequestBody?,
         @Part("required_by") required_by: RequestBody?,
         @Part("id") id: RequestBody?,
         @Part NationalIDFile: MultipartBody.Part
-    ): Call<ApiResponse?>?
+    ): Response<ApiResponse?>
 
     @Multipart
     @POST("updateEmployeeDocRequest")
-    fun updateEmployeeDocRequestWithoutFile(
+    suspend fun updateEmployeeDocRequestWithoutFile(
         @Part("subject") subject: RequestBody?,
         @Part("description") description: RequestBody?,
         @Part("request_type") request_type: RequestBody?,
         @Part("required_by") required_by: RequestBody?,
         @Part("id") id: RequestBody?
-    ): Call<ApiResponse?>?
+    ): Response<ApiResponse?>
 
     @POST("getEmployeeRequestsnew")
-    fun getEmployeeRequests(@Body getRequests: GetRequests?): Call<EmployeeRequests?>?
+    suspend fun getEmployeeRequests(@Body getRequests: GetRequests?): Response<EmployeeRequests?>
 
     @POST("employee-forgot-password")
-    fun forgotPassword(@Body forgotPassword: ForgotPassword?): Call<ApiResponse?>?
+    suspend fun forgotPassword(@Body forgotPassword: ForgotPassword?): Response<ApiResponse?>
 
     @POST("employee-resend-otp")
-    fun resendOTP(@Body forgotPassword: ForgotPassword?): Call<ApiResponse?>?
+    suspend fun resendOTP(@Body forgotPassword: ForgotPassword?): Response<ApiResponse?>
 
     @POST("employee-verify-otp")
-    fun verifyOTP(@Body verifyOTP: VerifyOTP?): Call<ApiResponse?>?
+    suspend fun verifyOTP(@Body verifyOTP: VerifyOTP?): Response<ApiResponse?>
 
     @POST("employee-reset-password")
-    fun resetPassword(@Body resetPassword: ResetPassword?): Call<ApiResponse?>?
+    suspend fun resetPassword(@Body resetPassword: ResetPassword?): Response<ApiResponse?>
 
     @POST("employee/notificationToken")
     suspend fun notificationToken(@Body tokenRequest: TokenRequest?): Response<ApiResponse?>
 
     @POST("employeeDeleteDocRequest")
-    fun deleteDocRequest(@Body deleteReq: DeleteReq?): Call<ApiResponse?>?
+    suspend fun deleteDocRequest(@Body deleteReq: DeleteReq?): Response<ApiResponse?>
 
     @POST("employeeDeleteLeaveRequest")
-    fun deleteLeaveRequest(@Body deleteReq: DeleteReq?): Call<ApiResponse?>?
+    suspend fun deleteLeaveRequest(@Body deleteReq: DeleteReq?): Response<ApiResponse?>
 
     @GET("employee/unreadnotificationListCount")
     suspend fun notificationCount(): Response<NotificationCount?>

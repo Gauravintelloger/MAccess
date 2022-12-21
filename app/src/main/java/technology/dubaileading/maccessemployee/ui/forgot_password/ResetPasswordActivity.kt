@@ -1,88 +1,91 @@
 package technology.dubaileading.maccessemployee.ui.forgot_password
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityResetPasswordBinding
-import technology.dubaileading.maccessemployee.rest.entity.ResetPassword
+import technology.dubaileading.maccessemployee.rest.entity.ApiResponse
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
-import technology.dubaileading.maccessemployee.utils.Utils
+import technology.dubaileading.maccessemployee.utility.*
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 
-class ResetPasswordActivity : BaseActivity<ActivityResetPasswordBinding, ForgotPasswordViewModel>(){
-
-
+@AndroidEntryPoint
+class ResetPasswordActivity : AppCompatActivity() {
+    private val viewModel: ForgotPasswordViewModel by viewModels()
+    private lateinit var viewBinding: ActivityResetPasswordBinding
+    lateinit var email: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
-        var email = intent.getStringExtra("email")
+        setStatusBarTranslucent(false)
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_reset_password)
+        viewBinding.viewModel = viewModel
 
+        email = intent.getStringExtra("email")!!
 
-        binding.submit.setOnClickListener {
-            if(binding?.newPass?.text?.trim()?.isEmpty()!!){
-                Toast.makeText(this@ResetPasswordActivity,"Enter New Password", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+        viewModel.statusMessage.observe(this) { it ->
+            it.getContentIfNotHandled()?.let {
+                showToast(it)
             }
-
-            if(binding?.rePass?.text?.trim()!!?.isEmpty()!!){
-                Toast.makeText(this@ResetPasswordActivity,"Re-Enter New Password", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (binding?.rePass?.text?.trim() != binding?.newPass?.text?.trim()){
-                Toast.makeText(this@ResetPasswordActivity,"New Password and Re-Enter Password is not match", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            var newPass = Utils.md5(binding?.newPass?.text?.toString()?.trim())
-            var rePass = Utils.md5(binding?.rePass?.text?.toString()?.trim())
-            var resetPassword = ResetPassword(email,newPass,rePass)
-
-            viewModel.resetPassword(this@ResetPasswordActivity,resetPassword)
-
-
         }
 
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            onBackPressed()
+        viewBinding.submitMaterialButton.setOnClickListener {
+            viewModel.resetPassword(email)
+            viewModel.resetPassword.observe(this, resetPasswordObserver)
         }
 
-
-        viewModel.forgotPasswordSuccess.observe(this){
-            Toast.makeText(this@ResetPasswordActivity, it.message, Toast.LENGTH_LONG).show()
-            startActivity(Intent(this@ResetPasswordActivity, LoginActivity    ::class.java))
+        viewBinding.backImageView.setOnClickListener {
+            viewBinding.newPasswordEditText.hideKeyboard()
             finish()
         }
-        viewModel.forgotPasswordError.observe(this){
-            Toast.makeText(this@ResetPasswordActivity, it.message, Toast.LENGTH_LONG).show()
+
+        viewBinding.newPasswordEditText.showKeyboard()
+
+    }
+
+    private var resetPasswordObserver: Observer<DataState<ApiResponse>> =
+        androidx.lifecycle.Observer<DataState<ApiResponse>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateResetPasswordResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                finishAffinity()
+                                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                            }
+                        })
+                }
+            }
         }
 
-
+    private fun validateResetPasswordResponse(response: ApiResponse) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            showToast(response.message)
+            finishAffinity()
+            startActivity(Intent(this, LoginActivity::class.java))
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
     }
-
-    override fun createViewModel(): ForgotPasswordViewModel {
-        return ViewModelProvider(this).get(ForgotPasswordViewModel::class.java)
-    }
-
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityResetPasswordBinding {
-        return ActivityResetPasswordBinding.inflate(layoutInflater!!)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
-    }
-
 
 }

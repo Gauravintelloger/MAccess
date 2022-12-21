@@ -16,7 +16,7 @@ class LeaveAdapter(var context: Context) : RecyclerView.Adapter<LeaveAdapter.Lea
     private var dataList = ArrayList<LeaveDataItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaveViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.leave_type_holder, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_leave_type, parent, false)
         return LeaveViewHolder(view)
     }
 

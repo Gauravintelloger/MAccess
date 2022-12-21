@@ -42,6 +42,7 @@ class HomeFragment : Fragment(), OnLikeClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().setStatusBarTranslucent(true)
         SessionManager.init(requireContext())
         viewBinding = FragmentHomeBinding.inflate(inflater, container, false)
         setUpListeners()
@@ -59,7 +60,6 @@ class HomeFragment : Fragment(), OnLikeClickListener {
         androidx.lifecycle.Observer {
             when (it) {
                 is DataState.Loading -> {
-                    viewBinding.errorLayout.root.hide()
                     viewBinding.recyclerView.hide()
                     viewBinding.progressBar.show()
                 }
@@ -70,12 +70,19 @@ class HomeFragment : Fragment(), OnLikeClickListener {
                 is DataState.Error -> {
                     viewBinding.recyclerView.hide()
                     viewBinding.progressBar.hide()
-                    viewBinding.apply {
-                        viewBinding.errorLayout.errorText.text = "No Data Found"
-                        viewBinding.errorLayout.root.show()
-                        viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
-                    }
                     requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    viewBinding.recyclerView.hide()
+                    viewBinding.progressBar.hide()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
                 }
             }
         }
@@ -84,29 +91,16 @@ class HomeFragment : Fragment(), OnLikeClickListener {
         if (activity != null && isAdded) {
             if (response.status == Constants.API_RESPONSE_CODE.OK) {
                 if (response.data != null && response.data.isNotEmpty()) {
-                    viewBinding.errorLayout.root.hide()
                     viewBinding.recyclerView.show()
                     homeAdapter.updateList(response.data)
                 } else {
                     homeAdapter.updateList(Collections.emptyList())
 
-                    viewBinding.errorLayout.errorText.text = "No Data Found"
-                    viewBinding.errorLayout.root.show()
-                    viewBinding.errorLayout.errorLottieAnimationView.playAnimation()
                 }
 
 
-            } else if (response.status == Constants.API_RESPONSE_CODE.NOT_OK && response.statuscode == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ),
-                    object : CustomDialog.OnClickListener {
-                        override fun okButtonClicked() {
-                            (activity as? HomeActivity?)?.logoutUser()
-                        }
-                    })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(response.message)
+                CustomDialog(requireActivity()).showInformationDialog(response.message)
             }
 
         }
@@ -213,12 +207,10 @@ class HomeFragment : Fragment(), OnLikeClickListener {
     private fun performTimerLogic() {
         if (SessionManager.timing.isNullOrEmpty()) {
             viewBinding.timeLayout.hide()
-            viewBinding.view.hide()
             return
         }
 
         viewBinding.timeLayout.show()
-        viewBinding.view.show()
 
         if (SessionManager.isBreakOut == true) {
             viewBinding.timer.text = SessionManager.hours
@@ -262,8 +254,9 @@ class HomeFragment : Fragment(), OnLikeClickListener {
                             SessionManager.isBreakOut = false
                             SessionManager.isBreakStarted = false
                             SessionManager.isTimerRunning = false
-                            viewBinding.timeLayout.hide()
-                            viewBinding.view.hide()
+                            runOnUiThread {
+                                viewBinding.timeLayout.hide()
+                            }
                         }
 
                         runOnUiThread {
@@ -313,6 +306,17 @@ class HomeFragment : Fragment(), OnLikeClickListener {
                     requireContext().dismissProgress()
                     requireContext().showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
             }
         }
 
@@ -331,17 +335,8 @@ class HomeFragment : Fragment(), OnLikeClickListener {
                 homeAdapter.notifyItemChanged(likePosition)
 
 
-            } else if (body.status == Constants.API_RESPONSE_CODE.NOT_OK && body.code == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED) {
-                CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
-                    R.string.tokenExpiredDesc
-                ),
-                    object : CustomDialog.OnClickListener {
-                        override fun okButtonClicked() {
-                            (activity as? HomeActivity?)?.logoutUser()
-                        }
-                    })
             } else {
-                CustomDialog(requireContext()).showInformationDialog(body.message)
+                CustomDialog(requireActivity()).showInformationDialog(body.message)
             }
 
         }

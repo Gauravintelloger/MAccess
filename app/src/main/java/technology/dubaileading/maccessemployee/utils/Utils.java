@@ -354,7 +354,6 @@ public class Utils {
     public static String md5(final String s) {
         final String MD5 = "MD5";
         try {
-            // Create MD5 Hash
             MessageDigest digest = MessageDigest
                     .getInstance(MD5);
             digest.update(s.getBytes());

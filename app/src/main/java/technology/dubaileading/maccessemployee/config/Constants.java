@@ -15,7 +15,7 @@ public class Constants {
     public @interface API_RESPONSE_CODE {
         String OK = "ok";
         String NOT_OK = "notok";
-        String TOKEN_EXPIRED = "500";
+        int TOKEN_EXPIRED = 401;
     }
 
 

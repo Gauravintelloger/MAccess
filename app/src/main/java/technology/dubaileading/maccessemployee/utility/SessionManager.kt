@@ -102,8 +102,7 @@ object SessionManager {
         prefs.edit().clear().apply()
     }
 
-     fun deleteAllUserInfo()
-    {
+     fun deleteAllUserInfo() {
         prefs.edit().clear().commit()
     }
 

@@ -13,9 +13,8 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.rest.entity.LeaveRequestsItem
 
 
-class LeaveRequestsAdapter(val context: Context,val onClickListener: leaveClickListener) : RecyclerView.Adapter<LeaveRequestsAdapter.RequestsViewHolder>() {
+class LeaveRequestsAdapter(val context: Context,val onClickListener: LeaveClickListener, var leaveRequests: List<LeaveRequestsItem?>) : RecyclerView.Adapter<LeaveRequestsAdapter.RequestsViewHolder>() {
 
-    private var leaveRequests = ArrayList<LeaveRequestsItem>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -31,38 +30,42 @@ class LeaveRequestsAdapter(val context: Context,val onClickListener: leaveClickL
         holder: RequestsViewHolder,
         position: Int
     ) {
-        holder.request_type.text = leaveRequests[position].description
-        holder.metadata.text = leaveRequests[position].leaveType?.title
-        holder.days.text = leaveRequests[position].days.toString()+" Days"
-        holder.from_to.text = leaveRequests[position].fromDate +"  -  "+ leaveRequests[position].toDate
-        holder.request_on.text = leaveRequests[position].createdAt
-        holder.status.text = leaveRequests[position].status
-        //holder.ref_number.text = leaveRequests[position].reference_number
+            holder.request_type.text = leaveRequests[position]?.description
+            holder.metadata.text = leaveRequests[position]?.leaveType?.title
+            holder.days.text = leaveRequests[position]?.days.toString() + " Days"
+            holder.from_to.text =
+                leaveRequests[position]?.fromDate + "  -  " + leaveRequests[position]?.toDate
+            holder.request_on.text = leaveRequests[position]?.createdAt
+            holder.status.text = leaveRequests[position]?.status
+            //holder.ref_number.text = leaveRequests[position].reference_number
 
 
-        if (leaveRequests[position].status.equals("pending")){
-            holder.status.background = ContextCompat.getDrawable(context,R.drawable.pending_bg)
-            holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
-            holder.delete.visibility = View.VISIBLE
-            //holder.edit.visibility = View.VISIBLE
-        } else if (leaveRequests[position].status.equals("approved")){
-            holder.status.background = ContextCompat.getDrawable(context,R.drawable.approved_bg)
-            holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
-            holder.delete.visibility = View.GONE
-            //holder.edit.visibility = View.GONE
-        } else if (leaveRequests[position].status.equals("rejected")){
-            holder.status.background = ContextCompat.getDrawable(context,R.drawable.declined_bg)
-            holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
-            holder.delete.visibility = View.GONE
-            //holder.edit.visibility = View.GONE
-        }
+            if (leaveRequests[position]?.status.equals("pending")) {
+                holder.status.background = ContextCompat.getDrawable(context, R.drawable.pending_bg)
+                holder.status.setTextColor(context.resources.getColor(R.color.text_color_yellow))
+                holder.delete.visibility = View.VISIBLE
+                //holder.edit.visibility = View.VISIBLE
+            } else if (leaveRequests[position]?.status.equals("approved")) {
+                holder.status.background =
+                    ContextCompat.getDrawable(context, R.drawable.approved_bg)
+                holder.status.setTextColor(context.resources.getColor(R.color.text_color_green))
+                holder.delete.visibility = View.GONE
+                //holder.edit.visibility = View.GONE
+            } else if (leaveRequests[position]?.status.equals("rejected")) {
+                holder.status.background =
+                    ContextCompat.getDrawable(context, R.drawable.declined_bg)
+                holder.status.setTextColor(context.resources.getColor(R.color.text_color_red))
+                holder.delete.visibility = View.GONE
+                //holder.edit.visibility = View.GONE
+            }
 
-        holder.delete.setOnClickListener {
-            onClickListener.onClick(leaveRequests[position].id!!)
-        }
 
-        holder.edit.setOnClickListener {
-            onClickListener.updateLeaveRequest(leaveRequests[position])
+            holder.delete.setOnClickListener {
+                onClickListener.onDeleteClicked(leaveRequests[position]?.id!!)
+            }
+
+            holder.edit.setOnClickListener {
+                onClickListener.updateLeaveRequest(leaveRequests[position]!!)
         }
 
     }
@@ -71,9 +74,8 @@ class LeaveRequestsAdapter(val context: Context,val onClickListener: leaveClickL
         return leaveRequests.size;
     }
 
-    fun setData(leaveRequestsData: ArrayList<LeaveRequestsItem>) {
-        leaveRequests.clear()
-        leaveRequests?.addAll(leaveRequestsData)
+    fun setData(leaveRequests: List<LeaveRequestsItem?>) {
+        this.leaveRequests = leaveRequests
         notifyDataSetChanged()
     }
 

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -40,6 +41,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SessionManager.init(this)
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
         val intentFilter = IntentFilter("IntentFilterAction")
@@ -54,6 +56,7 @@ class HomeActivity : AppCompatActivity() {
         setCountColor()
         setUpListeners()
         loadNotificationCountFromRemote()
+
 
     }
 
@@ -142,13 +145,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setCountColor() {
-        count =
-            viewBinding.bottomNavigationViewInclude.bottomNavigationView.getOrCreateBadge(R.id.notifications)
+        count = viewBinding.bottomNavigationViewInclude.bottomNavigationView.getOrCreateBadge(R.id.notifications)
         count.backgroundColor = Color.RED
         count.badgeTextColor = Color.WHITE
     }
 
-    private fun loadNotificationCountFromRemote() {
+    fun loadNotificationCountFromRemote() {
         viewModel.notificationCount()
         viewModel.notificationCount.observe(this, notificationCountObserver)
     }
@@ -162,6 +164,8 @@ class HomeActivity : AppCompatActivity() {
                     validateNotificationCount(it.item)
                 }
                 is DataState.Error -> {
+                }
+                is DataState.TokenExpired -> {
                 }
             }
         }
@@ -183,6 +187,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     fun logoutUser() {
+        SessionManager.deleteAllUserInfo()
         startActivity(Intent(applicationContext, LoginActivity::class.java))
         finish()
         showToast("Logged out Successfully")

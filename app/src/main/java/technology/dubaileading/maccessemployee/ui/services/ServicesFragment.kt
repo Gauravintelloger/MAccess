@@ -2,60 +2,62 @@ package technology.dubaileading.maccessemployee.ui.services
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import technology.dubaileading.maccessemployee.base.BaseFragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import technology.dubaileading.maccessemployee.databinding.FragmentServicesBinding
+import technology.dubaileading.maccessemployee.utility.setStatusBarTranslucent
 
-class ServicesFragment : BaseFragment<FragmentServicesBinding, ServicesViewModel>() {
+class ServicesFragment : Fragment() {
 
+    private val viewModel by viewModels<ServicesViewModel>()
+    private lateinit var viewBinding: FragmentServicesBinding
 
-    override fun createViewModel(): ServicesViewModel {
-        return ViewModelProvider(this).get(ServicesViewModel::class.java)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        requireActivity().setStatusBarTranslucent(true)
+        viewBinding = FragmentServicesBinding.inflate(inflater, container, false)
+        return viewBinding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Banking"))
+        viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Insurance"))
 
 
-    override fun createViewBinding(layoutInflater: LayoutInflater?): FragmentServicesBinding {
-        return FragmentServicesBinding.inflate(layoutInflater!!);
+        val servicesFragmentAdapter = ServicesFragmentAdapter(
+            childFragmentManager,
+            lifecycle
+        )
+
+        servicesFragmentAdapter.addFragment(BankingFragment())
+        servicesFragmentAdapter.addFragment(BankingFragment())
+        viewBinding.viewPager.adapter = servicesFragmentAdapter
+
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        binding?.materialToolbar?.setOnClickListener {
-            activity?.onBackPressed()
+    class ServicesFragmentAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
+        FragmentStateAdapter(fragmentManager, lifecycle) {
+        private val fragmentList: ArrayList<Fragment> = ArrayList()
+        override fun createFragment(position: Int): Fragment {
+            return fragmentList[position]
         }
 
-        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Banking"))
-        binding?.tabLay?.addTab(binding?.tabLay?.newTab()!!.setText("Insurance"))
+        fun addFragment(fragment: Fragment) {
+            fragmentList.add(fragment)
+        }
 
-
-        val fragmentManager: FragmentManager = activity?.supportFragmentManager !!
-        binding?.viewPager?.adapter = ServicesFragmentAdapter(fragmentManager,lifecycle)
-
-        binding?.tabLay?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                binding?.viewPager?.currentItem = tab!!.position
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-
-            }
-        })
-        binding?.viewPager?.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                binding?.tabLay?.selectTab( binding?.tabLay?.getTabAt(position))
-
-            }
-        })
-
+        override fun getItemCount(): Int {
+            return fragmentList.size
+        }
     }
+
 
 }

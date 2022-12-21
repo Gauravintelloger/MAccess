@@ -27,12 +27,13 @@
             android:layout_width="match_parent"
             android:background="@color/white"
             android:layout_height="match_parent">
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:indeterminateTint="@color/al_Color"
-            android:layout_gravity="center"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/al_Color" />
         </RelativeLayout>
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolBar"
@@ -40,6 +41,7 @@
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/ic_back"
             app:title="Time Clock"
+            android:fitsSystemWindows="true"
             app:titleCentered="true"
             app:titleTextAppearance="@style/tittle" />
         <androidx.appcompat.widget.AppCompatTextView

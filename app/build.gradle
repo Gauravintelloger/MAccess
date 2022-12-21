@@ -34,7 +34,7 @@ android {
         targetSdk 33
         versionCode 20
 
-        versionName "2.0.20"
+        versionName "2.0.22"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,12 +42,13 @@ android {
     buildTypes {
         debug {
             debuggable true
-            ext.enableCrashlytics = false
+            manifestPlaceholders = [crashlytics:"false"]
             buildConfigField 'Boolean', 'enableCrashlytics', 'false'
         }
         release {
             crunchPngs false
             minifyEnabled false
+            manifestPlaceholders = [crashlytics:"true"]
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -118,14 +119,14 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation 'com.google.android.libraries.places:places:2.7.0'
+    implementation 'com.google.android.libraries.places:places:3.0.0'
 
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
 
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-messaging:23.1.0'
+    implementation 'com.google.firebase:firebase-messaging:23.1.1'
 
     implementation 'com.github.bumptech.glide:glide:4.13.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'

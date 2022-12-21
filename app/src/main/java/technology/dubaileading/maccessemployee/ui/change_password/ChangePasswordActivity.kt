@@ -1,91 +1,129 @@
 package technology.dubaileading.maccessemployee.ui.change_password
 
 
+import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
-import technology.dubaileading.maccessemployee.base.BaseActivity
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityChangePasswordBinding
-import technology.dubaileading.maccessemployee.rest.entity.PasswordRequest
+import technology.dubaileading.maccessemployee.rest.entity.ChangePassword
 import technology.dubaileading.maccessemployee.ui.HomeActivity
-import technology.dubaileading.maccessemployee.utils.Utils
+import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordViewModel
+import technology.dubaileading.maccessemployee.ui.login.LoginActivity
+import technology.dubaileading.maccessemployee.utility.*
+import technology.dubaileading.maccessemployee.utils.CustomDialog
 
-
-class ChangePasswordActivity: BaseActivity<ActivityChangePasswordBinding, ChangePasswordViewModel>(){
+@AndroidEntryPoint
+class ChangePasswordActivity : AppCompatActivity() {
+    private val viewModel: ForgotPasswordViewModel by viewModels()
+    private lateinit var viewBinding: ActivityChangePasswordBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        backGroundColor()
-        binding?.materialToolbar?.setNavigationOnClickListener {
-            onBackPressed()
+        setStatusBarTranslucent(false)
+        viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_change_password)
+        viewBinding.viewModel = viewModel
+
+        viewModel.statusMessage.observe(this@ChangePasswordActivity) { it ->
+            it.getContentIfNotHandled()?.let {
+                if (it.contains("Enter Old Password", true)) {
+                    viewBinding.oldPasswordTextInputLayout.error = it
+                    if (viewBinding.passwordTextInputLayout.isErrorEnabled) {
+                        viewBinding.passwordTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.confirmPasswordTextInputLayout.isErrorEnabled) {
+                        viewBinding.confirmPasswordTextInputLayout.isErrorEnabled = false
+                    }
+                } else if (it.contains("Enter New Password", true)) {
+                    viewBinding.passwordTextInputLayout.error = it
+                    if (viewBinding.oldPasswordTextInputLayout.isErrorEnabled) {
+                        viewBinding.oldPasswordTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.confirmPasswordTextInputLayout.isErrorEnabled) {
+                        viewBinding.confirmPasswordTextInputLayout.isErrorEnabled = false
+                    }
+
+                } else if (it.contains("Re-Enter New Password", true)) {
+                    viewBinding.confirmPasswordTextInputLayout.error = it
+                    if (viewBinding.oldPasswordTextInputLayout.isErrorEnabled) {
+                        viewBinding.oldPasswordTextInputLayout.isErrorEnabled = false
+                    }
+                    if (viewBinding.passwordTextInputLayout.isErrorEnabled) {
+                        viewBinding.passwordTextInputLayout.isErrorEnabled = false
+                    }
+
+                } else {
+                    viewBinding.oldPasswordTextInputLayout.isErrorEnabled = false
+                    viewBinding.passwordTextInputLayout.isErrorEnabled = false
+                    viewBinding.confirmPasswordTextInputLayout.isErrorEnabled = false
+                    showToast(it)
+                }
+
+            }
         }
 
-        binding?.submit?.setOnClickListener {
-            var oldPassword = binding?.oldPass?.text?.trim()
-            var newPassword = binding?.newPass?.text?.trim()
-            var rePassword = binding?.rePass?.text?.trim()
-            if(oldPassword!!.isEmpty()){
-                Toast.makeText(this@ChangePasswordActivity,"Enter Old Password", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
+        viewBinding.backImageView.setOnClickListener {
+            this.currentFocus?.let { view ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
             }
-            if(newPassword!!.isEmpty()){
-                Toast.makeText(this@ChangePasswordActivity,"Enter New Password", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if(rePassword!!.isEmpty()){
-                Toast.makeText(this@ChangePasswordActivity,"Re-Enter New Password", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (newPassword != rePassword){
-                Toast.makeText(this@ChangePasswordActivity,"New Password and Re-Enter Password is not match", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-
-            var oldPass = Utils.md5(binding?.oldPass?.text?.toString()?.trim())
-            var newPass = Utils.md5(binding?.newPass?.text?.toString()?.trim())
-            var rePass = Utils.md5(binding?.rePass?.text?.toString()?.trim())
-            var passwordRequest = PasswordRequest(oldPass,newPass,rePass)
-
-            viewModel.changePassword(this,passwordRequest)
-
-
-        }
-
-        viewModel.changePasswordSuccess.observe(this){
-            Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
-            startActivity(Intent(this@ChangePasswordActivity, HomeActivity::class.java))
             finish()
         }
 
-        viewModel.error.observe(this){
-            Toast.makeText(this@ChangePasswordActivity,it.message,Toast.LENGTH_LONG).show()
+        viewBinding.oldPasswordTextInputEditText.showKeyboard()
+
+        viewBinding.submitMaterialButton.setOnClickListener {
+            this.currentFocus?.let { view ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
+            }
+            viewModel.changePassword()
+            viewModel.changePassword.observe(this, changePasswordObserver)
+        }
+    }
+
+    private var changePasswordObserver: Observer<DataState<ChangePassword>> =
+        androidx.lifecycle.Observer<DataState<ChangePassword>> {
+            when (it) {
+                is DataState.Loading -> {
+                    showProgress()
+                }
+                is DataState.Success -> {
+                    dismissProgress()
+                    validateChangePasswordResponse(it.item)
+                }
+                is DataState.Error -> {
+                    dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                finishAffinity()
+                                startActivity(Intent(applicationContext, LoginActivity::class.java))
+                            }
+                        })
+                }
+            }
         }
 
-    }
-
-    override fun createViewModel(): ChangePasswordViewModel {
-        return ViewModelProvider(this).get(ChangePasswordViewModel::class.java)
-    }
-
-    override fun createViewBinding(layoutInflater: LayoutInflater): ActivityChangePasswordBinding {
-        return ActivityChangePasswordBinding.inflate(layoutInflater!!)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun backGroundColor() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        window.setBackgroundDrawableResource(R.drawable.statusbar_color)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.white)
+    private fun validateChangePasswordResponse(response: ChangePassword) {
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            showToast(response.message)
+            finishAffinity()
+            startActivity(Intent(this, HomeActivity::class.java))
+        } else {
+            CustomDialog(this).showInformationDialog(response.message)
+        }
     }
 }

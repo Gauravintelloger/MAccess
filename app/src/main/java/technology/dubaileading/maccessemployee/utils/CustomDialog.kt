@@ -11,7 +11,7 @@ class CustomDialog(
     /**
      * Context of calling activity
      */
-    private val context: Context
+    private val context: Activity
 ) {
     /**
      * Shows A Cancellable Error Dialog

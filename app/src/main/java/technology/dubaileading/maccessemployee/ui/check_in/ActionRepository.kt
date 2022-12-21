@@ -2,8 +2,10 @@ package technology.dubaileading.maccessemployee.ui.check_in
 
 
 import android.util.Log
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.di.ErrorHandler
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.*
@@ -19,12 +21,18 @@ class ActionRepository @Inject constructor(
         try {
             if (networkHelper.isNetworkConnected()) {
                 val response = retrofit.checkIN(checkInRequest)
+//                println("Checkin request = ${Gson().toJson(checkInRequest)}")
+//                println("response checkin= ${Gson().toJson(response)}")
+
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
                 } else {
-                    Log.d("RetrofitOnSuccessError", response.message()+response.body())
-                    emit(DataState.Error(response.message()))
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
                 }
             } else {
                 emit(DataState.Error("No Internet Connection"))
@@ -40,12 +48,16 @@ class ActionRepository @Inject constructor(
         try {
             if (networkHelper.isNetworkConnected()) {
                 val response = retrofit.breakIN(breakInRequest)
+
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
                 } else {
-                    Log.d("RetrofitOnSuccessError", response.message()+response.body())
-                    emit(DataState.Error(response.message()))
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
                 }
             } else {
                 emit(DataState.Error("No Internet Connection"))
@@ -64,9 +76,12 @@ class ActionRepository @Inject constructor(
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
-                } else {
-                    Log.d("RetrofitOnSuccessError", response.message()+response.body())
-                    emit(DataState.Error(response.message()))
+                } else{
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
                 }
             } else {
                 emit(DataState.Error("No Internet Connection"))
@@ -86,8 +101,11 @@ class ActionRepository @Inject constructor(
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))
                 } else {
-                    Log.d("RetrofitOnSuccessError", response.message()+response.body())
-                    emit(DataState.Error(response.message()))
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
                 }
             } else {
                 emit(DataState.Error("No Internet Connection"))

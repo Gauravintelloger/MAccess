@@ -19,7 +19,6 @@ import technology.dubaileading.maccessemployee.rest.entity.TokenRequest
 import technology.dubaileading.maccessemployee.ui.forgot_password.ForgotPasswordActivity
 import technology.dubaileading.maccessemployee.ui.splash.SplashOrganisationActivity
 import technology.dubaileading.maccessemployee.utility.*
-import technology.dubaileading.maccessemployee.utils.AppShared
 import technology.dubaileading.maccessemployee.utils.CustomDialog
 import technology.dubaileading.maccessemployee.utils.Utils
 
@@ -89,6 +88,9 @@ class LoginActivity : AppCompatActivity() {
                     dismissProgress()
                     showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+
+                }
             }
         }
 
@@ -106,23 +108,38 @@ class LoginActivity : AppCompatActivity() {
                     dismissProgress()
                     showToast(it.error.toString())
                 }
+                is DataState.TokenExpired -> {
+                    dismissProgress()
+                    CustomDialog(this).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                logoutUser()
+                            }
+                        })
+                }
             }
         }
-
+    fun logoutUser() {
+        SessionManager.deleteAllUserInfo()
+        startActivity(Intent(applicationContext, LoginActivity::class.java))
+        finish()
+        showToast("Logged out Successfully")
+    }
     private fun validateLoginResponse(response: LoginResponse) {
 
         if (response.status == Constants.API_RESPONSE_CODE.OK) {
             SessionManager.user = response.data
             SessionManager.token = response.token
-            AppShared(this).saveToken(response.token!!)
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    return@OnCompleteListener
+                    CustomDialog(this).showInformationDialog("Unable to get FCM token")
+                }else{
+                    viewModel.saveFcmToken(TokenRequest(task.result, "android"))
+                    viewModel.saveToken.observe(this, saveFcmTokenObserver)
                 }
-                viewModel.saveFcmToken(TokenRequest(task.result, "android"))
-                viewModel.saveToken.observe(this, saveFcmTokenObserver)
-
             })
 
         } else {
@@ -139,6 +156,12 @@ class LoginActivity : AppCompatActivity() {
         } else {
             CustomDialog(this).showInformationDialog(response.message)
         }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewBinding.userNameTextInputEditText.showKeyboard()
 
     }
 }
