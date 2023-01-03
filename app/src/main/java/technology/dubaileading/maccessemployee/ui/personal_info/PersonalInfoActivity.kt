@@ -54,7 +54,7 @@ class PersonalInfoActivity : AppCompatActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
-
+        datePicker.datePicker.maxDate = System.currentTimeMillis()
 
         viewBinding.dateOfBirthEditText.setOnClickListener {
             viewBinding.dateOfBirthEditText.hideKeyboard()

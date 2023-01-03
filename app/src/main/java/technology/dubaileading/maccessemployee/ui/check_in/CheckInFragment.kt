@@ -115,7 +115,7 @@ class CheckInFragment :
                 locationUpdatesReceived++
                 if (locationHelper != null && lastLocation != null && ((lastLocation!!.hasAccuracy() && lastLocation!!.accuracy <= 100)) || locationUpdatesReceived > 3) {
                     stopLocationUpdates()
-                    locationUpdatesReceived = 0;
+                    locationUpdatesReceived = 0
                     latitude = lastLocation!!.latitude
                     longitude = lastLocation!!.longitude
                     addressLine = getStreetName(latitude, longitude)
