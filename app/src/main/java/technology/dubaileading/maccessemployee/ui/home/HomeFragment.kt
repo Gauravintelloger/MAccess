@@ -115,7 +115,7 @@ class HomeFragment : Fragment(), OnLikeClickListener {
     }
 
     private fun setupData() {
-        viewBinding.username.text = SessionManager.user?.username
+        viewBinding.username.text = SessionManager.user?.name
         if (SessionManager.user?.photo != null) {
             loadLogo(SessionManager.user?.photo)
         } else {
