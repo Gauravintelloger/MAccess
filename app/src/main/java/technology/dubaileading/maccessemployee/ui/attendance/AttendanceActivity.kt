@@ -70,9 +70,9 @@ class AttendanceActivity : AppCompatActivity() {
     }
 
     private fun getAttendanceReportFromRemote() {
-        viewModel.attendanceReports(
+         viewModel.attendanceReports(
             ReportRequest(
-                viewBinding.fromDate.text.toString(),
+               viewBinding.fromDate.text.toString(),
                 viewBinding.toDate.text.toString()
             )
         )

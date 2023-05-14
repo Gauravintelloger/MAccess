@@ -6,6 +6,7 @@ import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.HiltAndroidApp
+import technology.dubaileading.maccessemployee.ui.applyjobform.Questiondetail
 
 @HiltAndroidApp
 class BaseApplication : Application(), ActivityLifecycleCallbacks {
@@ -50,5 +51,16 @@ class BaseApplication : Application(), ActivityLifecycleCallbacks {
         lateinit var instance: BaseApplication
             private set
         private var currentActivity: Activity? = null
+    }
+
+    object QuestionObj{
+        var postcodeList=ArrayList<Questiondetail>()
+        var selectedquestionid=ArrayList<Int>()
+        var detailid:String?=""
+    }
+
+    object Jobfilter{
+        var departmentid:String=""
+        var designationid:String=""
     }
 }

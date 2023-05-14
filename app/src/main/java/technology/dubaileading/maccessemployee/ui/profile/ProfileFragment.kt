@@ -2,6 +2,7 @@ package technology.dubaileading.maccessemployee.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,9 @@ import technology.dubaileading.maccessemployee.rest.entity.Profile
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessemployee.ui.change_password.ChangePasswordActivity
+import technology.dubaileading.maccessemployee.ui.interviewround.Interviewroundlist
+import technology.dubaileading.maccessemployee.ui.jobpost.Jobpost
+import technology.dubaileading.maccessemployee.ui.manager.Managerjobpostlist
 import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
 import technology.dubaileading.maccessemployee.ui.settings.SettingsActivity
 import technology.dubaileading.maccessemployee.utility.*
@@ -60,6 +64,8 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+
+
 
     private var leavesObserver: Observer<DataState<GetLeave>> =
         androidx.lifecycle.Observer<DataState<GetLeave>> {
@@ -128,6 +134,22 @@ class ProfileFragment : Fragment() {
     ): View {
         viewBinding = FragmentProfileBinding.inflate(inflater, container, false)
         SessionManager.init(requireContext())
+
+        if (SessionManager.managertype.toString()=="1")
+        {
+            viewBinding.managerjobpost.visibility=View.VISIBLE
+            viewBinding.interviewroundlist.visibility=View.VISIBLE
+        }
+        else
+        {
+            viewBinding.managerjobpost.visibility=View.GONE
+            viewBinding.interviewroundlist.visibility=View.GONE
+        }
+
+
+
+
+        Log.e("managertype",SessionManager.managertype.toString())
         initLeaveRecyclerAdapter()
         getProfileFromRemote()
         getLeavesFromRemote()
@@ -163,6 +185,20 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setUpListeners() {
+
+        //
+
+        viewBinding.interviewroundlist.setOnClickListener {
+            startActivity(Intent(activity, Interviewroundlist::class.java))
+        }
+        viewBinding.jobpost.setOnClickListener {
+            startActivity(Intent(activity, Jobpost::class.java))
+        }
+        viewBinding.managerjobpost.setOnClickListener {
+            startActivity(Intent(activity, Managerjobpostlist::class.java))
+        }
+
+        ////
         viewBinding.personalInfo.setOnClickListener {
             startActivity(Intent(activity, PersonalInfoActivity::class.java))
         }

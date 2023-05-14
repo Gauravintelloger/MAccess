@@ -31,6 +31,9 @@ data class UserDetails(
 	@field:SerializedName("organisation")
 	val organisation: String? = null,
 
+	@field:SerializedName("is_manager")
+	val manager: Int? = null,
+
 	@field:SerializedName("organisation_logo")
 	val organisationLogo: String? = null,
 
@@ -39,5 +42,8 @@ data class UserDetails(
 
 	@field:SerializedName("username")
 	val username: String? = null,
+
+	@field:SerializedName("encrypt_org_id")
+	val encryptorgid: String? = null,
 
 )

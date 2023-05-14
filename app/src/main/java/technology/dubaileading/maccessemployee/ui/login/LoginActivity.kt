@@ -2,6 +2,7 @@ package technology.dubaileading.maccessemployee.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -132,6 +133,10 @@ class LoginActivity : AppCompatActivity() {
         if (response.status == Constants.API_RESPONSE_CODE.OK) {
             SessionManager.user = response.data
             SessionManager.token = response.token
+            SessionManager.encryptedorgid=response.data?.encryptorgid
+            SessionManager.managertype=response.data?.manager!!
+            Log.e("encryptedtoken", response.data?.encryptorgid.toString())
+
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {

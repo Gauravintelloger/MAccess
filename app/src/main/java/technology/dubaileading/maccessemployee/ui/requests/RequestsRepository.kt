@@ -2,6 +2,9 @@ package technology.dubaileading.maccessemployee.ui.requests
 
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,6 +17,17 @@ import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.di.ErrorHandler
 import technology.dubaileading.maccessemployee.rest.endpoints.EmployeeEndpoint
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.rest.entity.branchlistmodel.Branchlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.departmentlistmodel.Depalrtmentlistresponse
+import technology.dubaileading.maccessemployee.rest.entity.designationlist.Designationlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.interviewroundlistmodel.Interviewroundlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.jobcompanymodel.Jobcomapanymodel
+import technology.dubaileading.maccessemployee.rest.entity.jobpostlistresponse.DataXX
+import technology.dubaileading.maccessemployee.rest.entity.managerjobpostrequestlist.Data
+import technology.dubaileading.maccessemployee.rest.entity.managerjobpostrequestlist.DataX
+import technology.dubaileading.maccessemployee.ui.interviewround.InterviewJobPostAppPagingSource
+import technology.dubaileading.maccessemployee.ui.jobpost.JobPostAppPagingSource
+import technology.dubaileading.maccessemployee.ui.manager.ManagerJobPostAppPagingSource
 import technology.dubaileading.maccessemployee.utility.DataState
 import technology.dubaileading.maccessemployee.utility.NetworkHelper
 import java.io.File
@@ -409,4 +423,166 @@ class RequestsRepository @Inject constructor(
             emit(DataState.Error(ErrorHandler.onError(e)))
         }
     }
+
+
+
+    fun joblist(orgid:String, departmentid:String, designationid:String,categoryid:String,status:String): Flow<PagingData<DataXX>> {
+        return  Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 2),
+            pagingSourceFactory = { JobPostAppPagingSource(retrofit, orgid,departmentid,designationid,categoryid,status) }
+        ).flow
+    }
+
+
+    fun managerjoblist(departmentid:String, designationid:String,categoryid:String,status:String): Flow<PagingData<DataX>> {
+        return  Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 2),
+            pagingSourceFactory = { ManagerJobPostAppPagingSource(retrofit, departmentid,designationid,categoryid,status) }
+        ).flow
+    }
+
+
+
+//    fun interviewlist(jobapplicationid:String, interviewstatus:String,interviewdate:String,interviewtype:String):
+//            Flow<PagingData<DataX>> {
+//        return  Pager(
+//            config = PagingConfig(pageSize = 10, prefetchDistance = 2),
+//            pagingSourceFactory = { InterviewJobPostAppPagingSource(retrofit, jobapplicationid,interviewstatus,interviewdate,interviewtype ) }
+//        ).flow
+//    }
+
+    fun interviewlist(jobapplicationid:Int?, interviewstatus:Int?,interviewdate:String?,interviewtype:Int?):
+            Flow<PagingData<technology.dubaileading.maccessemployee.rest.entity.interviewroundlistmodel.DataX>>
+    {
+        return  Pager(
+            config = PagingConfig(pageSize = 1, prefetchDistance = 10),
+            pagingSourceFactory = {InterviewJobPostAppPagingSource(retrofit,jobapplicationid,interviewstatus,interviewdate,interviewtype)}
+        ).flow
+    }
+
+    suspend fun departmentlist(id:String): Flow<DataState<Depalrtmentlistresponse>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.departmentlist(id)
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
+
+    suspend fun designationlist(id:String): Flow<DataState<Designationlistmodel>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.designationlist(id)
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
+
+
+    suspend fun branchlist(): Flow<DataState<Branchlistmodel>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.getbranchlist()
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
+
+
+    suspend fun companylist(): Flow<DataState<Jobcomapanymodel>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.getcompanylist()
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
+    suspend fun interviewlistmodelnew(jobapplicationid:Int?, interviewstatus:Int?,interviewdate:String?,interviewtype:Int?): Flow<DataState<Interviewroundlistmodel>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.interviewroundlist(jobapplicationid=jobapplicationid, interviewstatus = interviewstatus, interviewdate = interviewdate, interviewtype = interviewtype, page = 1, itemperpage = 10)
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
 }

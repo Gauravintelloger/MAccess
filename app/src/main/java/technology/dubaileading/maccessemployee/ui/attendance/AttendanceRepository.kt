@@ -15,7 +15,8 @@ import javax.inject.Inject
 
 class AttendanceRepository @Inject constructor(
     val retrofit: EmployeeEndpoint, private val networkHelper: NetworkHelper
-) {
+)
+{
     suspend fun attendanceReports(request: ReportRequest): Flow<DataState<AttendenceReport>> = flow {
         emit(DataState.Loading)
         try {

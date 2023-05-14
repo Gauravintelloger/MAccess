@@ -53,5 +53,9 @@
         android:name="technology.dubaileading.maccessemployee.ui.check_out.CheckOutFragment"
         android:label="CheckOutFragment"
         tools:layout="@layout/fragment_check_out"/>
+    <fragment
+        android:id="@+id/joblistfilter"
+        android:name="technology.dubaileading.maccessemployee.ui.applyjobform.filterjoblist.Joblistfilter"
+        android:label="Joblistfilter" />
 
 </navigation>

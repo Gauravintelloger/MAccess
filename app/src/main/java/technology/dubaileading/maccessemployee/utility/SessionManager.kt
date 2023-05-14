@@ -19,6 +19,8 @@ object SessionManager {
 
     private val ATTENDANCE_INPUT="AttendanceInput"
     private val TOKEN="TOKEN"
+    private val ENCRIPTIONORGID="encryptorgid"
+    private val managerid="Managerid"
     private val USER_ID="USER_ID"
     private val DATE="date"
     private val HOURS="timing"
@@ -51,6 +53,16 @@ object SessionManager {
     var token:String?
         get()= prefs.getString(TOKEN,null)
         set(value)= prefs.edit().putString(TOKEN,value).apply()
+
+    var encryptedorgid:String?
+        get()= prefs.getString(ENCRIPTIONORGID,null)
+        set(value)= prefs.edit().putString(ENCRIPTIONORGID,value).apply()
+
+
+    var managertype:Int
+        get()= prefs.getInt(managerid,2)
+        set(value)= prefs.edit().putInt(managerid,value).apply()
+
 
     var userId:String?
         get()= prefs.getString(USER_ID,null)

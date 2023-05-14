@@ -5,6 +5,9 @@ class Constants {
         //val photoUrl : String = "https://maccess-saas-api.dubaileading.technology/images/organisation/"
         const val LEAVE_REQUEST = "leave_requests"
         const val OTHER_REQUEST = "other_requests"
+
     }
+
+
 
 }
