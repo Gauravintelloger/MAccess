@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +36,13 @@ import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.FragmentRequestsBinding
 import technology.dubaileading.maccessemployee.rest.entity.*
+import technology.dubaileading.maccessemployee.rest.entity.applycreditrequest.Applycreditresponsemodel
+import technology.dubaileading.maccessemployee.rest.entity.applycreditrequest.Newcreditrequestmodel
+import technology.dubaileading.maccessemployee.rest.entity.employeecreditbalance.Employeecreditbalancemodel
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.attendance.AttendanceReportAdapter
+import technology.dubaileading.maccessemployee.ui.profile.ProfileViewModel
+import technology.dubaileading.maccessemployee.ui.timecreaditrequest.TimecreditViewmodel
 import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.AppUtils
 import technology.dubaileading.maccessemployee.utils.CustomDialog
@@ -50,12 +57,21 @@ class RequestsFragment : Fragment() {
     private var leaveAttachmentFileTextView: TextView? = null
     private lateinit var documentRequestBottomSheetDialog: BottomSheetDialog
     private lateinit var leaveBottomSheetDialog: BottomSheetDialog
+    private lateinit var creditBottomSheetDialog: BottomSheetDialog
     private val dateFormat = "dd-MM-yyyy"
     private val viewModel by viewModels<RequestsViewModel>()
     private lateinit var viewBinding: FragmentRequestsBinding
     lateinit var requestFragmentAdapter: RequestFragmentAdapter
+    private val profileviewModel by viewModels<ProfileViewModel>()
 
+    var isAllFieldsChecked = false
+    private val timecreditViewmodel: TimecreditViewmodel by viewModels()
 
+    private lateinit var attendanceReportAdapter: AttendanceReportAdapter
+    var categoryarray: ArrayList<Int>? = null
+    var categoryspinner:Int=5
+
+    var timedurationvalue:String="0"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,8 +82,45 @@ class RequestsFragment : Fragment() {
         viewBinding = FragmentRequestsBinding.inflate(inflater, container, false)
         setupListeners()
         setUpObservers()
+
+//Log.e("requestmodule",SessionManager.requestmoduleaccess.toString())
         return viewBinding.root
     }
+
+    private var employeecreditbalanceleavesObserver: Observer<DataState<Employeecreditbalancemodel>> =
+        androidx.lifecycle.Observer<DataState<Employeecreditbalancemodel>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    try {
+                        Log.e("timeduration",it.item.data.balance.toString())
+                        if (it.item.data.balance.toString().isNullOrEmpty())
+                        {
+                            timedurationvalue="0"+"/360"
+                        }
+                        else{
+                            timedurationvalue=it.item.data.balance.toString()+"/360"
+                        }
+
+
+                    }
+                    catch (ex:Exception)
+                    {
+                        timedurationvalue="0"
+
+                    }
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                }
+            }
+        }
 
     private fun setupListeners() {
         viewBinding.newRequestTextView.setOnClickListener {
@@ -81,6 +134,9 @@ class RequestsFragment : Fragment() {
                 requireContext().showToast(it)
             }
         }
+//        profileviewModel.employeecreditbalance()
+//        profileviewModel.employeecreditbalance.observe(viewLifecycleOwner, employeecreditbalanceleavesObserver)
+
     }
 
     private fun newRequest() {
@@ -91,14 +147,52 @@ class RequestsFragment : Fragment() {
         val requestDocumentsLinearLayout: LinearLayout =
             view.findViewById(R.id.requestDocumentsLinearLayout)
 
+        val CreditRequestapply: LinearLayout = view.findViewById(R.id.CreditRequestapply)
+        if (SessionManager.username.toString()=="24" || SessionManager.username.toString()=="19")
+        {
+            CreditRequestapply.visibility=View.VISIBLE
+        }
+        else
+        {
+            CreditRequestapply.visibility=View.GONE
+        }
+
         requestLeaveLinearLayout.setOnClickListener {
             bottomSheetDialog.dismiss()
-            newLeaveRequest()
+            if(SessionManager.requestmoduleaccess.toString()=="1")
+            {
+                newLeaveRequest()
+            }
+            else
+            {
+                requireContext().showToast("New request is not allowed, please contact to administration.")
+
+            }
+
+
+        }
+
+
+        CreditRequestapply.setOnClickListener {
+//            startActivity(Intent(requireContext(), Timecreditapply::class.java))
+//            requireActivity().finish()
+            bottomSheetDialog.dismiss()
+
+            newcreditRequest()
+
         }
 
         requestDocumentsLinearLayout.setOnClickListener {
             bottomSheetDialog.dismiss()
-            newDocRequest()
+            if(SessionManager.requestmoduleaccess.toString()=="1")
+            {
+             newDocRequest()
+            }
+            else
+            {
+                requireContext().showToast("New request is not allowed, please contact to administration.")
+            }
+//
         }
         bottomSheetDialog.setContentView(view)
         bottomSheetDialog.show()
@@ -277,6 +371,160 @@ class RequestsFragment : Fragment() {
         viewModel.selectedFileLiveData?.value = path
     }
 
+
+    @SuppressLint("SetTextI18n")
+    private fun newcreditRequest() {
+        val view = layoutInflater.inflate(R.layout.fragment_make_credit_request, null)
+        creditBottomSheetDialog = BottomSheetDialog(requireContext())
+
+        val category = view.findViewById<DynamicWidthSpinner>(R.id.categoryspinner)
+        //val timeduration = view.findViewById<TextView>(R.id.timeduration)
+        val selectdate = view.findViewById<TextView>(R.id.selectdate)
+        val categoryerror = view.findViewById<TextView>(R.id.categoryerror)
+        val reason = view.findViewById<TextView>(R.id.reason)
+        val submitMaterialButton = view.findViewById<MaterialButton>(R.id.submitMaterialButton)
+
+//        timeduration.text=timedurationvalue+"/360"
+
+
+        selectdate.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker().build()
+            datePicker.show(requireActivity().supportFragmentManager, "DatePicker")
+
+            datePicker.addOnPositiveButtonClickListener {
+                val myFormat = "yyyy-MM-dd" // mention the format you need
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                selectdate.text = sdf.format(datePicker.selection)
+
+            }
+
+        }
+
+        viewModel.statusMessage.observe(requireActivity()) { it ->
+            it.getContentIfNotHandled()?.let {
+                requireActivity().showToast(it)
+            }
+        }
+
+        categoryarray= ArrayList()
+
+        for (i in 5..60 step 5)
+        {
+            categoryarray!!.add((i))
+        }
+
+        val adapter = ArrayAdapter(requireActivity(),
+            android.R.layout.simple_spinner_item, categoryarray!!)
+        category!!.adapter = adapter
+
+
+        category.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+
+                Log.e("timeee",adapter.getItem(position).toString())
+                categoryspinner= adapter.getItem(position)!!
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // write code to perform some action
+
+            }
+        }
+
+
+        submitMaterialButton.setOnClickListener {
+            categoryerror.visibility=View.GONE
+
+            if (selectdate.length()==0)
+            {
+                selectdate.setError("This field is required");
+
+            }
+            else if (reason.length()==0)
+            {
+                reason.setError("This field is required");
+
+
+            }
+
+            else
+            {
+                val newcreditrequestmodel= Newcreditrequestmodel(
+                    usageType = "early_going",
+                    reason = reason.text?.trim().toString(),
+                    creditsRequiredInMins = categoryspinner,
+                    date = selectdate.text.trim().toString()
+
+                )
+
+                timecreditViewmodel.addnewrequest(newcreditrequestmodel)
+                timecreditViewmodel.addnew.observe(requireActivity(), postsObserverapplyjob)
+
+
+            }
+
+
+        }
+
+
+
+
+
+        creditBottomSheetDialog.setContentView(view)
+        creditBottomSheetDialog.show()
+
+    }
+
+
+
+    private var postsObserverapplyjob: Observer<DataState<Applycreditresponsemodel>> =
+        androidx.lifecycle.Observer {
+            when (it) {
+                is DataState.Loading -> {
+
+
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+
+                    Log.e("applyjob",it.item.message)
+//                    validatePostsData(it.item)
+
+                    Toast.makeText(requireContext(),it.item.message,Toast.LENGTH_LONG).show()
+
+
+                    creditBottomSheetDialog.dismiss()
+                }
+                is DataState.Error -> {
+                    Toast.makeText(requireContext(),it.error.toString(),Toast.LENGTH_LONG).show()
+
+
+                    requireContext().dismissProgress()
+                }
+                is DataState.TokenExpired -> {
+
+                    requireContext().dismissProgress()
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (activity as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+
+
+
+
+
+
     @SuppressLint("SetTextI18n")
     private fun newLeaveRequest() {
         val view = layoutInflater.inflate(R.layout.leave_request, null)
@@ -287,6 +535,9 @@ class RequestsFragment : Fragment() {
         val startDateTextView = view.findViewById<TextView>(R.id.startDateTextView)
         val endDateTextView = view.findViewById<TextView>(R.id.endDateTextView)
         val leaveBalanceTextView = view.findViewById<TextView>(R.id.leaveBalanceTextView)
+        val leavefrom = view.findViewById<TextView>(R.id.leavefrom)
+        val leaveto = view.findViewById<TextView>(R.id.leaveto)
+        val openingleavebalence = view.findViewById<TextView>(R.id.openingleavebalence)
         val attachCardView = view.findViewById<MaterialCardView>(R.id.attachCardView)
         val remove = view.findViewById<ImageView>(R.id.remove)
         leaveAttachmentFileTextView = view.findViewById(R.id.attachmentFileTextView)
@@ -311,6 +562,7 @@ class RequestsFragment : Fragment() {
                 val days = daysDiff + 1
 
                 submitMaterialButton.text = "Submit($days day)"
+
             }
         }
 
@@ -355,7 +607,7 @@ class RequestsFragment : Fragment() {
             viewModel.applyLeave.observe(viewLifecycleOwner, applyLeaveObserver)
         }
 
-        loadAllLeaveTypes(leaveTypesSpinner, leaveBalanceTextView)
+        loadAllLeaveTypes(leaveTypesSpinner, leaveBalanceTextView,leavefrom,leaveto)
 
         leaveBottomSheetDialog.setContentView(view)
         leaveBottomSheetDialog.show()
@@ -443,6 +695,11 @@ class RequestsFragment : Fragment() {
             if (viewPager.currentItem == 1){
                 (requestFragmentAdapter.fragmentList[1] as? DocumentRequestFragment)?.loadAllDocumentRequestsFromRemote()
             }
+            if (viewPager.currentItem==2)
+            {
+                (requestFragmentAdapter.fragmentList[2] as? Creditrequestfragment)?.getAttendanceReportFromRemote()
+
+            }
 
         } else {
             CustomDialog(requireActivity()).showInformationDialog(response.message)
@@ -452,7 +709,9 @@ class RequestsFragment : Fragment() {
 
     private fun loadAllLeaveTypes(
         leaveTypesSpinner: DynamicWidthSpinner,
-        leaveBalanceTextView: TextView
+        leaveBalanceTextView: TextView,leavefrom:TextView,
+        leaveto:TextView
+
     ) {
         viewModel.getLeaveTypes()
         viewModel.leaveTypes.observe(
@@ -462,7 +721,7 @@ class RequestsFragment : Fragment() {
                 is DataState.Loading -> {
                 }
                 is DataState.Success -> {
-                    validateLeaveTypesData(it.item, leaveTypesSpinner, leaveBalanceTextView)
+                    validateLeaveTypesData(it.item, leaveTypesSpinner, leaveBalanceTextView,leavefrom,leaveto)
                 }
                 is DataState.Error -> {
                     requireContext().showToast(it.error.toString())
@@ -567,7 +826,9 @@ class RequestsFragment : Fragment() {
     private fun validateLeaveTypesData(
         response: LeaveTypes,
         leaveTypesSpinner: DynamicWidthSpinner,
-        leaveBalanceTextView: TextView
+        leaveBalanceTextView: TextView,
+        leavefrom: TextView,
+        leaveto: TextView
     ) {
         if (activity != null && isAdded) {
             if (response.status == Constants.API_RESPONSE_CODE.OK) {
@@ -585,13 +846,20 @@ class RequestsFragment : Fragment() {
                                     p3: Long
                                 ) {
                                     if (p2 != 0) {
+                                        leavefrom.show()
+                                        leaveto.show()
                                         viewModel.selectedLeaveType?.value =
                                             spinnerAdapter.result[p2 - 1]
-                                       leaveBalanceTextView.text  = "${spinnerAdapter.result[p2 - 1]?.shortCode} Left:${spinnerAdapter.result[p2 - 1]?.balanceLeaves} of ${spinnerAdapter.result[p2 - 1]?.noOfLeaves}"
+                                        leaveBalanceTextView.text  = "${spinnerAdapter.result[p2 - 1]?.shortCode} Left:${spinnerAdapter.result[p2 - 1]?.balanceLeaves} of ${spinnerAdapter.result[p2 - 1]?.noOfLeaves}"
+                                        leavefrom.text="From: "+"${spinnerAdapter.result[p2 - 1]?.leave_cycle_from}"
+                                        leaveto.text="To: "+"${spinnerAdapter.result[p2 - 1]?.leave_cycle_to}"
+
                                         leaveBalanceTextView.show()
                                     } else {
                                         viewModel.selectedLeaveType?.value = null
                                         leaveBalanceTextView.hide()
+                                        leavefrom.hide()
+                                        leaveto.hide()
 
                                     }
                                 }
@@ -620,6 +888,12 @@ class RequestsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Leave"))
         viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Document"))
+        if (SessionManager.username.toString()=="24" || SessionManager.username.toString()=="19")
+        {
+            viewBinding.tabLayout.addTab(viewBinding.tabLayout.newTab().setText("Credit Request"))
+        }
+
+
 
         viewBinding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -644,13 +918,14 @@ class RequestsFragment : Fragment() {
             }
         })
 
-         requestFragmentAdapter = RequestFragmentAdapter(
+        requestFragmentAdapter = RequestFragmentAdapter(
             childFragmentManager,
             lifecycle
         )
 
         requestFragmentAdapter.addFragment(LeaveRequestFragment())
         requestFragmentAdapter.addFragment(DocumentRequestFragment())
+        requestFragmentAdapter.addFragment(Creditrequestfragment())
         viewBinding.viewPager.adapter = requestFragmentAdapter
 
         viewModel.selectedFileLiveData?.observe(viewLifecycleOwner) {

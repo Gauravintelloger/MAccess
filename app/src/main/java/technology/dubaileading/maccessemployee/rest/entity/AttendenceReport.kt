@@ -14,7 +14,9 @@ data class AttendenceReport(
 	val message: String? = null,
 
 	@field:SerializedName("status")
-	val status: String? = null
+	val status: String? = null,
+
+
 )
 
 
@@ -23,6 +25,11 @@ data class AttendanceData(
 	val data: List<DataItem?>? = null,
 )
 
+
+data class projectdata(
+	@field:SerializedName("title")
+	val title: String? = null,
+)
 
 data class DataItem(
 
@@ -40,6 +47,9 @@ data class DataItem(
 
 	@field:SerializedName("date")
 	val date: String? = null,
+
+	@field:SerializedName("project")
+	val leaveData: projectdata? = null
 
 )
 

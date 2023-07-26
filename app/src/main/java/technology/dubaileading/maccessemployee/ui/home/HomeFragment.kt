@@ -1,6 +1,7 @@
 package technology.dubaileading.maccessemployee.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +36,7 @@ class HomeFragment : Fragment(), OnLikeClickListener {
     private var likePosition: Int = 0
     private var backPressed: Long = 0L
     private lateinit var viewBinding: FragmentHomeBinding
-    private val viewModel by viewModels<HomeFragmentViewModel>()
+    private val viewModel  by viewModels<HomeFragmentViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,9 +46,22 @@ class HomeFragment : Fragment(), OnLikeClickListener {
         requireActivity().setStatusBarTranslucent(true)
         SessionManager.init(requireContext())
         viewBinding = FragmentHomeBinding.inflate(inflater, container, false)
+
+
+        Log.e("postupdate",SessionManager.postupdate.toString())
+        if (SessionManager.postupdate.toString().equals("0"))
+        {
+            viewBinding.recyclerView.visibility=View.GONE
+        }
+        else
+        {
+            loadAllPostsFromRemote()
+        }
+
         setUpListeners()
         initPostsRecyclerList()
-        loadAllPostsFromRemote()
+
+        Log.e("attendencetype",SessionManager.attendenceaccess.toString())
         return viewBinding.root
     }
 
@@ -126,20 +140,29 @@ class HomeFragment : Fragment(), OnLikeClickListener {
 
     private fun setUpListeners() {
         viewBinding.timeClock.setOnClickListener {
-            if (SessionManager.timing.isNullOrEmpty()) {
-                findNavController().navigate(
-                    R.id.checkInFragment,
-                    null,
-                    getNavBuilder().build()
-                )
-            } else {
-                findNavController().navigate(
-                    R.id.checkOutFragment,
-                    null,
-                    getNavBuilder().build()
-                )
-
+            if (SessionManager.attendenceaccess.toString().equals("0"))
+            {
+                CustomDialog(requireActivity()).showInformationDialog("Attendance not allowed")
             }
+            else
+            {
+                if (SessionManager.timing.isNullOrEmpty()) {
+                    findNavController().navigate(
+                        R.id.checkInFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+                } else {
+                    findNavController().navigate(
+                        R.id.checkOutFragment,
+                        null,
+                        getNavBuilder().build()
+                    )
+
+                }
+            }
+
+
 
         }
         viewBinding.timeLayout.setOnClickListener {

@@ -15,6 +15,7 @@ import technology.dubaileading.maccessemployee.rest.entity.GetLeave
 import technology.dubaileading.maccessemployee.rest.entity.Profile
 import technology.dubaileading.maccessemployee.rest.entity.ResetPassword
 import technology.dubaileading.maccessemployee.rest.entity.UpdateProfile
+import technology.dubaileading.maccessemployee.rest.entity.employeecreditbalance.Employeecreditbalancemodel
 import technology.dubaileading.maccessemployee.utility.DataState
 import technology.dubaileading.maccessemployee.utility.Event
 import technology.dubaileading.maccessemployee.utils.Utils
@@ -28,6 +29,10 @@ class ProfileViewModel @Inject constructor(private val profileRepository: Profil
 
     private val _leaves = MutableLiveData<DataState<GetLeave>>()
     val leaves: LiveData<DataState<GetLeave>> = _leaves
+
+
+    private val _employeecreditbalance = MutableLiveData<DataState<Employeecreditbalancemodel>>()
+    val employeecreditbalance: LiveData<DataState<Employeecreditbalancemodel>> = _employeecreditbalance
 
     private val _statusMessage = MutableLiveData<Event<String>>()
     val statusMessage: LiveData<Event<String>> = _statusMessage
@@ -52,6 +57,16 @@ class ProfileViewModel @Inject constructor(private val profileRepository: Profil
                 .onEach { dataState ->
                     dataState.let {
                         _leaves.value = it
+                    }
+                }.launchIn(viewModelScope)
+        }
+    }
+    fun employeecreditbalance() {
+        viewModelScope.launch {
+            profileRepository.getEmployeecreditbalance()
+                .onEach { dataState ->
+                    dataState.let {
+                        _employeecreditbalance.value = it
                     }
                 }.launchIn(viewModelScope)
         }

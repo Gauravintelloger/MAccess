@@ -50,9 +50,13 @@ class LeaveRequestFragment: Fragment(), LeaveClickListener {
         savedInstanceState: Bundle?
     ): View {
         viewBinding = FragmentLeaveRequestBinding.inflate(inflater, container, false)
-        initialiseRecyclerAdapter()
-        loadAllLeaveRequestsFromRemote()
-        setUpObservers()
+
+        if(SessionManager.requestmoduleaccess.toString()=="1")
+        {
+            initialiseRecyclerAdapter()
+            loadAllLeaveRequestsFromRemote()
+            setUpObservers()
+        }
         return viewBinding.root
     }
 
@@ -285,7 +289,6 @@ class LeaveRequestFragment: Fragment(), LeaveClickListener {
 
                                     }
                                 }
-
                                 override fun onNothingSelected(p0: AdapterView<*>?) {
                                 }
                             }
@@ -523,6 +526,5 @@ class LeaveRequestFragment: Fragment(), LeaveClickListener {
         }
 
     }
-
 
 }

@@ -25,6 +25,27 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.timecreaditrequest.Timecreditapply"
+            android:exported="false" />
+        <activity
+            android:name=".ui.timecreaditrequest.timecreditlistdetail.Timecreditlistdetail"
+            android:exported="false" />
+        <activity
+            android:name=".ui.timecreaditrequest.Timecreditlist"
+            android:exported="false" />
+        <activity
+            android:name=".ui.payslip.Payslipwebview"
+            android:exported="false" />
+        <activity
+            android:name=".ui.payslip.PayslipActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.interviewround.DetailInterviewlist"
+            android:exported="false" />
+        <activity
+            android:name=".ui.manager.Managerjobdetails"
+            android:exported="false" />
+        <activity
             android:name=".ui.interviewround.Interviewroundlist"
             android:exported="false" />
         <activity

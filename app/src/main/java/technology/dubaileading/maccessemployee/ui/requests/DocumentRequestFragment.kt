@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -57,9 +58,15 @@ class DocumentRequestFragment: Fragment(), DocumentClickListener {
         savedInstanceState: Bundle?
     ): View {
         viewBinding = FragmentDocumentRequestBinding.inflate(inflater, container, false)
-        initialiseRecyclerAdapter()
-        loadAllDocumentRequestsFromRemote()
-        setUpObservers()
+//        initialiseRecyclerAdapter()
+//        loadAllDocumentRequestsFromRemote()
+//        setUpObservers()
+        if(SessionManager.requestmoduleaccess.toString()=="1")
+        {
+            initialiseRecyclerAdapter()
+            loadAllDocumentRequestsFromRemote()
+            setUpObservers()
+        }
         return viewBinding.root
     }
 
@@ -208,7 +215,7 @@ class DocumentRequestFragment: Fragment(), DocumentClickListener {
         }
 
         attachCardView.setOnClickListener {
-            checkPermissionAndOpenPicker()
+           // checkPermissionAndOpenPicker()
         }
 
         remove.setOnClickListener {
@@ -246,6 +253,7 @@ class DocumentRequestFragment: Fragment(), DocumentClickListener {
         } else {
             openAttachments()
         }
+        openAttachments()
     }
 
     private fun checkPermission() {
@@ -259,6 +267,8 @@ class DocumentRequestFragment: Fragment(), DocumentClickListener {
             openAttachments()
         }
     }
+
+
 
     private fun showPermissionNeededAlert() {
         val builder = AlertDialog.Builder(requireContext())
@@ -576,7 +586,21 @@ class DocumentRequestFragment: Fragment(), DocumentClickListener {
 
     override fun downloadDoc(otherRequestsItem: OtherRequestsItem) {
         this.otherRequestsItem = otherRequestsItem
-        checkPermissionAndAllowFileWrite()
+        //checkPermissionAndAllowFileWrite()
+           downloadFile()
+        checkPermission(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            101)
+    }
+    private fun checkPermission(permission: String, requestCode: Int) {
+        if (ContextCompat.checkSelfPermission(requireActivity(), permission) == PackageManager.PERMISSION_DENIED) {
+
+            // Requesting the permission
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(permission), requestCode)
+        } else {
+           // Toast.makeText(requireActivity(), "Permission already granted", Toast.LENGTH_SHORT).show()
+            downloadFile()
+        }
     }
 
     private fun downloadFile() {

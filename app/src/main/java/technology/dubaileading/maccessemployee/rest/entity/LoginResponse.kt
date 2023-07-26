@@ -34,6 +34,13 @@ data class UserDetails(
 	@field:SerializedName("is_manager")
 	val manager: Int? = null,
 
+
+	@field:SerializedName("is_post_view")
+	val ispostview: Int? = null,
+
+	@field:SerializedName("profile_id")
+	val profileid: Int? = null,
+
 	@field:SerializedName("organisation_logo")
 	val organisationLogo: String? = null,
 
@@ -45,5 +52,17 @@ data class UserDetails(
 
 	@field:SerializedName("encrypt_org_id")
 	val encryptorgid: String? = null,
+
+	@field:SerializedName("organisation_id")
+	val organisationid: Int? = null,
+
+
+	@field:SerializedName("mobile_attendance_allowed")
+	val mobileattendanceallowed: String? = null,
+
+
+
+
+
 
 )

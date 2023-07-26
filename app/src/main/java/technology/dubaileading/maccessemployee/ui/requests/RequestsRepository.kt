@@ -23,8 +23,10 @@ import technology.dubaileading.maccessemployee.rest.entity.designationlist.Desig
 import technology.dubaileading.maccessemployee.rest.entity.interviewroundlistmodel.Interviewroundlistmodel
 import technology.dubaileading.maccessemployee.rest.entity.jobcompanymodel.Jobcomapanymodel
 import technology.dubaileading.maccessemployee.rest.entity.jobpostlistresponse.DataXX
+import technology.dubaileading.maccessemployee.rest.entity.jobpostlistresponse.Jobpostlistresponse
 import technology.dubaileading.maccessemployee.rest.entity.managerjobpostrequestlist.Data
 import technology.dubaileading.maccessemployee.rest.entity.managerjobpostrequestlist.DataX
+import technology.dubaileading.maccessemployee.rest.entity.projectlistmodel.Projectlistmodel
 import technology.dubaileading.maccessemployee.ui.interviewround.InterviewJobPostAppPagingSource
 import technology.dubaileading.maccessemployee.ui.jobpost.JobPostAppPagingSource
 import technology.dubaileading.maccessemployee.ui.manager.ManagerJobPostAppPagingSource
@@ -426,7 +428,7 @@ class RequestsRepository @Inject constructor(
 
 
 
-    fun joblist(orgid:String, departmentid:String, designationid:String,categoryid:String,status:String): Flow<PagingData<DataXX>> {
+    fun joblist(orgid:String, departmentid:Int?, designationid:Int?,categoryid:Int?,status:Int?): Flow<PagingData<DataXX>> {
         return  Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 2),
             pagingSourceFactory = { JobPostAppPagingSource(retrofit, orgid,departmentid,designationid,categoryid,status) }
@@ -434,7 +436,7 @@ class RequestsRepository @Inject constructor(
     }
 
 
-    fun managerjoblist(departmentid:String, designationid:String,categoryid:String,status:String): Flow<PagingData<DataX>> {
+    fun managerjoblist(departmentid:Int?, designationid:Int?,categoryid:Int?,status:Int?): Flow<PagingData<DataX>> {
         return  Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 2),
             pagingSourceFactory = { ManagerJobPostAppPagingSource(retrofit, departmentid,designationid,categoryid,status) }
@@ -442,14 +444,6 @@ class RequestsRepository @Inject constructor(
     }
 
 
-
-//    fun interviewlist(jobapplicationid:String, interviewstatus:String,interviewdate:String,interviewtype:String):
-//            Flow<PagingData<DataX>> {
-//        return  Pager(
-//            config = PagingConfig(pageSize = 10, prefetchDistance = 2),
-//            pagingSourceFactory = { InterviewJobPostAppPagingSource(retrofit, jobapplicationid,interviewstatus,interviewdate,interviewtype ) }
-//        ).flow
-//    }
 
     fun interviewlist(jobapplicationid:Int?, interviewstatus:Int?,interviewdate:String?,interviewtype:Int?):
             Flow<PagingData<technology.dubaileading.maccessemployee.rest.entity.interviewroundlistmodel.DataX>>
@@ -561,11 +555,39 @@ class RequestsRepository @Inject constructor(
         }
     }
 
-    suspend fun interviewlistmodelnew(jobapplicationid:Int?, interviewstatus:Int?,interviewdate:String?,interviewtype:Int?): Flow<DataState<Interviewroundlistmodel>> = flow {
+
+
+    suspend fun joblistmodelnew(orgid:String, departmentid:Int, designationid:Int,categoryid:Int,status:Int): Flow<DataState<Jobpostlistresponse>> = flow {
         emit(DataState.Loading)
         try {
             if (networkHelper.isNetworkConnected()) {
-                val response = retrofit.interviewroundlist(jobapplicationid=jobapplicationid, interviewstatus = interviewstatus, interviewdate = interviewdate, interviewtype = interviewtype, page = 1, itemperpage = 10)
+                val response = retrofit.jobpostlist(perpage = orgid,departmentid = departmentid, designationid =  designationid, jobcategory =  categoryid, status = status,page = 1,items_per_page=10)
+                if (response.isSuccessful) {
+                    val userResponse = response.body()
+                    emit(DataState.Success(userResponse!!))
+                } else {
+                    if (response.code() == Constants.API_RESPONSE_CODE.TOKEN_EXPIRED){
+                        emit(DataState.TokenExpired)
+                    }else{
+                        emit(DataState.Error(response.message()))
+                    }
+                }
+            } else {
+                emit(DataState.Error("No Internet Connection"))
+            }
+        } catch (e: Exception) {
+            Log.d("Retrofit error", e.toString())
+//            emit(DataState.Error(ErrorHandler.onError(e)))
+        }
+    }
+
+
+
+    suspend fun projectlist(): Flow<DataState<Projectlistmodel>> = flow {
+        emit(DataState.Loading)
+        try {
+            if (networkHelper.isNetworkConnected()) {
+                val response = retrofit.projectlist()
                 if (response.isSuccessful) {
                     val userResponse = response.body()
                     emit(DataState.Success(userResponse!!))

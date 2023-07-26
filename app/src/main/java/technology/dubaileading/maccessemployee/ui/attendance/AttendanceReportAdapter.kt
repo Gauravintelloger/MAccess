@@ -2,6 +2,7 @@ package technology.dubaileading.maccessemployee.ui.attendance
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,22 @@ class AttendanceReportAdapter( private val context: Context, var dataList: List<
             holder.remark.text = bean.remarks.toString()
         }
         holder.comp.text = bean?.sources.toString()
+
+//        Log.e("jobtittle",bean!!.leaveData!!.title.toString())
+        try {
+            holder.title.text=bean!!.leaveData!!.title.toString()
+            if (bean!!.leaveData!!.title.isNullOrEmpty())
+            {
+                holder.title.visibility=View.GONE
+            }
+            else{
+                holder.title.visibility=View.VISIBLE
+            }
+        }
+        catch (ex:Exception)
+        {
+            ex.printStackTrace()
+        }
 
         if (bean?.mode!! == "in"){
             holder.status_img.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_break_in))
@@ -61,5 +78,6 @@ class AttendanceReportAdapter( private val context: Context, var dataList: List<
         var status_img = itemView.findViewById<View>(R.id.status_img) as ImageView
         var remark = itemView.findViewById<View>(R.id.remark) as TextView
         var comp = itemView.findViewById<View>(R.id.comp) as TextView
+        var title = itemView.findViewById<View>(R.id.projecttitle) as TextView
     }
 }

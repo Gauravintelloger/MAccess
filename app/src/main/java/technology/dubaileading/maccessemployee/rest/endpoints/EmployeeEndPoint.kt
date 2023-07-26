@@ -6,23 +6,34 @@ import retrofit2.Response
 import retrofit2.http.*
 import technology.dubaileading.maccessemployee.rest.entity.*
 import technology.dubaileading.maccessemployee.rest.entity.addnewjobresponse.AddNewjobresponseModel
+import technology.dubaileading.maccessemployee.rest.entity.applycreditrequest.Applycreditresponsemodel
+import technology.dubaileading.maccessemployee.rest.entity.applycreditrequest.Newcreditrequestmodel
 import technology.dubaileading.maccessemployee.rest.entity.branchlistmodel.Branchlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.checkMattendancePermission.checkMattendancePermissionModel
 import technology.dubaileading.maccessemployee.rest.entity.countrylistmodel.CountrylistModel
+import technology.dubaileading.maccessemployee.rest.entity.creditlistdetail.CreditlistdetailModel
 import technology.dubaileading.maccessemployee.rest.entity.currencylistmodel.Currencylistmodel
+import technology.dubaileading.maccessemployee.rest.entity.deletecreditrequest.Deletecreditrequest
 import technology.dubaileading.maccessemployee.rest.entity.departmentlistmodel.Depalrtmentlistresponse
 import technology.dubaileading.maccessemployee.rest.entity.designationlist.Designationlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.employeecreditbalance.Employeecreditbalancemodel
+import technology.dubaileading.maccessemployee.rest.entity.interviewchangestatusmodel.Interviewchangestatusmodel
+import technology.dubaileading.maccessemployee.rest.entity.interviewchangestatusmodel.Interviewchangestatusrequest
+import technology.dubaileading.maccessemployee.rest.entity.interviewjobdetailmodel.Interviewjobdetailmodel
 import technology.dubaileading.maccessemployee.rest.entity.interviewroundlistmodel.Interviewroundlistmodel
 import technology.dubaileading.maccessemployee.rest.entity.jobapplicationrequest.JobApplicationRequest
 import technology.dubaileading.maccessemployee.rest.entity.jobapplicationresponse.Jobapplicationresponse
 import technology.dubaileading.maccessemployee.rest.entity.jobcompanymodel.Jobcomapanymodel
 import technology.dubaileading.maccessemployee.rest.entity.jobpostlistresponse.Jobpostlistresponse
 import technology.dubaileading.maccessemployee.rest.entity.jobquestions.Jobquestionmodel
+import technology.dubaileading.maccessemployee.rest.entity.managerjobdetailmodel.Mangerjobdetailmanagermodel
 import technology.dubaileading.maccessemployee.rest.entity.managerjobpostrequestlist.ManagerjobpostrequestlistModel
 import technology.dubaileading.maccessemployee.rest.entity.newjobpostrequestmodel.Newjobpostrequestmodel
+import technology.dubaileading.maccessemployee.rest.entity.paysliplistmodel.Paysliplistmodel
 import technology.dubaileading.maccessemployee.rest.entity.prerequiistquestionmodel.Prerequistquestionmodel
+import technology.dubaileading.maccessemployee.rest.entity.projectlistmodel.Projectlistmodel
 import technology.dubaileading.maccessemployee.rest.entity.resumeuploadmodel.ResumeuploadModel
-import technology.dubaileading.maccessemployee.ui.applyjobform.UploaddocViewModel
-import technology.dubaileading.maccessemployee.ui.manager.Addnewjob.AddNewJobPost
+import technology.dubaileading.maccessemployee.rest.entity.timecreditrequestlist.TimecreaditrequestlistModel
 
 
 interface EmployeeEndpoint {
@@ -55,6 +66,9 @@ interface EmployeeEndpoint {
 
     @GET("employee/employeeProfileView")
     suspend fun getProfile(): Response<Profile?>
+
+    @GET("employeeCreditBalance")
+    suspend fun getEmployeecreditbalance(): Response<Employeecreditbalancemodel>
 
     @POST("employee/EmployeeUpdateProfile")
     suspend fun updateProfile(@Body updateProfile: UpdateProfile?): Response<Profile?>
@@ -179,11 +193,21 @@ interface EmployeeEndpoint {
 
     @GET("employee/unreadnotificationListCount")
     suspend fun notificationCount(): Response<NotificationCount?>
+
+
+    @POST("employee/checkMattendancePermission")
+    suspend fun checkMattendancePermission(): Response<checkMattendancePermissionModel?>
 ///
     @GET("admin/getJobPreRequiQuestions/{id}")
     suspend fun jobpostquestion(
         @Path("id") id: String,
     ): Response<Jobquestionmodel?>
+
+
+    @GET("manager/detailsJobPostRequest/{id}")
+    suspend fun managerjobpostdetail(
+        @Path("id") id: String,
+    ): Response<Mangerjobdetailmanagermodel?>
 
 
     @Multipart
@@ -210,10 +234,11 @@ interface EmployeeEndpoint {
     suspend fun jobpostlist(
         @Part("organisation_id") perpage: String?,
         @Part("page") page: Int?,
-        @Part("department_id") departmentid: String?,
-        @Part("designation_id") designationid: String?,
-        @Part("job_category") jobcategory: String?,
-        @Part("status") status: String?,
+        @Part("department_id") departmentid: Int?,
+        @Part("designation_id") designationid: Int?,
+        @Part("job_category") jobcategory: Int?,
+        @Part("status") status: Int?,
+        @Part("items_per_page") items_per_page: Int?,
 
         ): Response<Jobpostlistresponse?>
 
@@ -234,10 +259,10 @@ interface EmployeeEndpoint {
     suspend fun managerjobpostlist(
         @Part("page") page: Int?,
         @Part("items_per_page") itemperpage: Int?,
-        @Part("department_id") departmentid: String?,
-        @Part("designation_id") designationid: String?,
-        @Part("job_category") jobcategory: String?,
-        @Part("job_request_status") status: String?,
+        @Part("department_id") departmentid: Int?,
+        @Part("designation_id") designationid: Int?,
+        @Part("job_category") jobcategory: Int?,
+        @Part("job_request_status") status: Int?,
 
         ): Response<ManagerjobpostrequestlistModel?>
 
@@ -269,4 +294,38 @@ interface EmployeeEndpoint {
 
         ): Response<Interviewroundlistmodel?>
 
+
+    @GET("admin/viewInterviewRound/{id}")
+    suspend fun interviewjobpostdetail(
+        @Path("id") id: String,
+    ): Response<Interviewjobdetailmodel?>
+
+    @POST("manager/changeApplicantStatus")
+    suspend fun changeapplicationstatus(@Body interviewchangestatusrequest: Interviewchangestatusrequest): Response<Interviewchangestatusmodel?>
+
+
+
+    @POST("employee/payrollsList")
+    suspend fun paysliplist(@Body reportRequest: ReportRequest?): Response<Paysliplistmodel?>
+
+    @POST("employee/projectLists")
+    suspend fun projectlist(
+
+    ): Response<Projectlistmodel?>
+
+    @POST("listTimeCreditRequestsEmployee")
+    suspend fun listtimecredit(): Response<TimecreaditrequestlistModel?>
+
+    @POST("deleteTimeCreditRequest/{id}")
+    suspend fun deleteTimeCreditRequest(
+        @Path("id") id: String,
+    ): Response<Deletecreditrequest?>
+    @GET("viewTimeCreditRequest/{id}")
+    suspend fun viewTimeCreditRequest(
+        @Path("id") id: String,
+    ): Response<CreditlistdetailModel?>
+
+
+    @POST("requestTimeCredit")
+    suspend fun applycreditrequest(@Body newcreditrequestmodel: Newcreditrequestmodel?): Response<Applycreditresponsemodel?>
 }

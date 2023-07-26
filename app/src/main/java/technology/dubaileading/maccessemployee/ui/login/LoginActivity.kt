@@ -38,8 +38,9 @@ class LoginActivity : AppCompatActivity() {
             val loginRequest = LoginRequest(
                 device_token = getUniqueID(this@LoginActivity),
                 password = Utils.md5(viewBinding.passwordTextInputEditText.text.toString().trim()),
-                username = viewBinding.userNameTextInputEditText.text.toString()
-            )
+                username = viewBinding.userNameTextInputEditText.text.toString(),
+                organisation_name = "DLT"
+                )
 
             viewModel.userLogin(loginRequest)
             viewModel.userDetails.observe(this, loginObserver)
@@ -135,13 +136,18 @@ class LoginActivity : AppCompatActivity() {
             SessionManager.token = response.token
             SessionManager.encryptedorgid=response.data?.encryptorgid
             SessionManager.managertype=response.data?.manager!!
-            Log.e("encryptedtoken", response.data?.encryptorgid.toString())
+            SessionManager.profileid=response.data.profileid!!
+            SessionManager.attendenceaccess=response.data.mobileattendanceallowed!!
 
+            SessionManager.postupdate=response.data.ispostview.toString()
+            SessionManager.username=response.data.organisationid.toString()
+            Log.e("encryptedtoken", response.data?.mobileattendanceallowed.toString())
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     CustomDialog(this).showInformationDialog("Unable to get FCM token")
                 }else{
+                    Log.e("firebasetoken",task.result)
                     viewModel.saveFcmToken(TokenRequest(task.result, "android"))
                     viewModel.saveToken.observe(this, saveFcmTokenObserver)
                 }

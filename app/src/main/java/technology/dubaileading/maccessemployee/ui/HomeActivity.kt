@@ -21,7 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.ActivityHomeBinding
+import technology.dubaileading.maccessemployee.rest.entity.LoginResponse
 import technology.dubaileading.maccessemployee.rest.entity.NotificationCount
+import technology.dubaileading.maccessemployee.rest.entity.checkMattendancePermission.checkMattendancePermissionModel
 import technology.dubaileading.maccessemployee.ui.login.LoginActivity
 import technology.dubaileading.maccessemployee.utility.*
 
@@ -37,6 +39,7 @@ class HomeActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             loadNotificationCountFromRemote()
         }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,10 +59,34 @@ class HomeActivity : AppCompatActivity() {
         setCountColor()
         setUpListeners()
         loadNotificationCountFromRemote()
-
+        viewModel.checkMattendancePermission()
+        viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
 
     }
 
+
+    private var loginObserver: Observer<DataState<checkMattendancePermissionModel>> =
+        androidx.lifecycle.Observer<DataState<checkMattendancePermissionModel>> {
+            when (it) {
+                is DataState.Loading -> {
+                    //showProgress()
+                }
+                is DataState.Success -> {
+                   // dismissProgress()
+                    SessionManager.attendenceaccess=it.item.data.mobileAttendanceAllowed.toString()
+                    SessionManager.requestmoduleaccess=it.item.data.requestmoduleaccess.toString()
+                    SessionManager.postupdate=it.item.data.isPostView.toString()
+
+                }
+                is DataState.Error -> {
+                   // dismissProgress()
+                    showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+
+                }
+            }
+        }
     private fun setUpListeners() {
         viewBinding.bottomNavigationViewInclude.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
@@ -69,6 +96,8 @@ class HomeActivity : AppCompatActivity() {
                         null,
                         getNavBuilder().build()
                     )
+                    viewModel.checkMattendancePermission()
+                    viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
                 }
                 R.id.requests -> {
                     findNavController(R.id.fragmentContainerView).navigate(
@@ -76,6 +105,8 @@ class HomeActivity : AppCompatActivity() {
                         null,
                         getNavBuilder().build()
                     )
+                    viewModel.checkMattendancePermission()
+                    viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
                 }
                 R.id.home -> {
                     findNavController(R.id.fragmentContainerView).navigate(
@@ -83,6 +114,8 @@ class HomeActivity : AppCompatActivity() {
                         null,
                         getNavBuilder().build()
                     )
+                    viewModel.checkMattendancePermission()
+                    viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
                 }
                 R.id.notifications -> {
                     findNavController(R.id.fragmentContainerView).navigate(
@@ -90,6 +123,8 @@ class HomeActivity : AppCompatActivity() {
                         null,
                         getNavBuilder().build()
                     )
+                    viewModel.checkMattendancePermission()
+                    viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
                 }
                 R.id.profile -> {
                     findNavController(R.id.fragmentContainerView).navigate(
@@ -97,6 +132,8 @@ class HomeActivity : AppCompatActivity() {
                         null,
                         getNavBuilder().build()
                     )
+                    viewModel.checkMattendancePermission()
+                    viewModel.checkMattendancePermissionresponse.observe(this, loginObserver)
 
                 }
             }

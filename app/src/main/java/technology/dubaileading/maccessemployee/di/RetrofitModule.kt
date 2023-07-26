@@ -1,5 +1,6 @@
 package technology.dubaileading.maccessemployee.di
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -47,6 +48,7 @@ object RetrofitModule {
 
         okHttpBuilder.addInterceptor { chain ->
             val original = chain.request()
+            Log.e("response",original.toString())
 
             val httpUrl = original.url
             val url = httpUrl

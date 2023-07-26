@@ -54,4 +54,6 @@
     ////
     <string name="job_list">Job Post List</string>
     <string name="job_post_request">Job Post Request</string>
+    <string name="pay_slip">Pay Slip</string>
+    <string name="creditrequest">Credit Request</string>
 </resources>

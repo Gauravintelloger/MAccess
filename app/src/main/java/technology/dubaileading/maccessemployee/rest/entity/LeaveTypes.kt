@@ -22,7 +22,7 @@ data class  LeaveTypeData(
 	@field:SerializedName("balance_leaves")
 	val balanceLeaves: Int? = null,
 
-	@field:SerializedName("no_of_leaves")
+	@field:SerializedName("opening_leave_balance")
 	val noOfLeaves: Int? = null,
 
 	@field:SerializedName("id")
@@ -32,5 +32,13 @@ data class  LeaveTypeData(
 	val title: String? = null,
 
 	@field:SerializedName("short_code")
-	val shortCode: String? = null
+	val shortCode: String? = null,
+
+	@field:SerializedName("leave_cycle_from")
+	val leave_cycle_from: String? = null,
+
+	@field:SerializedName("leave_cycle_to")
+	val leave_cycle_to: String? = null,
+
+
 )

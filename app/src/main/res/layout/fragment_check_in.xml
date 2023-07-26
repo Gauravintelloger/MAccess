@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#E3E3E3">
 
     <FrameLayout
@@ -86,16 +87,78 @@
 
         <LinearLayout
             android:id="@+id/shiftBt"
-            android:layout_width="wrap_content"
-            android:layout_height="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/shift_gradient"
-            android:orientation="horizontal"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:orientation="vertical"
             android:visibility="gone">
+            <TextView
+                style="@style/InputTitleTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginRight="@dimen/_15sdp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:text="Select Project"
+                tools:ignore="HardcodedText" />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/_20sdp"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginRight="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:padding="@dimen/_5sdp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+
+
+                    android:orientation="vertical">
+                    <technology.dubaileading.maccessemployee.utility.DynamicWidthSpinner
+                        android:id="@+id/designationspinner"
+                        style="@style/SpinnerThemeNormalDropdownArrow"
+                        android:layout_width="match_parent"
+
+                        android:layout_height="match_parent"
+                        android:spinnerMode="dropdown" />
+
+                    <TextView
+                        android:visibility="gone"
+                        android:id="@+id/designationerror"
+                        style="@style/InputTitleTheme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="This field is required"
+                        android:textColor="@color/text_color_red"
+                        tools:ignore="HardcodedText" />
+
+
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="80dp"
+               android:layout_gravity="center_horizontal"
+               android:background="@drawable/shift_gradient"
+               android:orientation="horizontal"
+
+               android:visibility="visible">
+
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/gif"
@@ -116,6 +179,7 @@
                 android:layout_height="80dp"
                 android:padding="26dp"
                 android:src="@drawable/arrow_white" />
+           </LinearLayout>
         </LinearLayout>
 
         <TextView

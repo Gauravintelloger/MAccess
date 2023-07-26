@@ -67,6 +67,9 @@ class SplashGifActivity : AppCompatActivity() {
         }
     }
 
+
+
+
     private fun startUpdateFlow(appUpdateInfo: AppUpdateInfo) {
         try {
             val starter =

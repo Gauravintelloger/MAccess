@@ -33,7 +33,7 @@ class LoginRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Log.d("Retrofit error", e.toString())
-            emit(DataState.Error(ErrorHandler.onError(e)))
+//            emit(DataState.Error(ErrorHandler.onError(e)))
         }
     }
 

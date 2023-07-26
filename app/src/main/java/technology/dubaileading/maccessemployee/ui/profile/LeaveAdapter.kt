@@ -1,6 +1,7 @@
 package technology.dubaileading.maccessemployee.ui.profile
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ class LeaveAdapter(var context: Context) : RecyclerView.Adapter<LeaveAdapter.Lea
 
     override fun onBindViewHolder(holder: LeaveViewHolder, position: Int) {
         holder.leaveLeft_Heading.text = dataList[position].leaveCode+" Left"
+        Log.e("remaninigleaves",dataList[position].remainingLeaves.toString())
         holder.leaveLeft.text = dataList[position].remainingLeaves.toString()
         holder.leaveTotal.text = "/"+dataList[position].totalLeaves.toString()
 

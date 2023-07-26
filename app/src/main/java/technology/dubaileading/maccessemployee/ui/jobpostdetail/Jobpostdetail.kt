@@ -46,7 +46,7 @@ class Jobpostdetail : AppCompatActivity() {
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_jobpostdetail)
 
         viewBinding.materialToolbar.setNavigationOnClickListener {
-            startActivity(Intent(this@Jobpostdetail, HomeActivity::class.java))
+            startActivity(Intent(this@Jobpostdetail, Jobpost::class.java))
             finish()
         }
 
@@ -73,7 +73,10 @@ class Jobpostdetail : AppCompatActivity() {
 //            openURL.data = Uri.parse("https://staging.dubaileading.technology/maccess-saas/admin/admin/#!/open-job-post-view/"+BaseApplication.QuestionObj.detailid.toString())
 //            startActivity(openURL)
 
-            var t1:String="https://staging.dubaileading.technology/maccess-saas/admin/admin/#!/open-job-post-view/"+BaseApplication.QuestionObj.detailid.toString()
+
+            //val t1:String="https://dubaileading.technology/demo/maccess-saas/admin/admin/#!/open-job-post-view/"+BaseApplication.QuestionObj.detailid.toString()
+           // val t1:String="https://staging.dubaileading.technology/maccess-saas/admin/admin/#!/open-job-post-view/"+BaseApplication.QuestionObj.detailid.toString()
+            val t1:String="https://maccessweb.dubaileading.technology/admin/#!/open-job-post-view/"+BaseApplication.QuestionObj.detailid.toString()
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
             shareIntent.type="text/plain"

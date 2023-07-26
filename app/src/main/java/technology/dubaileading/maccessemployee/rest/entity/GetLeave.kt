@@ -34,10 +34,10 @@ data class LeaveData(
 
 data class LeaveDataItem(
 
-	@field:SerializedName("remaining_leaves")
+	@field:SerializedName("balance_leaves")
 	val remainingLeaves: Int? = null,
 
-	@field:SerializedName("total_leaves")
+	@field:SerializedName("opening_leave_balance")
 	val totalLeaves: Int? = null,
 
 	@field:SerializedName("leave_code")

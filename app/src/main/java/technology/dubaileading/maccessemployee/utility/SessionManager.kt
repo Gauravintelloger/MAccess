@@ -24,6 +24,14 @@ object SessionManager {
     private val USER_ID="USER_ID"
     private val DATE="date"
     private val HOURS="timing"
+    private val profileids="profileid"
+    private val PROJECTID="PROJECTID"
+    private val PROJECTNAME="PROJECTNAME"
+    private val ATTENDENCEACCESS="ATTENDENCEACCESS"
+    private val POSTUPDATES="POSTUPDATES"
+    private val USERNAME="USERNAME"
+    private val REQUESTMODULEACCESS="REQUESTMODULEACCESS"
+
 
     fun init(cntx: Context) {
         prefs = cntx.getSharedPreferences(
@@ -41,6 +49,11 @@ object SessionManager {
         operation(editor)
         editor.apply()
     }
+
+
+    var requestmoduleaccess:String?
+        get()= prefs.getString(REQUESTMODULEACCESS,null)
+        set(value)= prefs.edit().putString(REQUESTMODULEACCESS,value).apply()
 
     var isLoggedIn:Boolean?
     get()= prefs.getBoolean(IS_USER_LOGGED_IN,false)
@@ -64,6 +77,11 @@ object SessionManager {
         set(value)= prefs.edit().putInt(managerid,value).apply()
 
 
+    var profileid:Int
+        get()= prefs.getInt(profileids,2)
+        set(value)= prefs.edit().putInt(profileids,value).apply()
+
+
     var userId:String?
         get()= prefs.getString(USER_ID,null)
         set(value)= prefs.edit().putString(USER_ID,value).apply()
@@ -73,6 +91,9 @@ object SessionManager {
         get()= prefs.getString(OFFICE_LOCATION_DETAIL,null)
         set(value)= prefs.edit().putString(OFFICE_LOCATION_DETAIL,value).apply()
 
+    var attendenceaccess:String?
+        get()= prefs.getString(ATTENDENCEACCESS,null)
+        set(value)= prefs.edit().putString(ATTENDENCEACCESS,value).apply()
 
     var profileImage:String?
         get()= prefs.getString(PROFILE_IMAGE,null)
@@ -81,6 +102,16 @@ object SessionManager {
     var timing:String?
         get()= prefs.getString(DATE, null)
         set(value)= prefs.edit().putString(DATE,value).apply()
+
+
+    var postupdate:String?
+        get()= prefs.getString(POSTUPDATES, null)
+        set(value)= prefs.edit().putString(POSTUPDATES,value).apply()
+
+
+    var username:String?
+        get()= prefs.getString(USERNAME, null)
+        set(value)= prefs.edit().putString(USERNAME,value).apply()
 
     var hours:String?
 //        get() {
@@ -92,6 +123,18 @@ object SessionManager {
 //        }
         get()= prefs.getString(HOURS, null)
         set(value)= prefs.edit().putString(HOURS,value).apply()
+
+    var projectid:String?
+
+        get()= prefs.getString(PROJECTID, null)
+        set(value)= prefs.edit().putString(PROJECTID,value).apply()
+
+    var projectname:String?
+
+        get()= prefs.getString(PROJECTNAME, null)
+        set(value)= prefs.edit().putString(PROJECTNAME,value).apply()
+
+
 
     var isTimerRunning:Boolean?
         get()= prefs.getBoolean(IS_TIMER_RUNNING,false)

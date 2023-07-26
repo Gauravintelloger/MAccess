@@ -31,6 +31,7 @@ class CheckboxAdaptor(var context: Context, var dataList: List<String>,var quest
         return NotificationViewHolder(view)
     }
     private var setOnCheckedClickListener: ((String, View) -> Unit)? = null
+    @SuppressLint("SuspiciousIndentation")
     override fun onBindViewHolder(holder: CheckboxAdaptor.NotificationViewHolder, @SuppressLint("RecyclerView") position: Int) {
 
         val bean: String = dataList.get(position)
@@ -51,7 +52,20 @@ class CheckboxAdaptor(var context: Context, var dataList: List<String>,var quest
 
               selectedPosition=position
 
+              for(i in 0..BaseApplication.QuestionObj.postcodeList.size)
+              {
+                  try {
+                      if (BaseApplication.QuestionObj.postcodeList[i].question==question)
+                      {
+                          BaseApplication.QuestionObj.postcodeList.removeAt(i)
+                      }
+                  }
+                  catch (ex:Exception)
+                  {
+                      ex.printStackTrace()
+                  }
 
+              }
 
 
                   try {

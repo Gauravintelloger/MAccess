@@ -20,14 +20,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationCallback
@@ -43,6 +47,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
 import pl.droidsonroids.gif.GifDrawable
 import technology.dubaileading.maccessemployee.R
+import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.config.Constants.API_RESPONSE_CODE.*
 import technology.dubaileading.maccessemployee.databinding.FragmentCheckInBinding
 import technology.dubaileading.maccessemployee.locationUtils.GpsSettingsCheckCallback
@@ -51,7 +56,11 @@ import technology.dubaileading.maccessemployee.locationUtils.LocationUtils
 import technology.dubaileading.maccessemployee.receivers.GpsStatusReceiver
 import technology.dubaileading.maccessemployee.rest.entity.CheckInRequest
 import technology.dubaileading.maccessemployee.rest.entity.CheckInResponse
+import technology.dubaileading.maccessemployee.rest.entity.designationlist.Designationlistmodel
+import technology.dubaileading.maccessemployee.rest.entity.projectlistmodel.Projectlistmodel
 import technology.dubaileading.maccessemployee.ui.HomeActivity
+import technology.dubaileading.maccessemployee.ui.applyjobform.filterjoblist.DesigbationlistAdaptor
+import technology.dubaileading.maccessemployee.ui.jobpost.Jobpostlistviewmodel
 import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.CustomDialog
 import technology.dubaileading.maccessemployee.utils.Utils
@@ -79,9 +88,11 @@ class CheckInFragment :
     private var isLocationRefreshedOnPunch: Boolean = false
     private var longitude: Double = 0.0
     private var addressLine: String? = ""
+    private  var designationid:Int=0
     private lateinit var viewBinding: FragmentCheckInBinding
     private lateinit var gpsStatusReceiver: GpsStatusReceiver
     private var isPunchInOutDetailAvailable: Boolean = false
+    private val jobpostlistviewmodel: Jobpostlistviewmodel by viewModels()
 
     private var resultLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (isRuntimePermissionGranted()) {
@@ -150,7 +161,7 @@ class CheckInFragment :
         gpsStatusReceiver = GpsStatusReceiver(this)
         setListenerOnViews()
         checkPunchInOutStatus()
-
+        loadproject()
 
         return viewBinding.root
     }
@@ -234,7 +245,9 @@ class CheckInFragment :
                         date = currentDate,
                         time = currentTime,
                         lat_long = "$latitude,$longitude",
-                        versionName
+                        settings_project_id = designationid,
+                        app_version = versionName
+
                     )
 
                     viewModel.checkIn(checkInRequest)
@@ -472,4 +485,95 @@ class CheckInFragment :
 
         }
     }
+
+    ///
+    private fun loadproject() {
+        jobpostlistviewmodel.projectlist()
+//        jobpostlistviewmodel.departmentRequestTypes.observe(this, designationlistobserver)
+
+        jobpostlistviewmodel.projectlistResponse.observe(
+            requireActivity()
+        ) {
+            when (it) {
+                is DataState.Loading -> {
+                }
+                is DataState.Success -> {
+                    Log.e("designationdata",it.item.toString())
+                    designationTypesData(it.item)
+                }
+                is DataState.Error -> {
+                    context?.showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                    CustomDialog(requireActivity()).showNonCancellableMessageDialog(message = getString(
+                        R.string.tokenExpiredDesc
+                    ),
+                        object : CustomDialog.OnClickListener {
+                            override fun okButtonClicked() {
+                                (this as? HomeActivity?)?.logoutUser()
+                            }
+                        })
+                }
+            }
+        }
+
+
+    }
+    @SuppressLint("SetTextI18n")
+    private fun designationTypesData(
+        response: Projectlistmodel,
+    ) {
+
+        if (response.status == Constants.API_RESPONSE_CODE.OK) {
+            if (response.data != null && response.data.isNotEmpty()) {
+                val spinnerAdapter = ProjectlistAdaptor(requireActivity(), response.data)
+                viewBinding.designationspinner.apply {
+                    adapter = spinnerAdapter
+                    onItemSelectedListener =
+                        object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                p0: AdapterView<*>?,
+                                p1: View?,
+                                p2: Int,
+                                p3: Long
+                            ) {
+                                //    leaveBalanceTextView.text=spinnerAdapter.result[p2-1]!!.title
+                                //   leaveTypesSpinner.textView.setText(spinnerAdapter.result[p2]!!.title)
+
+                                try {
+                                    designationid=spinnerAdapter.result[p2-1]?.id!!
+                                    Log.e("data",spinnerAdapter.result[p2-1]?.id.toString())
+                                    SessionManager.projectid=spinnerAdapter.result[p2-1]?.id.toString()
+                                    SessionManager.projectname=spinnerAdapter.result[p2-1]?.title.toString()
+                                }
+                                catch (ex:java.lang.Exception)
+                                {
+                                    ex.printStackTrace()
+                                }
+
+
+                            }
+
+                            override fun onNothingSelected(p0: AdapterView<*>?) {
+                            }
+                        }
+                }
+
+            } else {
+                val equipmentsSpinnerAdapter =
+                    DesigbationlistAdaptor(requireActivity(), Collections.emptyList())
+                viewBinding.designationspinner.apply {
+                    adapter = equipmentsSpinnerAdapter
+                }
+            }
+
+        } else {
+            CustomDialog(requireActivity()).showInformationDialog(response.message)
+        }
+
+
+    }
+
+
+    ///////
 }

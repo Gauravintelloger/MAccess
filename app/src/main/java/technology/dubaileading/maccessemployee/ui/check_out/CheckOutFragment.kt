@@ -145,6 +145,19 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
 
         gpsStatusReceiver = GpsStatusReceiver(this)
         checkPunchInOutStatus()
+        viewBinding.projectname.text=SessionManager!!.projectname.toString()
+        Log.e("projectid",SessionManager.projectid.toString())
+
+        if (SessionManager.projectname.isNullOrEmpty())
+        {
+
+            viewBinding.projectnamelayout.visibility=View.GONE
+        }
+        else
+        {
+            viewBinding.projectnamelayout.visibility=View.VISIBLE
+
+        }
 
         return viewBinding.root
     }
@@ -675,6 +688,7 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                 val checkOutRequest = CheckOutRequest(
                     date = currentDate,
                     time = currentTime,
+                    settings_project_id = SessionManager.projectid.toString(),
                     lat_lng,
                     2
                 )
@@ -797,6 +811,8 @@ class CheckOutFragment : Fragment(), GpsStatusReceiver.OnGpsStateListener,
                 is DataState.Success -> {
                     requireContext().dismissProgress()
                     validateCheckOutResponse(it.item)
+                    SessionManager.projectid=null
+                    SessionManager.projectname=""
                 }
                 is DataState.Error -> {
                     requireContext().dismissProgress()

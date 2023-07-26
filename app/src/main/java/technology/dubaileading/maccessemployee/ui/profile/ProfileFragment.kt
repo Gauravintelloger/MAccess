@@ -13,20 +13,24 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_profile.*
 import technology.dubaileading.maccessemployee.R
 import technology.dubaileading.maccessemployee.config.Constants
 import technology.dubaileading.maccessemployee.databinding.FragmentProfileBinding
 import technology.dubaileading.maccessemployee.rest.entity.GetLeave
 import technology.dubaileading.maccessemployee.rest.entity.LeaveDataItem
 import technology.dubaileading.maccessemployee.rest.entity.Profile
+import technology.dubaileading.maccessemployee.rest.entity.employeecreditbalance.Employeecreditbalancemodel
 import technology.dubaileading.maccessemployee.ui.HomeActivity
 import technology.dubaileading.maccessemployee.ui.attendance.AttendanceActivity
 import technology.dubaileading.maccessemployee.ui.change_password.ChangePasswordActivity
 import technology.dubaileading.maccessemployee.ui.interviewround.Interviewroundlist
 import technology.dubaileading.maccessemployee.ui.jobpost.Jobpost
 import technology.dubaileading.maccessemployee.ui.manager.Managerjobpostlist
+import technology.dubaileading.maccessemployee.ui.payslip.PayslipActivity
 import technology.dubaileading.maccessemployee.ui.personal_info.PersonalInfoActivity
 import technology.dubaileading.maccessemployee.ui.settings.SettingsActivity
+import technology.dubaileading.maccessemployee.ui.timecreaditrequest.Timecreditlist
 import technology.dubaileading.maccessemployee.utility.*
 import technology.dubaileading.maccessemployee.utils.CustomDialog
 
@@ -66,6 +70,39 @@ class ProfileFragment : Fragment() {
         }
 
 
+    private var employeecreditbalanceleavesObserver: Observer<DataState<Employeecreditbalancemodel>> =
+        androidx.lifecycle.Observer<DataState<Employeecreditbalancemodel>> {
+            when (it) {
+                is DataState.Loading -> {
+                    requireContext().showProgress()
+                }
+                is DataState.Success -> {
+                    requireContext().dismissProgress()
+                    try {
+                        if (it.item.data.balance.toString().isNullOrEmpty())
+                        {
+                            viewBinding.employeecreditbalance.text="0"+"/360"
+                        }
+                        else{
+                            viewBinding.employeecreditbalance.text=it.item.data.balance.toString()+"/360"
+                        }
+
+
+                    }
+                    catch (ex:Exception)
+                    {
+                        viewBinding.employeecreditbalance.text="0"+"/360"
+
+                    }
+                }
+                is DataState.Error -> {
+                    requireContext().dismissProgress()
+                    requireContext().showToast(it.error.toString())
+                }
+                is DataState.TokenExpired -> {
+                }
+            }
+        }
 
     private var leavesObserver: Observer<DataState<GetLeave>> =
         androidx.lifecycle.Observer<DataState<GetLeave>> {
@@ -115,6 +152,7 @@ class ProfileFragment : Fragment() {
     private fun validateLeaveResponse(body: GetLeave) {
         if (activity != null && isAdded) {
             if (body.status == Constants.API_RESPONSE_CODE.OK) {
+
                 viewBinding.availableLeave.text = body.data?.sumAvailableLeave.toString()
                 viewBinding.totalLeave.text = "/" + body.data?.sumTotalLeave.toString()
                 viewBinding.leaveRequested.text = body.data?.leaveRequested.toString()
@@ -146,6 +184,13 @@ class ProfileFragment : Fragment() {
             viewBinding.interviewroundlist.visibility=View.GONE
         }
 
+//        if (SessionManager.username.toString()=="24" || SessionManager.username.toString()=="19")
+//        {
+//            viewBinding.CreditRequest.visibility=View.VISIBLE
+//        }
+//        else{
+//            viewBinding.CreditRequest.visibility=View.GONE
+//        }
 
 
 
@@ -182,12 +227,14 @@ class ProfileFragment : Fragment() {
     private fun getLeavesFromRemote() {
         viewModel.leaves()
         viewModel.leaves.observe(viewLifecycleOwner, leavesObserver)
+
+//        viewModel.employeecreditbalance()
+//        viewModel.employeecreditbalance.observe(viewLifecycleOwner, employeecreditbalanceleavesObserver)
+
     }
 
     private fun setUpListeners() {
-
         //
-
         viewBinding.interviewroundlist.setOnClickListener {
             startActivity(Intent(activity, Interviewroundlist::class.java))
         }
@@ -198,9 +245,18 @@ class ProfileFragment : Fragment() {
             startActivity(Intent(activity, Managerjobpostlist::class.java))
         }
 
+        viewBinding.CreditRequest.setOnClickListener {
+            startActivity(Intent(activity, Timecreditlist::class.java))
+
+        }
+
         ////
         viewBinding.personalInfo.setOnClickListener {
             startActivity(Intent(activity, PersonalInfoActivity::class.java))
+        }
+
+        viewBinding.payslip.setOnClickListener {
+            startActivity(Intent(activity, PayslipActivity::class.java))
         }
 
         viewBinding.changePass.setOnClickListener {
